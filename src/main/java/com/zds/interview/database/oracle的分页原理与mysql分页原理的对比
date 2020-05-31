@@ -2,3 +2,4 @@ mysql 是利用关键词limit 后面传入 页数 和每页条数 （疑问mysql
 个人初步猜想 是利用mysql的编写者编写的C++ 代码的那个方法  有机会可以看看这块C++的mysql代码）
 
 对于oracle的分页实现 目前只记得 。。。。是利用统计行
+com/zds/daymotion/20200531心情
