@@ -1,0 +1,4 @@
+从java语法关键字sysnchronized 到底层的汇编指令 lock cmpcxhg compareandexchange
+
+
+cpu 执行01串指令

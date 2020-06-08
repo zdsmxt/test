@@ -1,0 +1,9 @@
+这个同步关键字锁
+锁的是对象
+
+分析联想一下对象的内存布局
+
+标记字 markword
+类指针 class pointer
+常量实例 class instance
+对齐     padding   （因为一个对象大小需要满足是8字节的整数被）
