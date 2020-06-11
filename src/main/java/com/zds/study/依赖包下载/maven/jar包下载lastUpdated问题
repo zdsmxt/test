@@ -1,0 +1,12 @@
+
+
+初学一些jar包 习惯性怀疑是否是 网速原因
+于是在maven的conf 目录里面把setting 里面的的镜像
+<mirrors> 改为阿里云的镜像 而不是从中央仓库下载 因为墙的原因
+
+这个时候还是有lastUpdated 于是 执行maven生命周期里面的clean 可以
+但是当开始执行 compile 进行编译时 于是发现 报错 路径安全问题
+于是打开项目的setting 找到maven选项里面的runner 配置maven 的运行时参数
+这个时候安全问题没有了 但是maven 依赖那一块 pom 文件飘红晓松了
+但是右侧的maven依赖里面还是飘红 于是重启idea 刷新idea关于这个项目index
+idea启动成功 maven 里面jar 下载成功
