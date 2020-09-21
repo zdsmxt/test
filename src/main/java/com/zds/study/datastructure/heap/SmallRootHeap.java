@@ -2,6 +2,7 @@ package com.zds.study.datastructure.heap;
 
 import java.util.PriorityQueue;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SmallRootHeap {
     public static void main(String[] args) {
@@ -11,6 +12,8 @@ public class SmallRootHeap {
 
         //红黑树
         TreeMap treeMap = new TreeMap();
+
+        ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
 
 
     }
