@@ -1,0 +1,20 @@
+maven 的安全检查
+
+
+
+需要在idea maven 里面的启动种加上的参数
+
+-Dmaven.wagon.http.ssl.insecure=true
+-Dmaven.wagon.http.ssl.allowall=true
+-Dmaven.wagon.http.ssl.ignore.validity.dates=true
+
+
+maven jar 包的下载失败
+
+ssl 安全的校验
+
+setting.xml 文件里面的镜像
+
+
+
+
