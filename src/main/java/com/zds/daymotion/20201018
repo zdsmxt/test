@@ -1,0 +1,92 @@
+电商提问
+
+开发工具 idea（你用哪些插件 lombok ） navicat git maven
+技术栈
+框架：spring springboot dubbo
+关系型数据库：mysql
+非关系型数据库：redis 集群哨兵
+分布式关系型数据库:（DRDS） Distribute Relational Database Service
+订单表数据：3千万行
+搜索引擎：elasticsearch
+订单那一块的逻辑：？？？？？
+分布式事务：？？
+你平时有遇到一些比较复杂的业务逻辑？？
+
+
+
+
+
+
+
+然哥：
+技术栈：
+电网
+框架：springcloud  spring springboot dubbo
+持久层框架
+io:文件流
+版本控制工具：git gitlab vss svn
+关系型数据库：mysql oracle
+非关系型数据库：redis
+分布式关系型数据库:（DRDS） Distribute Relational Database Service
+订单表数据：3千万行
+订单那一块的逻辑：
+分布式服务器：存储文件图片 oss
+分布式事务：无
+安全性：检测漏洞   863
+消息中间件：rabbitsocket:
+双端通信：websocket
+
+
+
+
+
+
+金宏：
+技术栈：
+电网
+框架：springcloud  spring sofaboot dubbo
+持久层框架
+io:文件流
+版本控制工具：git gitlab vss svn
+关系型数据库：mysql oracle
+非关系型数据库：redis
+分布式关系型数据库:（DRDS） Distribute Relational Database Service
+分布式服务器：存储文件图片 oss
+分布式事务：无
+安全性：检测漏洞   863
+消息中间件：rabbitsocket:
+双端通信：websocket
+sofaboot
+
+
+
+
+
+剑锋
+技术栈：
+华三：
+开发语言：java python测试脚本 jdk1.8  安全线程：
+框架：zookeeper内核修改 集群间通知  单例
+持久层框架：
+io:文件流
+版本控制工具：suv svn
+关系型数据库：postsql 一个控制器 一个数据库
+非关系型数据库：没有redis
+事务：原生jpa  hibernate
+安全性：
+设计模式：单例 工厂 发布订阅
+数据同步：几十万条路由配置
+方案分析：分析两个月 编码一个月
+安全技术：自己控制器的
+lesson: 类似安全的激活码
+
+
+做云桌面：
+下发保证：
+
+
+
+
+
+
+

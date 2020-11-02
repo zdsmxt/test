@@ -1,0 +1,15 @@
+
+
+servlet server服务程序 一个在服务端容器的负责处理客服端请求并返回给客户端响应的一个功能
+
+HttpServlet
+HttpServletRequest
+HttpServletResponse
+
+service
+
+用户请求到达服务器容器
+
+这个servlet 会基于这个请求 生成请求和响应实例
+最终调用服务里面这个uri 里面的具体接口返回数据 装载到响应对象里 通过服务器返回给客服端
+
