@@ -1,0 +1,80 @@
+1.第一次访问localhost:9010/data-web  发送请求  服务器返回一个cookie里面的jessionid 有了 存在redis
+
+2.跳转到单点登录的页面 输入用户名密码 此时 认证成功 cookie 变成了4个
+
+(1)casprivacy
+(2)登录之前的jsessionid
+(3)登录之后的jsessionid
+(4)rememberMe
+
+如果想模拟这个用户登录成功
+
+比如用postman 模拟接口测试
+
+在header 头里面
+key            value
+application    json/
+Cookie         jsessionid=)登录之后的jsessionid
+
+1.用户注销 清空服务端session 重定向到登录页面
+2.密码更改 update user set password = "xxxx" where id = #{id}
+3.用户编辑 update user set displyname = "" where id =#{id}
+
+
+
+标签分类表里面的id parent_id 构成分类标签的唯一索引
+
+标签体系 这张表是否 嵌入到 flag ?
+
+实体与体系
+分类与体系
+体系下实体
+实体下标签
+
+如何约束
+
+一个标签体系下多个标签分类
+一个标签分类下对应多个标签
+一个实体下对应多个标签
+一个标签体系下对应多个实体
+
+
+对于实体下标签个数的统计 select count(flag.id) from flag where entity_id = e.id
+
+
+一个标签体系下多个标签分类  一个标签分类下多个标签
+一个标签体系下多个实体         一个实体下多个标签
+
+
+概览
+创建标签分类的时候
+flag_classify  level 级别 parent_id 上级分类 sys_id 标签体系id
+用户标签一级分类个数
+select count(flag_classify.id) from flag_classify
+where sys_id ="用户标签id" and level = 1
+用户标签一级分类下的标签个数
+select count(flag.id) from flag
+where sys_id ="用户标签id"
+
+用户标签一级分类个数
+select count(flag_classify.id) from flag_classify
+where sys_id ="用户标签id" and level = 2
+用户标签二级分类下的标签个数？？？？？？？？
+select count(flag.id) from flag
+where sys_id ="用户标签id" and flag_classify_id =（）and level =2
+
+标签表里面耦合 标签分类id 和这个标签分类的level
+select count(flag.id) from flag
+where sys_id ="用户标签id" and level =2
+
+查询标签分类表 找到所有用户标签体系且为二级的标签分类
+select id from flag_classify where sys_id ="用户体系标签" and level=2
+
+
+
+
+
+
+
+
+
