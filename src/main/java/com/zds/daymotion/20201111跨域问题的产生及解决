@@ -1,0 +1,151 @@
+
+
+
+前端 3333 端口 访问 我的后端9010端口 后端由于重定向到cas 的8080 问题
+重定向的8080 再到前端的3333 会存在跨域问题
+
+
+后端接口代理 后端uet 测试环境的配置
+
+
+
+1.去掉用户表里面的区域属性 因为用不到地区表
+2.wiki 里面上传库表设计
+3.
+
+
+库表里面设计存在的疑问：
+1.实体表里面的标签数如何处理 是直接在实体里面创建flag_number 还是 后面会根据数仓宽表 动态获取这个值？
+2.标签体系和标签类型 是否可以各用一个枚举类 转出jvm 本地虚拟机内存
+3.一定要分清 标签类型和标签分类 这两个不是一回事 不要搞混
+4.如何确定 一个标签分类  对 id 和 parent_id 构建组成一个唯一索引
+
+
+
+
+前端代码分支 merge 到后端代码
+
+考虑到系统用户名可能 会有重复 所依建议对于name
+
+经验 ： redis 设置 密码 有的机器没有设置密码导致 被攻破 疯狂挖矿cpu飙高
+
+假如把 标签体系表省略掉 把这个数据存储到 标签分类表里面 这样就相当于
+标签分类树 产生了五级 一般树体系 不要超过三级 所以 这里面我是不建议 把标签体系 也划归到标签分类表
+
+标签分类需要用到标签体系
+实体需要用到标签体系
+
+所以 我考虑用一张单表 标签体系表  给这两张表（实体表 标签分类表）用
+
+[结合需求文档 分析接口]
+1.首页 所有用户都可以看到的标签体系概览
+注意这里的数据组织结构复杂度
+flag-overview
+
+某一个标签体系分类的个数伪sql语句
+select count()
+对四张表索引的考虑
+
+实体entity
+1.主键id primary
+2.name 唯一限制 唯一索引 索引名 uniq_e_name
+3.实体和数据库 要不要绑定限制唯一
+标签flag
+1.主键id primary
+2.name 唯一限制 唯一索引 索引名 uniq_f_name
+3.可能用到的组合查询条件 uniq_f_id_parent_id  通过id 和parent_id 唯一确定一个 标签分类
+
+一个标签表 有这个标签分类id 标签体系id 标签分类级别
+要不要给这个标签添加一个标签权限字段 （里面 用来存储 各个部门的集合）
+
+
+考虑到后面 其他业务人员 会基于自己的需求 创建新的标签
+
+还有系统 最开始 标签管理员 基于 实体创建的 系统标签
+是否需要区分这两种标签 （有标签创建人） 可以根据这个人所在的组织确定
+
+
+四级里面的两个 标签个数 及分类个数的计算
+
+1.用户标签体系下的 一级分类标签数为
+查询表为    from   flag_classify
+查询条件为  where   sys_id =用户标签体系
+select count(id) from flag_classify where  sys_id =用户标签体系 and level =1
+
+2.用户标签体系下的 一级分类标签下属的标签个数数为
+查询表为    from   flag
+查询条件为  where   sys_id =用户标签体系 因为所有的标签肯定都属于一级标签所以这里就不加条件level
+select count(id) from flag where  sys_id =用户标签体系
+
+3.用户标签体系下的 二级分类标签数为
+查询表为    from   flag_classify
+查询条件为  where   sys_id =用户标签体系
+select count(id) from flag_classify where  sys_id =用户标签体系 and level =2
+
+4.用户标签体系下的 二级分类标签下属的标签个数数为
+查询表为    from   flag
+查询条件为  where   sys_id =用户标签体系 and level in(2,3,4)
+select count(id) from flag where  sys_id =用户标签体系and level in(2,3,4)
+
+5.用户标签体系下的 三级分类标签数为
+查询表为    from   flag_classify
+查询条件为  where   sys_id =用户标签体系
+select count(id) from flag_classify where  sys_id =用户标签体系 and level =3
+
+6.用户标签体系下的 三级分类标签下属的标签个数数为
+查询表为    from   flag
+查询条件为  where   sys_id =用户标签体系 and level in(3,4)
+select count(id) from flag where  sys_id =用户标签体系and level in(3,4)
+
+7.用户标签体系下的 四级分类标签数为
+查询表为    from   flag_classify
+查询条件为  where   sys_id =用户标签体系
+select count(id) from flag_classify where  sys_id =用户标签体系 and level =4
+
+8.用户标签体系下的 四级分类标签下属的标签个数数为
+查询表为    from   flag
+查询条件为  where   sys_id =用户标签体系 and level = 4
+select count(id) from flag where  sys_id =用户标签体系and level =4
+
+
+分组语句的使用
+
+
+前端需要的功能权限：
+用户登录 默认赋予最小权限   在用户角色表里面插入绑定用户和最小权限的角色
+
+
+
+
+数据库设计修改意见
+
+数据库表名 建议两个单词
+实体表       tag_own_entity
+标签分类     tag_cateory
+标签        tag_self
+
+
+
+前端：
+所有返回的数据 需要用DataQuary 包裹
+
+
+cas 那一块 出现的问题
+
+1.接口参数
+2.获取所有权限列表（重要重要）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
