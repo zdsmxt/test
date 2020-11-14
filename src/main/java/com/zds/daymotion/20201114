@@ -1,0 +1,253 @@
+
+
+
+周六加班
+
+  你恐惧的是那些陌生的地方带给你的恐惧
+1.给所有接口方法加上注释
+2.思考 如何根据用户名 获取这个用户拥有的权限码
+这里面需要考虑 用户 和权限表之间 还有三张表关联
+这里需要考虑的是如何把 用户与用户角色表的左连接 与 角色表的左连接和 角色权限表的左连接 和 权限表的左连接 进行拆分成单个子查询
+放到 业务代码逻辑里去处理(我担心的问题 是否是在业务代码里面处理这些语句传来的值的时候 是否是有数据发生改变 语句执行的比较快 而且还有事务控制)
+
+
+首先根据用户名 获取 这个用户的主键id
+
+用户表单表查询语句一
+select user.id from user where username = "xxx";
+
+根据用户名获取这个用户所有的角色id 集合信息
+list<Integer>
+select role.id from user_role where uid = user.id
+
+根据获取的角色id集合 获取角色权限表里面 存储的这些角色的权限id
+
+select pid from role_permission where role_id in (上一步查询获取的所有角色id 集合)
+
+根据获取的权限id 集合获取所有的权限码
+
+select permname from permission where id in ()======这里 你又开始害怕了 假如 mapper  接口传来的是 id集合如何处理
+
+
+所有语句实例如下
+
+#把多表关联查询 分散到业务代码里面的 多个单表查询
+
+#举例   根据用户名获取权限码 这里假设用户名唯一
+
+# 先举例多表关联的查询
+SELECT
+	u.username,
+	r.rolename,
+	p.perm
+FROM
+	sys_user u
+LEFT JOIN sys_user_role ur ON (u.id = ur.uid)
+LEFT JOIN sys_role r ON (ur.rid = r.id)
+LEFT JOIN sys_role_perm rp ON (r.id = rp.rid)
+LEFT JOIN sys_permission p ON (rp.pid = p.id)
+WHERE
+	u.username = 'zds'
+AND r. STATUS = 0
+
+#getUserIdByUserName
+select id from sys_user where username = 'zds'
+
+#getUserRoleByUserId
+select rid from sys_user_role where uid in (select id from sys_user where username = 'zds')
+
+#getRoleNameByRoleIdAndStatus
+select rolename from sys_role
+where `status` =0 and id in(select rid from sys_user_role
+where uid in (select id from sys_user
+where username = 'zds'))
+
+#getPerIdByRids
+select pid from sys_role_perm
+where rid in (select rid from sys_user_role
+where uid in (select id from sys_user where username = 'zds'))
+
+#getPermNameByPermIds
+select perm from sys_permission where id in(select pid from sys_role_perm
+where rid in (select rid from sys_user_role
+where uid in (select id from sys_user where username = 'zds')))
+====================================================================================
+select * from tablename in () 在mapper 里面怎么写 mapper 接口传入的是集合参数
+
+sql 脚本
+
+
+-- ----------------------------
+-- Table structure for sys_permission
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_permission`;
+CREATE TABLE `sys_permission` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `perm` varchar(40) DEFAULT NULL COMMENT '权限码',
+  `name` varchar(32) DEFAULT NULL COMMENT '名称',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `create_user` varchar(32) DEFAULT NULL,
+  `update_user` varchar(32) DEFAULT NULL COMMENT '操作人',
+  `associate_group` varchar(32) DEFAULT '' COMMENT '所属组别',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `ind_permission_perm` (`perm`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='权限表';
+
+-- ----------------------------
+-- Records of sys_permission
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for sys_role
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_role`;
+CREATE TABLE `sys_role` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `rolename` varchar(32) DEFAULT NULL COMMENT '角色名称',
+  `status` varchar(2) DEFAULT NULL COMMENT '状态：0-启用，1-禁用',
+  `remark` varchar(32) DEFAULT NULL COMMENT '备注',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `create_user` varchar(32) DEFAULT NULL,
+  `update_user` varchar(32) DEFAULT NULL COMMENT '操作人',
+  `associate_group` varchar(32) DEFAULT '' COMMENT '所属组别',
+  `parent_id` int NOT NULL COMMENT '父角色id',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='角色表';
+
+-- ----------------------------
+-- Records of sys_role
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for sys_role_perm
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_role_perm`;
+CREATE TABLE `sys_role_perm` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `rid` int DEFAULT NULL COMMENT '角色id',
+  `pid` int DEFAULT NULL COMMENT '权限id',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='角色权限关联表';
+
+-- ----------------------------
+-- Records of sys_role_perm
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for sys_user
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user`;
+CREATE TABLE `sys_user` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(32) NOT NULL COMMENT '用户名',
+  `display_name` varchar(32) DEFAULT NULL COMMENT '显示中文名字',
+  `remark` varchar(32) DEFAULT NULL COMMENT '备注',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `create_user` varchar(32) DEFAULT NULL,
+  `update_user` varchar(32) DEFAULT NULL COMMENT '操作人',
+  `status` tinyint DEFAULT NULL COMMENT '状态:0-未启用，1-正常使用，2-不在岗',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uniq_username` (`username`) USING BTREE COMMENT '用户名唯一索引',
+  KEY `idx_display_name` (`display_name`) COMMENT '展示名普通索引'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='用户信息表';
+
+-- ----------------------------
+-- Records of sys_user
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for sys_user_role
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user_role`;
+CREATE TABLE `sys_user_role` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `uid` int DEFAULT NULL COMMENT '用户id',
+  `rid` int DEFAULT NULL COMMENT '角色id',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uniq_uid_rid` (`uid`,`rid`) COMMENT '用户id，角色id唯一索引'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='用户角色关联表';
+
+-- ----------------------------
+-- Records of sys_user_role
+-- ----------------------------
+
+
+
+
+
+
+
+
+
+
+
+=================================================================================
+
+//
+//    @Select("select  \n" +
+//            "     pid" +
+//            "     from sys_role_perm where \n" +
+//            "     rid in  \n" +
+//            "     <foreach item=\"item\" index=\"index\" collection=\"rids\" open=\"(\" separator=\",\" close=\")\">  \n" +
+//            "      #{item, jdbcType=INTEGER}  \n" +
+//            "     </foreach>  \n")
+//    List<Integer> getPermIdsByRoleIds(@Param("rids")List<Integer> rids);
+//
+//
+//
+=================================================================================
+    @Select({"<script>",
+            "select pid from sys_role_perm where rid in ",
+            "<foreach collection=\"rids\" item=\"roleId\" index=\"index\" open=\"(\" separator=\",\" close=\")\">",
+            "#{roleId, jdbcType=INTEGER}",
+            "</foreach>",
+            "</script>"})
+    List<Integer> getPermIdsByRoleIds(@Param("rids")List<Integer> rids);
+===========================================================================================================
+
+  @Override
+    public List<String> getAllPermsByUserName(String userName) {
+        Integer uid = userMapper.getUserIdByUserName(userName);
+        List<Integer> roleIds = userMapper.getRoleIdByUserId(uid);
+//        List<RolePermission> rolePermissions = rolePermMapper.selectByRids(roleIds);
+//        ArrayList<Integer> permIds = new ArrayList<>();
+//        if(!StringUtils.isEmpty(rolePermissions)){
+//            for (RolePermission rolePermission : rolePermissions) {
+//                permIds.add(rolePermission.getPid());
+//            }
+//        }
+        List<Integer> permIds = rolePermMapper.getPermIdsByRoleIds(roleIds);
+        ArrayList<String> perms = new ArrayList<>();
+        if(!StringUtils.isEmpty(permIds)){
+            List<Permission> permissions = permissionMapper.selectByIds(permIds);
+            if(!StringUtils.isEmpty(permissions)){
+                for (Permission permission : permissions) {
+                    perms.add(permission.getPerm());
+                }
+            }
+
+        }
+//        if(!StringUtils.isEmpty(perms)){
+//            return perms;
+//        }else{
+//            return null;
+//        }
+        return !StringUtils.isEmpty(perms)?perms:null;
+    }
+===========================================================================================================
+===========================================================================================================
+
+List<Map<String, Object>> 不要被这个封装的返回值 吓到 实际就是一个list里面放的map map 里面放置的是 一个string 类型的键 一个object 超类
+封装的返回值
+    @SelectProvider(type = DynamicSqlBuilder.class, method = "buildGetAllRoleByParam")
+    @Results({
+            @Result(column = "rolename", property = "roleName"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "update_user", property = "updateUser"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "associate_group", property = "associateGroup")
+    })
+    List<Map<String, Object>> getAllUserRole(RoleVO roleVO);
