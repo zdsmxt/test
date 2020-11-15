@@ -1,0 +1,116 @@
+
+
+开发最实际用到的总结：
+
+一：接口开发
+1.增
+   从控制层Controller 开始谈：
+      按照传入的接口参数分类开始聊：
+           1）单个增加 method public object singleAdd(@RequestBody UserVo userVo){}
+           注意接口的请求方法类型 post ***@PostMapping(value="方法上的路径 基于你业务方法定义的")
+           接口传入的是除了主键id ****注意这里的主键的生成方式
+           if(根据这个实体对应的数据库表里面的id 自增AutoIncrement)
+           else if(通过雪花算 UUID 单独生成主键String java类型  数据库 vachar)
+           和 创建时间createTime 创建人createUser 更新时间updateTime 更新人updateUser的其他必要关键字段
+           注意：如果你用的是restAPI 开发风格 需要在这里从参数上加上请求体注解 ****@RequestBody
+           并且&& 你的对象传入一般都是以VO 结尾的 注意这里面 如果有后端校验的需要 建议选用springboot
+           里面自带的valid****注解 比如@NotNull @Max= @Min=
+           2）批量增加 method public object singleAdd(@RequestBody List<UserVo> userVo){}
+           这里是批量导入
+           if（批量导入???????????????????????????如何书写）
+           else(传入的参数 是一个集合对象@Request List<User>)或者
+           ||前端给你传入了 他自己定义的比较复杂的数据组织结构 你后端如何解析
+ 从业务服务层Service 开始谈：
+      按照业务里面你们公司是互联网类型还是政务或者银行保险传统行业来分：
+           按照不同的业务逻辑来分：
+                1）电商
+                     这里由于是互联网项目 单表的数据会比较大 这里是建议 采用 尽量避免 两个表及以上的连接查询
+                     （原因分析：疑问笛卡尔积的原因 如果
+                     if(单表数据过万){
+                      两张表的的因为笛卡尔积产生的数据规模就上亿了 这个如果没有索引走全量查询 对数据库的压力是很大的;
+                      }）
+                     if(项目is互联网){
+                         建议把多表关联查询 切成 关联的每张表的单个查询 在业务代码里进行组织 与传统一个sql(多表关联的)语句相比
+                         就是 原来一步就可以获取所有的数据集合 可能 需要对数据集合就一次判空操作 StringUtils.isEmpty(被判断的从数据库获取的集合对象)
+                         现在需要的是引入多个表的Mapper 接口 比如 以经典的权限RBAC 为例
+                         注意梳理这里面的表之间的关联关系
+                         五张表 用户 角色 权限 用户角色表 角色权限表
+                         需求：假如 我想我去某一个用户的所有权限
+                         一条sql 语句的解决方案: 以用户表为主表
+                                 @AutoWired
+                                 private UserMapper useMapper;
+                                        if(Stringutils.isEmpty(List<Permission>)){}
+                                              select * from user u
+                                              left join user_role ur on u.id = ur.uid
+                                              left join Role r on r.id = ur.rid
+                                              left join role_permission rp on r.id = rp.rid
+                                              left join permission rp on p.id = rp.pid
+                                              where u.username = "你想查的用户名"
+                                              ========>List<Permission>
+                      }else{
+                         多条sql 语句的解决方案:
+                               @AutoWired
+                               private UserMapper userMapper;
+                               select * from user where username = "你想查的用户名"
+                               ========>User user
+                               @AutoWired
+                               private UserRoleMapper userRoleMapper;
+                               if(Stringutils.isEmpty(user)){}
+                               select id from userrole where uid = #{user.getId() 基于上一步获取的用户主键id}
+                               ========>List<rid> rids
+                               @AutoWired
+                               private RoleMapper roleMapper;
+                               if(Stringutils.isEmpty(rids)){}
+                               select rolename from userrole where id in (List<rid>) 基于上一步获取的角色主键id集合
+                               ========>List<rolename> rolenames
+                               @AutoWired
+                               private RolePermimssionMapper rolePermimssionMapper;
+                               if(Stringutils.isEmpty(rids)){}
+                               select pid from rolepermimssion where rid in (List<rid>) 基于上上一步获取的角色主键id集合
+                               List<pid> pids
+                               @AutoWired
+                               private PermimssionMapper permimssionMapper;
+                               if(Stringutils.isEmpty(pids)){}
+                               select * from permimssion where id in (List<pid>) 基于上上一步获取的权限码主键id集合
+                               ========>List<Permission> permissions
+                      }
+                2）直播
+                3）在线教育
+                4）银行
+                5）保险
+
+2.删 AssertUtil.warn(******************注意注意注意****************) 线上数据不能删
+           所以这里做了 逻辑删除 也就是数据路里面 多了一个是否是删除状态的字段is_delete 0创建默认就有 1 删除
+           实际是一个更新sql语句 update user set is_delete = 1 where username = "xxx" xxx 离职了 销户了
+ 从控制层Controller 开始谈：
+      按照传入的接口参数分类开始聊：
+                 1）单个删除
+                 @DeleteMapping(value="/deleteUser/{uid}")
+                 (**********注意如果是删除单个人 就只传一个id 就够了 没有必要把这个用户的所有字段都传 避免前端ajax 发送的请求所带的参数过多消耗网络流量)
+                 method public object singleDelete(@PathVariable(Value="uid") Integer uid){}
+                 update user set is_delete = 1 where id = uid
+                 2)批量删除
+                 @DeleteMapping(value="/deleteUser")
+                 method public object singleAdd(@RequestBody List<Integer> uids){}
+                 update user set is_delete = 1 where id in ( uids)
+                 @Select({"<script>",
+                         "select pid from sys_role_perm where rid in ",
+                         "<foreach collection=\"rids\" item=\"item\" index=\"index\" open=\"(\" separator=\",\" close=\")\">",
+                         "#{item, jdbcType=INTEGER}",
+                         "</foreach>",
+                         "</script>"})
+                 List<Integer> getPermIdsByRoleIds(@Param("rids")List<Integer> rids);
+                 如果用tk.mybatis 写法如下：
+                 default List<RolePermission> selectByRids(List<Integer> rids) {
+                         // 根据角色权限id 获取角色权限表里面的实体集合
+                         Condition condition = new Condition(RolePermission.class);
+                         Example.Criteria criteria = condition.and();
+                         criteria.andIn("id", rids);
+                         return this.selectByExample(condition);
+                     }
+
+3.改
+
+4.查
+
+
