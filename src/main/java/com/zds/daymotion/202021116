@@ -1,0 +1,206 @@
+
+
+1.user/detail 接口
+  缺哪些数据 最紧要 username(有的) displayname
+
+2.用户首次登录 插入用户表的数据
+
+3.权限不过给一个提示（message ）
+
+4.swagger 所有接口 加一个权限标识字段  问一下慧小贷 那边
+
+
+
+
+用户管理
+   getAllUser(){}
+
+
+问题描述：1.需要确认 用户管理下的 所有用户的部门 需要加一张部门表？
+        2.关于用户第一次登录系统的备注是否要给予默认值？
+        3.一个用户是否存在多个部门？
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.统计各个xxxController 的权限码
+
+？？？？？？？？ 加了一个异常工具类 和切面类 数据库新添加一个权限码 导致当前用户登录不上
+
+==========给表中的某一个字段设置默认值:
+      sql 语句: 选中表 添加约束 约束名 default 设置的默认值
+      alter table 你想修改的表名 add constraint 约束名 default(你想给的默认值) for 你想添加的字段
+      alter sys_user add constraint df_status_user default（1） for status
+
+==========给表中的添加一个字段设置默认值达到
+       sql语句：alter table 表名 add (字段 字段类型) default '输入默认值'] [null/not null]\
+       ALTER TABLE employee ADD spbh varchar(20) NOT NULL Default 0
+       ALTER TABLE sys_user ADD deptid int  Default null
+
+
+敏感信息的处理
+      企业（本身就是公共的）信息是公开的
+
+      标签定义是公开的 标签下的数据 根据各个用户的权限来展示****************不让看标签下的数据
+
+      用户首次登录
+      系统初始化的时候
+      默认初始化
+      1.管理员数据
+      2.
+
+      如何初始化一个用户为超级管理员
+          超级管理员 给某一个用户赋予 标签管理员角色
+
+      **** 角色分几级比较好
+
+
+下午：(我设计的接口路径的原则 能少则少  没有必要要的 就不要传 最好接口 可以提现业务 和版本)
+   梳理纬仲的接口:
+   一 几个下拉菜单对应的字典数据：
+   @RestController
+   @RequestMapping("/dict")
+   DictionaryController
+   1.给标签创建的时候 赋予这标签的部门权限使用 部门下拉菜单 /dictionary/department -> /dict/dept
+   2.给实体创建的时候 会根据大宽表获取这个实体 所在的数据库 数据库下拉菜单 /dictionary/database->/dict/db
+   3.给实体创建的时候 会根据大宽表获取这个实体 所在的表table 表table下拉菜单 /dictionary/table->/dict/tb
+   4.主键名列表 字典表 (用于实体编辑-主键选择) /dictionary/primarykey -> /dict/eids
+   5.标签体系字典表(用于实体编辑-体系选择等)  /dictionary/tagssystem -> /dict/tagsys
+
+
+   注意 注意 注意 自己的任务：
+     *******************************新建部门表 或者直接用之前的部门表
+     *******************************考虑之前的 用户表 与部门表之间的关系  一个部门可以有多个用户  一个用户只属于一个部门
+
+     疑问：============
+     问题描述：加了异常工具类 异常处理切面 之后  访问后台系统 跳转到cas 认证页面 出现了 输入用户名密码 认证完成 后端可以看到认证完成的日志
+     但是 前端界面 并没有发生跳转 用户首次登录的 信息 已经插入到用户表中了 包括用户和角色关系表的数据也已插入 但是就是不显示
+     1.shiro 认证异常(org.apache.shiro.authc.AuthenticationException:
+     Authentication failed for token submission [org.apache.shiro.cas.CasToken@78cd9b66].
+     Possible unexpected error? (Typical or expected login exceptions should extend from AuthenticationException).)
+============================================= debug 原则 三到五遍 太多浪费时间=============================================
+
+idea  如何进入return 里面的方法调用
+
+   因为修改了 用户表的status 状态值（我给的限制条件是不能为空） 导致的 用户插入产生了问题
+
+   当你不知道语句如何书写 当点击navicate 里面的创建什么的比如索引 添加非空字段 可以考虑查看最右端的SQL 预览（
+### Error updating database.  Cause: java.sql.SQLIntegrityConstraintViolationException: Column 'status' cannot be null
+### The error may exist in com/data/web/upms/mapper/UserMapper.java (best guess)
+### The error may involve com.data.web.upms.mapper.UserMapper.insert-Inline
+### The error occurred while setting parameters
+### SQL: INSERT INTO sys_user  ( id,username,display_name,remark,create_user,update_user,create_time,update_time,`status` ) VALUES( ?,?,?,?,?,?,?,?,? )
+### Cause: java.sql.SQLIntegrityConstraintViolationException: Column 'status' cannot be null
+; Column 'status' cannot be null）
+注意这个异常 被抛给了shiro 里面的异常捕捉 导致的直接问题是很容易让人怀疑 这个问题是shiro 里面产生的问题
+ 是不是因为插入了脏数据导致产生的异常
+调试 for 循环的时候 如何跳转转到 你想要执行的那个下标index
+
+=============================================脏数据 导致的空指针 异常 随着多表关联的循环次数的变多 这个异常 不难 但是很费时间
+验证新加的全局异常工具类 是否生效 加一个接口 配上一个未知的权限 看看异常是否被全局异常捕获
+
+
+
+开始加部门表：
+  数据准备：
+  部门汇总：
+       公开
+       培训
+       增长
+       销售
+       金融风控
+       市场
+       会计
+
+
+       user /detail 缺roleIds
+
+       ES 存的是 数仓清洗过的 各个实体信息
+       从这里面获取 各个实体 所对应的标签 数值
+
+
+测试环境 用的 ES7
+
+==============================================
+Optional.ofNullable(currentUser)
+.orElseGet(() -> User.builder().id(0).username("System").displayName("系统").build());
+注意这里 可选择类optional 的写法
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+debug 了 一下 controller 上加的切面
+
+@Test
+测试Mapper 没有问题 但是 从service 访问会报错
+
+总结今天 因为 获取用户详情 导致的结果 是 改bug 改了差不多有三个小时  导致真正开发的时间 被挤占
+
+问题定位 花的时间 蛮多的
+
+猜到了是 脏数据 导致的问题 但是 没有想到 那么严重
+
+尤其是空指针的问题
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20201116daylog
+一 今天的工作进度：
+1. 把权限功能相关的（权限 角色 用户）与纬仲联调 补缺少的字段
+2. 根据俊雅的用户需求 添加部门表 并考虑 为后面的 标签数据权限 建立一张 部门标签表
+3. 根据晋哥的要求 给登入的用户添加一个可以查看所有标签定义的角色 默认第一次登录赋予
+4. 着手开发实体 但是 由于里面的 数据库 表 和主键字段 这个地方业务不清晰 需要仔细考虑
+   mysql 和ES 各自到底存放什么样的数据 还需设计
+
+二 存在的疑问：
+
+1.ES 那一块 未来如何拿数据
+2.需要再跟俊雅 商量 实体 那一块的 诸如 数据库 表名 和 实体字段获取 那一块
+3.角色 之间的关系 和 角色与权限之间的关系 如何规划 设计 需要不断完善
+
+
+
+
+
+
+
+
