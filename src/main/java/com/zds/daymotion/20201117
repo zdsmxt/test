@@ -82,6 +82,20 @@ public interface EntityMapper extends tk.mybatis.mapper.common.Mapper<EntityDO>,
 }
 
 
+20201116daylog
+一 今天的工作进度：
+1. 把实体相关的接口 初步开发完
+
+二 存在的疑问：
+
+1.角色之间的继承关系 案例来说
+  举例：超级管理员是具有最高权限的 标签管理员 是超级管理员的下级
+也就 意味着 超级管理员角色具有标签管理员的所有角色 权限 但是我今天测实体添加接口 实体添加 entity:add
+由于 是数据库里面是标签管理员的父类parent_id 是 超级管理员  但是 我以超级管理员 登录 却显示没有权限
+
+
+
+
 
 
 
