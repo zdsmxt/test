@@ -1,0 +1,88 @@
+
+
+1.用户管理模块 基本上 就是 那个 当前登录的用户 拥有用户查询 和编辑的角色 才可以 编辑当前 用户
+  这里是用户编辑的时候 来一个部门下拉菜单 从而判定这个用户来自那个部门
+  现在的纠结 是存部门名称 还是部门主键
+  但是肯定 有一点 这里需要用到部门的主键
+  假设 我这里存的部门名 那我后面 可以根据 这个部门名称从部门表里面 获取这个部门主键
+  从而 在根据 这个部门主键 查部门标签 表 从而获取这个用户 可以使用部门的标签
+
+
+    @Result
+    @GetMapping("test")
+    @RequiresPermissions(value = "user:test1111")
+    public void test() {
+        System.out.println("test===================================");
+    }
+
+
+假如我想 获取这个实体的两个字段 但是我定义的实体 有8个字段
+
+但是我查询语句写的时候 只有 两个字段 但是 那剩下6个字段都被映射为空
+
+
+
+
+// 用户 那一块 重启服务器是否能自动清理 redis 里面的jsessionid
+
+登录成功 跳转那一块 是否要带 前端 index.html 里面的DashBoard 路径
+
+git 什么情况下不跟踪
+
+*******************************************如何维护用户之间的所属关系*******************************************
+利用角色 之间的继承关系树
+
+用户的新加 是通过系统管理员控制 只有系统管理员 有这个权限 编辑登录进来的用户的其他角色 就是给用户新添加其他角色
+
+
+drop database if exists data_web;
+create database data_web charset utf8mb4;
+use data_web;
+
+@Value
+
+
+idea 代码添加注释 配置
+
+
+==========******************************超级管理员 不让某个用户登录
+
+
+实体类导入的 Date 时间类型 用的是 包sql 里面的 还是java.uitl 里面的
+
+
+
+tag flag_number 字段去掉
+
+e_id  改为 primary_key
+
+标签表里面的   分级  和  sys_id   因为 你有分类id 可以获取到这个分类id 对应的体系id
+
+
+不要粘代码 一定要手写一遍
+
+@Mapper
+public interface EntityMapper extends tk.mybatis.mapper.common.Mapper<EntityDO>, tk.mybatis.mapper.common.MySqlMapper<EntityDO> {
+
+    default EntityDO selectEntityByName(String name) {
+        Example example = new Example(================EntityDO.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("name", name);
+        return this.selectOneByExample(example);
+    }
+
+     default EntityDO selectEntityByName(String name) {
+        Example example = new Example(===============Role.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("name", name);
+        return this.selectOneByExample(example);
+    }
+
+
+}
+
+
+
+
+
+
