@@ -1,0 +1,62 @@
+区分重点 ：
+      先开发 不要纠结后面的问题
+          代码 ： 能动手 尽量别哔哔
+
+
+关于超级管理员 为什么不能有下属用户的权限码的问题 比如超级管理员 可以管理标签管理员 但是不可以
+
+=========================涉及更新和添加都用/add
+
+
+字典表那一块的处理
+  value 主键  前端显示的值lebel
+
+关于标签类型 tagTypes 那一块的枚举值的 书写命名 不要以数字结尾 应该以具体这个枚举值的值来看 比如
+
+TagTypeEnum.TAG_TYPE_1 改为 --->TagTypeEnum.TAG_TYPE_STATISTICAL
+
+今天用idea 的 大小写转换的快捷键ctr/command +shift+u  发现 一个问题 就是 按键盘左边的ctrl+shift 不生效 右边可以生效
+
+
+**********************************用户编辑的接口 给用户赋予其他角色 这个接口 返回成功但是后台数据没有修改
+
+
+TagCategory
+TagCategoryDO
+TagCategoryVO
+TagCategoryMapper
+TagCategoryService
+TagCategoryServiceImpl
+TagCategoryController
+
+
+
+================
+实体创建产生的编码code 是采用什么样的的编码 uuid
+
+批量导入的 代码如何写
+
+？？？？？？？？？我原来想的是如何给前端 对于标签树的处理 给前端 返回一个 树形结构的json 串
+？？？？？？？？？？是否要在标签分类表里面加上 level 这个标签分类的级别
+
+标签分类相关
+
+   如何处理标签体系 这个0级（顶级）标签分类 标签分类别里面 多一个level = 0 加以表示
+   因为默认 标签管理模块会展示这个实体所属的 0级标签体系
+
+   创建标签分类 如果不选上级标签分类 默认归属 标签体系这个0级标签分类下的一级 也就是说 这个
+   一级标签的parent_id 的父类是体系id 而这个体系id 我要从 之前创建的实体里面 返回的实体详情里面的实体id 里面所属的体系id
+   也就是意味着 这个 if(tagCategoryVO.getParentId is empty) -> tagCategoryDO.setParentId = sys_id
+
+
+缺少一个展示标签体系的字典表查询接口
+
+标签管理员创建实体之前 也就意味着 我在标签分类表里面已经初始化好了
+
+用户标签体系
+企业标签体系
+业务标签体系
+
+INSERT INTO `data_web`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `tc_id`) VALUES ('1', '00001', '用户标签体系', '0', '0', '标签体系', '2020-11-18 14:43:46', 'zds', '2020-11-18 14:43:51', 'zds', '0', '0');
+INSERT INTO `data_web`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `tc_id`) VALUES ('2', '00002', '企业标签体系', '0', '0', '标签体系', '2020-11-18 14:44:36', 'zds', '2020-11-18 14:44:50', 'zds', '0', '0');
+INSERT INTO `data_web`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `tc_id`) VALUES ('3', '00003', '业务标签体系', '0', '0', '标签体系', '2020-11-18 14:45:25', 'zds', '2020-11-18 14:45:30', 'zds', '0', '0');

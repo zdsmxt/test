@@ -93,8 +93,18 @@ public interface EntityMapper extends tk.mybatis.mapper.common.Mapper<EntityDO>,
 也就 意味着 超级管理员角色具有标签管理员的所有角色 权限 但是我今天测实体添加接口 实体添加 entity:add
 由于 是数据库里面是标签管理员的父类parent_id 是 超级管理员  但是 我以超级管理员 登录 却显示没有权限
 
+//        AssertUtil.assertNotNull(entityVO.getName(), "实体名称为空，请检查数据");
+//        AssertUtil.assertNotNull(entityVO.getSysId(), "实体所属的体系为空，请检查数据");
+//        AssertUtil.assertNotNull(entityVO.getDatabase(), "实体所属的数据库为空，请检查数据");
+//        AssertUtil.assertNotNull(entityVO.getTable(), "实体所属的表为空，请检查数据");
+//        AssertUtil.assertNotNull(entityVO.getEId(), "实体所属的主键为空，请检查数据");
 
-
+//    default EntityDO selectEntityByCode(String code) {
+//        Example example = new Example(EntityDO.class);
+//        Example.Criteria criteria = example.createCriteria();
+//        criteria.andEqualTo("code", code);
+//        return this.selectOneByExample(example);
+//    }
 
 
 
