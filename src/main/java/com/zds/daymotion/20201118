@@ -60,3 +60,12 @@ TagCategoryController
 INSERT INTO `data_web`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `tc_id`) VALUES ('1', '00001', '用户标签体系', '0', '0', '标签体系', '2020-11-18 14:43:46', 'zds', '2020-11-18 14:43:51', 'zds', '0', '0');
 INSERT INTO `data_web`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `tc_id`) VALUES ('2', '00002', '企业标签体系', '0', '0', '标签体系', '2020-11-18 14:44:36', 'zds', '2020-11-18 14:44:50', 'zds', '0', '0');
 INSERT INTO `data_web`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `tc_id`) VALUES ('3', '00003', '业务标签体系', '0', '0', '标签体系', '2020-11-18 14:45:25', 'zds', '2020-11-18 14:45:30', 'zds', '0', '0');
+
+
+20201118daylog
+一 工作进度：
+1.把标签分类相关的接口 开发一半
+2.领取新电脑 配置开发环境
+二 存在的疑问：
+
+1.电脑配置 clone项目  下载gradle 依赖jar 可能是因为墙的原因导致下不下来 项目跑不起来
