@@ -1,0 +1,359 @@
+
+我在插入系统标签的时候
+
+由于 中间 有TagVO 转 TagDO
+
+由于用的是BeanUtil.copy(TagVO,TagDO)
+
+由于VO这样定义的
+private String updateCycle;
+但是DO这样定义的
+private   Date updateCycle;
+
+导致 这个值 DO 没有拿到 所以传输的是空的
+
+
+
+标签首页的 二维表里面的数据获取
+
+一旦标签分类的层级定下后 是否后期会有修改层级的需要
+
+假如说你有插入 添加一个实体的的需要  但是这个实体 需要的字段 有依赖其他实体的id
+这个时候 需要 你 去数据库（不能像前端 可以直接 调用包含那个实体id集合的字典接口）查询这个实体对应的
+表里面的数据 从而获取你想要的 下拉菜单里面的字段值的主键id
+
+先有实体 根据实体 获取 这个实体的 标签体系id
+
+根据实体的标签体系id 来创建 一级标签分类
+    根据实体的标签体系id 和 一级标签分类id 作为parent_id 来创建二级标签分类
+    根据实体的标签体系id 和 二级标签分类id 作为parent_id 来创建三级标签分类
+    根据实体的标签体系id 和 三级标签分类id 作为parent_id 来创建四级标签分类
+
+
+
+
+问题是这里如何确定标签分类的层级
+
+
+
+
+问题描述：
+
+我的思路：
+
+
+
+一个部门多个用户
+一个部门多个标签
+
+假如用户所在的A部门想用B部门创建的标签   就把B部门的标签 和A部门的id 绑定插入到 部门标签表里面
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+标签分级 如何 在插入标签分类的时候 给这个标签分类 加级别
+
+// 如果使用默认的是不会返回 插入成功后返回的主键  这里是返回插入成功的状态值1
+        int id = tagMapper.insert(tagDO);
+  // 如果使用默认的是不会返回 插入成功后返回的主键  这里是返回插入成功的状态值1
+        int tagId = tagMapper.insertUseGeneratedKeys(tagDO);
+        Integer id = tagDO.getId();
+        System.out.println(tagId+"---------------------->");
+        System.out.println(id+"---------------------->");
+
+
+
+        注意 整形    标签表里的更新周期的数据类型 改字符串 为整形
+
+
+
+
+
+        /*
+        Navicat MySQL Data Transfer
+
+        Source Server         : localdatabase
+        Source Server Version : 50732
+        Source Host           : localhost:3306
+        Source Database       : test
+
+        Target Server Type    : MYSQL
+        Target Server Version : 50732
+        File Encoding         : 65001
+
+        Date: 2020-11-20 18:15:53
+        */
+
+        SET FOREIGN_KEY_CHECKS=0;
+
+        -- ----------------------------
+        -- Table structure for cas_server
+        -- ----------------------------
+        DROP TABLE IF EXISTS `cas_server`;
+        CREATE TABLE `cas_server` (
+          `id` int(11) DEFAULT NULL,
+          `username` varchar(96) DEFAULT NULL,
+          `password` varchar(765) DEFAULT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+        -- ----------------------------
+        -- Records of cas_server
+        -- ----------------------------
+        INSERT INTO `cas_server` VALUES ('1', 'test', 'test');
+        INSERT INTO `cas_server` VALUES ('2', 'user', '96e79218965eb72c92a549dd5a330112');
+        INSERT INTO `cas_server` VALUES ('3', 'admin', '96e79218965eb72c92a549dd5a330112');
+        INSERT INTO `cas_server` VALUES ('4', 'wwz', '96e79218965eb72c92a549dd5a330112');
+        INSERT INTO `cas_server` VALUES ('5', 'zds', '96e79218965eb72c92a549dd5a330112');
+
+        -- ----------------------------
+        -- Table structure for tag_category
+        -- ----------------------------
+        DROP TABLE IF EXISTS `tag_category`;
+        CREATE TABLE `tag_category` (
+          `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '标签分类主键',
+          `name` varchar(255) CHARACTER SET utf8mb4 NOT NULL COMMENT '标签分类名称',
+          `parent_id` int(11) DEFAULT NULL COMMENT '上级标签分类主键',
+          `sys_id` int(11) NOT NULL COMMENT '所有标签分类所属体系主键',
+          `level` smallint(6) NOT NULL,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=latin1;
+
+        -- ----------------------------
+        -- Records of tag_category
+        -- ----------------------------
+        INSERT INTO `tag_category` VALUES ('1', '基本信息', '0', '1', '1');
+        INSERT INTO `tag_category` VALUES ('2', '人口属性', '1', '1', '2');
+        INSERT INTO `tag_category` VALUES ('3', '社会属性', '1', '1', '2');
+        INSERT INTO `tag_category` VALUES ('4', '地理位置', '1', '1', '2');
+        INSERT INTO `tag_category` VALUES ('5', '设备属性', '0', '1', '1');
+        INSERT INTO `tag_category` VALUES ('6', '操作系统', '5', '1', '2');
+        INSERT INTO `tag_category` VALUES ('7', '手机品牌', '5', '1', '2');
+        INSERT INTO `tag_category` VALUES ('8', '网络', '5', '1', '2');
+        INSERT INTO `tag_category` VALUES ('9', '运营商', '5', '1', '2');
+        INSERT INTO `tag_category` VALUES ('10', '行为信息', '0', '1', '1');
+        INSERT INTO `tag_category` VALUES ('11', '访问渠道', '10', '1', '2');
+        INSERT INTO `tag_category` VALUES ('12', '登录注册行为', '10', '1', '2');
+        INSERT INTO `tag_category` VALUES ('13', '点击特征', '10', '1', '2');
+        INSERT INTO `tag_category` VALUES ('14', '活跃特征', '10', '1', '2');
+        INSERT INTO `tag_category` VALUES ('15', '留资信息', '10', '1', '2');
+        INSERT INTO `tag_category` VALUES ('16', '业务反馈情况', '10', '1', '2');
+        INSERT INTO `tag_category` VALUES ('17', '营销活动点击', '13', '1', '3');
+        INSERT INTO `tag_category` VALUES ('18', '菜单按钮点击', '13', '1', '3');
+        INSERT INTO `tag_category` VALUES ('19', '访问活跃', '14', '1', '3');
+        INSERT INTO `tag_category` VALUES ('20', '营销活跃', '14', '1', '3');
+        INSERT INTO `tag_category` VALUES ('21', '前端留资', '15', '1', '3');
+        INSERT INTO `tag_category` VALUES ('22', '服务咨询', '15', '1', '3');
+        INSERT INTO `tag_category` VALUES ('23', '业务偏好', '0', '1', '1');
+        INSERT INTO `tag_category` VALUES ('24', '开公司', '23', '1', '2');
+        INSERT INTO `tag_category` VALUES ('25', '代理记账', '23', '1', '2');
+        INSERT INTO `tag_category` VALUES ('26', '税务代办', '23', '1', '2');
+        INSERT INTO `tag_category` VALUES ('27', '审计稅筹', '23', '1', '2');
+        INSERT INTO `tag_category` VALUES ('28', '增值服务', '23', '1', '2');
+        INSERT INTO `tag_category` VALUES ('29', '资讯关注偏好', '23', '1', '2');
+        INSERT INTO `tag_category` VALUES ('30', '行业关注偏好', '23', '1', '2');
+        INSERT INTO `tag_category` VALUES ('31', '工商注册', '24', '1', '3');
+        INSERT INTO `tag_category` VALUES ('32', '公司法人变更', '24', '1', '3');
+        INSERT INTO `tag_category` VALUES ('33', '小规模代理记账', '25', '1', '3');
+        INSERT INTO `tag_category` VALUES ('34', '旧账梳理', '25', '1', '3');
+        INSERT INTO `tag_category` VALUES ('35', '税控器托管', '26', '1', '3');
+        INSERT INTO `tag_category` VALUES ('36', '税务异常处理', '26', '1', '3');
+        INSERT INTO `tag_category` VALUES ('37', '财务报表审计', '27', '1', '3');
+        INSERT INTO `tag_category` VALUES ('38', '企业税收筹划', '27', '1', '3');
+        INSERT INTO `tag_category` VALUES ('39', '灵活用工', '28', '1', '3');
+        INSERT INTO `tag_category` VALUES ('40', '业务偏好', '31', '1', '4');
+        INSERT INTO `tag_category` VALUES ('41', '业务活跃', '32', '1', '4');
+        INSERT INTO `tag_category` VALUES ('42', '业务偏好', '33', '1', '4');
+        INSERT INTO `tag_category` VALUES ('43', '业务活跃', '34', '1', '4');
+        INSERT INTO `tag_category` VALUES ('44', '业务偏好', '35', '1', '4');
+        INSERT INTO `tag_category` VALUES ('45', '业务活跃', '36', '1', '4');
+        INSERT INTO `tag_category` VALUES ('46', '业务偏好', '37', '1', '4');
+        INSERT INTO `tag_category` VALUES ('47', '业务活跃', '38', '1', '4');
+        INSERT INTO `tag_category` VALUES ('48', '业务活跃', '39', '1', '4');
+
+        -- ----------------------------
+        -- Table structure for tag_sys
+        -- ----------------------------
+        DROP TABLE IF EXISTS `tag_sys`;
+        CREATE TABLE `tag_sys` (
+          `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '标签主键',
+          `name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL COMMENT '标签名称',
+          `category_id` int(11) NOT NULL COMMENT '标签所属的直接分类id',
+          `sys_id` int(11) NOT NULL COMMENT '标签所属的体系id',
+          `level` smallint(6) NOT NULL,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=latin1;
+
+        -- ----------------------------
+        -- Records of tag_sys
+        -- ----------------------------
+        INSERT INTO `tag_sys` VALUES ('1', '年龄', '2', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('2', '性别', '2', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('3', '婚姻状况', '3', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('4', '是否有车', '3', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('5', '是否有房', '3', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('6', '家庭年收入', '3', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('7', '家庭年支出', '3', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('8', '所在省份', '4', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('9', '所在城市', '4', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('10', '所在地区', '4', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('11', 'Android', '6', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('12', 'IOS', '6', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('13', '华为', '7', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('14', '小米', '7', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('15', 'wifi', '8', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('16', '4G', '8', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('17', '5G', '8', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('18', '移动', '9', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('19', '联通', '9', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('20', '电信', '9', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('21', '常用访问渠道', '11', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('22', '渠道来源', '11', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('23', '最近一次访问渠道', '11', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('24', '常用地登录', '12', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('25', '首次登录时间', '12', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('26', '常用登录方式', '12', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('27', '累计参加优惠活动数', '17', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('28', '参加活动类型', '17', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('29', '最近一次活动参与时间', '17', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('30', '活动点击次数', '17', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('31', '立即预约按钮点击时间', '18', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('32', '代理记账菜单点击次数', '18', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('33', '最近一次访问APP', '19', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('34', '服务号访问次数', '19', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('35', '服务号平均访问时长', '19', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('36', '最近一次push响应', '20', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('37', '留资渠道', '21', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('38', '最近一次留资时间', '21', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('39', '留资次数', '21', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('40', '最近一次服务咨询渠道', '22', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('41', '咨询在线客服次数', '22', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('42', '最近一次电话咨询时间', '22', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('43', '最近一次咨询内容', '22', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('44', '有效留资数', '22', '1', '3');
+        INSERT INTO `tag_sys` VALUES ('45', '最近一次待反馈业务', '16', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('46', '待反馈业务数', '16', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('47', '平均反馈时长', '16', '1', '2');
+        INSERT INTO `tag_sys` VALUES ('48', '短期偏好', '40', '1', '4');
+        INSERT INTO `tag_sys` VALUES ('49', '最近30天购买产品', '41', '1', '4');
+        INSERT INTO `tag_sys` VALUES ('50', '长期偏好', '42', '1', '4');
+        INSERT INTO `tag_sys` VALUES ('51', '最近一周浏览次数', '43', '1', '4');
+        INSERT INTO `tag_sys` VALUES ('52', '短期偏好', '44', '1', '4');
+        INSERT INTO `tag_sys` VALUES ('53', '最近30天购买产品', '45', '1', '4');
+        INSERT INTO `tag_sys` VALUES ('54', '长期偏好', '46', '1', '4');
+        INSERT INTO `tag_sys` VALUES ('55', '最近一周咨询次数', '47', '1', '4');
+        INSERT INTO `tag_sys` VALUES ('56', '最近一次咨询时间', '48', '1', '4');
+
+
+        -- 获取用户体系下 所有各个分级的标签分类个数
+        select count(id),level from tag_category where sys_id = 1
+        group by level
+
+
+        select id from tag_category where LEVEL = 1
+
+        -- 获取用户体系下 所有各个分级的标签个数
+        select count(id),level from tag_sys where sys_id = 1
+        group by level
+
+
+       标签分级跟标签创建时有关
+
+       创建标签分类的时候 会给这个 新的标签分类 加或者 不加上级标签分类或者直接为 标签体系
+
+       如果用户没有选任何的 上级分类 那就 把这个新的标签分类的级level别设为1
+
+       也就是每次创建新的标签分类的时候 获取这个标签的上级标签的level +1 设置为这个插入的标签分类的级别
+
+       url ? userId=1 or
+       ip:8080/projectName/user?userId=1
+       ip:8080/projectName/user/{userId}
+
+
+
+        /**
+         * 基于传入的 上级标签分类的级别 给这个新建的标签分类级别加一
+         */
+        public static final Integer DEFAULT_TAG_CATEGORY_LEVEL = 1;
+
+        这个level 怎么加
+
+        20201120daylog
+
+        一 工作进度：
+        1.把标签还剩的一个的首页展示的接口开发一半 预计周六写完
+
+        二 存在的疑问：
+        总结：之前关于首页三大体系下的四个级别下的 标签分类数 和标签数
+             是在标签分类表里面 耦合 level 和 体系id
+             和在标签表里面 耦合 level 和 体系id 按照体系和对level 分组来获取标签的分类个数和标签个数
+             对标签表里面的各级标签的求和汇总得到上一级的标签个数
+             比如：一级标签个数 = 所有二级标签个数之和
+                  二级标签个数 = 所有二级标签个数+所有三级标签个数之和
+                  三级标签个数 = 所有三级标签个数+所有四级标签个数之和
+                  四级标签个数 = 所有四级标签个数之和
+        ????:有没有别的思路 可以根据标签树的层级关系 避免掉 加这个level 字段？
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        对应的sql:
+       -- 获取用户体系下 所有各个分级的标签分类个数
+       select count(id) as 标签分类数量,level
+       from tag_category
+       where sys_id = 1
+       group by level
+
+       level    标签分类数量
+           1	4
+           2	20
+           3	15
+           4	9
+       -- 获取用户体系下 所有各个分级的标签个数
+       select count(id) as 标签数量,level
+       from tag_sys
+       where sys_id = 1
+       group by level
+
+         level    标签数量
+          2	        29
+          3	        18
+          4	         9
+
+
+
+
+
+
+
+
+
+
+
+
+
