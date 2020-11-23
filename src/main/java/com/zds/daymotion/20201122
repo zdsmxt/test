@@ -1,0 +1,163 @@
+  @Override
+    public Object GetTagLevelCount() {
+        // 获取用户标签体系下的各个级别的标签分类数量
+        List<TagLevelCountDO> userTagCategoryLevelCount = tagCategoryMapper.getTagCategoryLevelCount(USER_TAG_SYSTEM_ID);
+        // 获取用户标签体系下的各个级别的标签数量
+        List<TagLevelCountDO> userTagLevelCount = tagMapper.getTagLevelCount(USER_TAG_SYSTEM_ID);
+        //组装各个标签体系下的数据
+        List<TagSystemDO> userTagSystemDOS = new ArrayList<>();
+        // 这里的数据是按照级别升序组装的
+        if(!StringUtils.isEmpty(userTagCategoryLevelCount)){
+            for (TagLevelCountDO TagLevelCountDO : userTagCategoryLevelCount) {
+                TagSystemDO tagSystemDO = new TagSystemDO();
+                tagSystemDO.setLevel(TagLevelCountDO.getLevel());
+                tagSystemDO.setTagCategoryCount(TagLevelCountDO.getTagCount());
+                userTagSystemDOS.add(tagSystemDO);
+            }
+        }
+        Integer firstLevelTagCount = null;
+        Integer secondLevelTagCount = null;
+        Integer thirdLevelTagCount = null;
+        Integer fourLevelTagCount = null;
+        if(!StringUtils.isEmpty(userTagLevelCount)){
+            /** 这里需要计算各级标签的数量 计算规则
+             * 一级 = 一级 +二级 +三级 +四级
+             * 二级 = 二级 +三级 +四级
+             * 三级 = 三级 +四级
+             * 四级 = 四级
+             */
+            Integer firstTagCount = null;
+            Integer secondTagCount = null;
+            Integer thirdTagCount = null;
+            Integer fourTagCount = null;
+
+            if(userTagLevelCount.size()==ALL_LEVEL){
+                firstTagCount = userTagLevelCount.get(0).getLevel();
+                secondTagCount = userTagLevelCount.get(1).getLevel();
+                thirdTagCount = userTagLevelCount.get(2).getLevel();
+                fourTagCount = userTagLevelCount.get(3).getLevel();
+                // 这里是处理一级标签分类下 直接挂有标签的情况
+                firstLevelTagCount = firstTagCount+secondTagCount+thirdTagCount+fourTagCount;
+            }
+
+            if(userTagLevelCount.size()==ALL_LEVEL-1){
+                secondTagCount = userTagLevelCount.get(0).getLevel();
+                thirdTagCount = userTagLevelCount.get(1).getLevel();
+                fourTagCount = userTagLevelCount.get(2).getLevel();
+            }
+            // 这里是 累加各级二到四级标签的数量
+            secondLevelTagCount = secondTagCount+thirdTagCount+fourTagCount;
+            thirdLevelTagCount = thirdTagCount+fourTagCount;
+            fourLevelTagCount = fourTagCount;
+            userTagSystemDOS.get(0).setTagCount(firstLevelTagCount);
+            userTagSystemDOS.get(1).setTagCount(secondLevelTagCount);
+            userTagSystemDOS.get(2).setTagCount(thirdLevelTagCount);
+            userTagSystemDOS.get(3).setTagCount(fourLevelTagCount);
+        }
+
+        // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+        HashMap<Integer, Object> map = new HashMap<>();
+        // 用户体系的数据组装完毕  用户体系的主键为1
+        return null;
+    }
+
+    @Override
+        public Object GetTagLevelCount() {
+            // 获取用户标签体系下的各个级别的标签分类数量
+            List<TagLevelCountDO> userTagCategoryLevelCount = tagCategoryMapper.getTagCategoryLevelCount(USER_TAG_SYSTEM_ID);
+            // 获取用户标签体系下的各个级别的标签数量
+            List<TagLevelCountDO> userTagLevelCount = tagMapper.getTagLevelCount(USER_TAG_SYSTEM_ID);
+            // 获取企业标签体系下的各个级别的标签分类数量
+            List<TagLevelCountDO> enterpriseTagCategoryLevelCount = tagCategoryMapper.getTagCategoryLevelCount(ENTERPRISE_TAG_SYSTEM_ID);
+            // 获取企业标签体系下的各个级别的标签数量
+            List<TagLevelCountDO> enterpriseTagLevelCount = tagMapper.getTagLevelCount(ENTERPRISE_TAG_SYSTEM_ID);
+            // 获取业务标签体系下的各个级别的标签分类数量
+            List<TagLevelCountDO> businessTagCategoryLevelCount = tagCategoryMapper.getTagCategoryLevelCount(BUSINESS_TAG_SYSTEM_ID);
+            // 获取业务标签体系下的各个级别的标签数量
+            List<TagLevelCountDO> businessTagLevelCount = tagMapper.getTagLevelCount(BUSINESS_TAG_SYSTEM_ID);
+            List<TagSystemDO> userTagSystemDOS = this.combineEachTagSystem(userTagCategoryLevelCount, userTagLevelCount);
+            List<TagSystemDO> enterpriseTagSystemDOS = this.combineEachTagSystem(enterpriseTagCategoryLevelCount, enterpriseTagLevelCount);
+            List<TagSystemDO> businessTagSystemDOS = this.combineEachTagSystem(businessTagCategoryLevelCount, businessTagLevelCount);
+            // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+            HashMap<Integer,List<TagSystemDO>> map = new HashMap<>();
+            // 用户体系的数据组装完毕  用户体系的主键为1
+            map.put(USER_TAG_SYSTEM_ID,userTagSystemDOS);
+            // 企业体系的数据组装完毕  用户体系的主键为2
+            map.put(ENTERPRISE_TAG_SYSTEM_ID,enterpriseTagSystemDOS);
+            // 业务体系的数据组装完毕  用户体系的主键为3
+            map.put(BUSINESS_TAG_SYSTEM_ID,businessTagSystemDOS);
+            return map;
+        }
+
+        private  List<TagSystemDO> combineEachTagSystem( List<TagLevelCountDO> sysTagCategoryLevelCount, List<TagLevelCountDO> sysTagLevelCount){
+            //组装各个标签体系下的数据
+            List<TagSystemDO> tagSystemDOS = new ArrayList<>();
+            // 这里的数据是按照级别升序组装的
+            if(!StringUtils.isEmpty(sysTagCategoryLevelCount)){
+                for (TagLevelCountDO TagLevelCountDO : sysTagCategoryLevelCount) {
+                    TagSystemDO tagSystemDO = new TagSystemDO();
+                    tagSystemDO.setLevel(TagLevelCountDO.getLevel());
+                    tagSystemDO.setTagCategoryCount(TagLevelCountDO.getTagCount());
+                    tagSystemDOS.add(tagSystemDO);
+                }
+            }
+            Integer firstLevelTagCount = null;
+            Integer secondLevelTagCount = null;
+            Integer thirdLevelTagCount = null;
+            Integer fourLevelTagCount = null;
+            if(!StringUtils.isEmpty(sysTagLevelCount)){
+                /** 这里需要计算各级标签的数量 计算规则
+                 * 一级 = 一级 +二级 +三级 +四级
+                 * 二级 = 二级 +三级 +四级
+                 * 三级 = 三级 +四级
+                 * 四级 = 四级
+                 */
+                Integer firstTagCount = null;
+                Integer secondTagCount = null;
+                Integer thirdTagCount = null;
+                Integer fourTagCount = null;
+
+                if(sysTagLevelCount.size()==ALL_LEVEL){
+                    firstTagCount = sysTagLevelCount.get(0).getLevel();
+                    secondTagCount = sysTagLevelCount.get(1).getLevel();
+                    thirdTagCount = sysTagLevelCount.get(2).getLevel();
+                    fourTagCount = sysTagLevelCount.get(3).getLevel();
+                    // 这里是处理一级标签分类下 直接挂有标签的情况
+                    firstLevelTagCount = firstTagCount+secondTagCount+thirdTagCount+fourTagCount;
+                }
+
+                if(sysTagLevelCount.size()==ALL_LEVEL-1){
+                    secondTagCount = sysTagLevelCount.get(0).getLevel();
+                    thirdTagCount = sysTagLevelCount.get(1).getLevel();
+                    fourTagCount = sysTagLevelCount.get(2).getLevel();
+                }
+                // 这里是 累加各级二到四级标签的数量
+                secondLevelTagCount = secondTagCount+thirdTagCount+fourTagCount;
+                thirdLevelTagCount = thirdTagCount+fourTagCount;
+                fourLevelTagCount = fourTagCount;
+                tagSystemDOS.get(0).setTagCount(firstLevelTagCount);
+                tagSystemDOS.get(1).setTagCount(secondLevelTagCount);
+                tagSystemDOS.get(2).setTagCount(thirdLevelTagCount);
+                tagSystemDOS.get(3).setTagCount(fourLevelTagCount);
+            }
+            return tagSystemDOS;
+        }
+
+INSERT INTO `data_web`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('1', '2af5d3b8-bc4a-44bd-b743-25b935fdbe46', '基本信息', '1', '1', '测试插入标签分类', '2020-11-20 11:45:34', 'zds', '2020-11-20 11:45:34', 'zds', '1');
+INSERT INTO `data_web`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('2', '639300ce-db26-4219-97b8-fe34e9afdd84', '人口属性', '1', '2', '测试插入标签分类', '2020-11-20 11:46:30', 'zds', '2020-11-20 11:46:30', 'zds', '1');
+INSERT INTO `data_web`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('3', '523675b8-b79b-4a1a-905c-925be296f9d0', '社会属性', '1', '2', '测试标签分类插入', '2020-11-20 12:37:14', 'zds', '2020-11-20 12:37:14', 'zds', '1');
+INSERT INTO `data_web`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('4', '3a74caa7-e92f-4ea3-98bb-cc15ee83452c', '地理位置', '1', '2', '测试标签分类插入', '2020-11-20 12:44:46', 'zds', '2020-11-20 12:44:46', 'zds', '1');
+
+
+
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('1', 'age', '年龄', '2', 'int', '1', '-1', '1', '大于18小于80', 'sha1', '测试标签插入', '2020-11-20 12:13:56', 'zds', '2020-11-20 12:13:56', 'zds', NULL, NULL, '1', '1');
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('2', 'age', '年龄', '2', 'int', '1', '-1', '1', '大于18 小于80', 'sha1', '测试标签插入', '2020-11-20 12:34:47', 'zds', '2020-11-20 12:34:47', 'zds', '1', '2', '1', '1');
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('3', 'gender', '性别', '2', 'string', '1', '-1', '1', '1或0', 'sha1', '测试标签插入', '2020-11-20 12:36:00', 'zds', '2020-11-20 12:36:00', 'zds', '1', '2', '1', '1');
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('4', 'marital status', '婚姻状况', '3', 'string', '1', '-1', '1', '未婚 已婚 离婚', 'sha1', '测试标签插入', '2020-11-20 12:39:43', 'zds', '2020-11-20 12:39:43', 'zds', '1', '2', '1', '1');
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('5', 'ishavecar', '是否有车', '3', 'string', '1', '-1', '1', '有车没得', 'sha1', '测试标签插入', '2020-11-20 12:40:54', 'zds', '2020-11-20 12:40:54', 'zds', '1', '2', '1', '1');
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('6', 'ishavehouse', '是否有房', '3', 'string', '1', '-1', '1', '有房没得', 'sha1', '测试标签插入', '2020-11-20 12:41:23', 'zds', '2020-11-20 12:41:23', 'zds', '1', '2', '1', '1');
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('7', 'houseyearincome', '家庭年收入', '3', 'string', '1', '-1', '1', '大于10万 小于100万', 'sha1', '测试标签插入', '2020-11-20 12:42:19', 'zds', '2020-11-20 12:42:19', 'zds', '1', '2', '1', '1');
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('8', 'homeyearoutcome', '家庭年支出', '3', 'string', '1', '-1', '1', '大于10万 小于100万', 'sha1', '测试标签插入', '2020-11-20 12:42:58', 'zds', '2020-11-20 12:42:58', 'zds', '1', '2', '1', '1');
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('9', 'province', '所在省份', '4', 'string', '1', '-1', '1', '31个省', 'sha1', '测试标签插入', '2020-11-20 12:45:53', 'zds', '2020-11-20 12:45:53', 'zds', '1', '2', '1', '1');
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('10', 'city', '所在城市', '4', 'string', '1', '-1', '1', 'cs', 'sha1', '测试标签插入', '2020-11-20 12:46:22', 'zds', '2020-11-20 12:46:22', 'zds', '1', '2', '1', '1');
+INSERT INTO `data_web`.`tag_sys` (`id`, `field`, `name`, `category_id`, `value_type`, `update_cycle_id`, `status`, `authority`, `rule`, `algorithm`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`, `level`, `entity_id`, `tag_type_id`) VALUES ('11', 'area', '所在地区', '4', 'string', '1', '-1', '1', 'cs', 'sha1', '测试标签插入', '2020-11-20 12:47:21', 'zds', '2020-11-20 12:47:21', 'zds', '1', '2', '1', '1');
