@@ -210,6 +210,109 @@ ES 初步学习
         1.暂无
 
 
+          @Override
+            public Object getEveryLevelTagCount() {
+                //获取所有体系下的 标签分类数量
+                List<TagLevelCountDO> allSystemTagCategoryCount = tagCategoryMapper.getAllSystemTagCategoryCount();
+                List<TagLevelCountDO> userTagCounts = null;
+                List<TagLevelCountDO> enterpriseTagCounts = null;
+                List<TagLevelCountDO> businessTagCounts = null;
+                //获取所有体系下的 标签分类数量
+                List<TagLevelCountDO> allSystemTagCount = tagMapper.getAllSystemTagCount();
+                for (TagLevelCountDO tagCountDO : allSystemTagCount) {
+                    // 用户
+                    if(tagCountDO.getSysId().equals(FIRST_LEVEL)){
+                        userTagCounts = this.getTagCount(FIRST_LEVEL, tagCountDO);
+                    }
+                    // 企业
+                    if(tagCountDO.getSysId().equals(SECOND_LEVEL)){
+                        enterpriseTagCounts = this.getTagCount(SECOND_LEVEL, tagCountDO);
+                    }
+                    // 业务
+                    if(tagCountDO.getSysId().equals(THIRD_LEVEL)){
+                        businessTagCounts = this.getTagCount(THIRD_LEVEL, tagCountDO);
+                    }
+                }
+                List<TagSystemDO> userTagSystem = null;
+                List<TagSystemDO> enterpriseTagSystem = null;
+                List<TagSystemDO> businessTagSystem = null;
+                for (TagLevelCountDO tagLevelCountDO : allSystemTagCategoryCount) {
+                    // 处理用户标签体系
+                    if(tagLevelCountDO.getSysId().equals(FIRST_LEVEL)){
+                        userTagSystem = this.getTagSystemCount(FIRST_LEVEL,tagLevelCountDO);
+                    }
+                    // 处理企业标签体系
+                    if(tagLevelCountDO.getSysId().equals(SECOND_LEVEL)){
+                        enterpriseTagSystem = this.getTagSystemCount(SECOND_LEVEL,tagLevelCountDO);
+                    }
+                    // 处理业务标签体系
+                    if(tagLevelCountDO.getSysId().equals(THIRD_LEVEL)){
+                        businessTagSystem = this.getTagSystemCount(THIRD_LEVEL,tagLevelCountDO);
+                    }
+                }
+                if(!StringUtils.isEmpty(userTagSystem)){
+                    for (TagSystemDO tagSystemDO : userTagSystem) {
+                     tagSystemDO.setTagCount(this.levelTagCount(tagSystemDO.getLevel(),userTagCounts));
+                   }
+                }
+                if(!StringUtils.isEmpty(enterpriseTagSystem)){
+                    for (TagSystemDO tagSystemDO : enterpriseTagSystem) {
+                    tagSystemDO.setTagCount(this.levelTagCount(tagSystemDO.getLevel(),enterpriseTagCounts));
+                  }
+                }
+                if(!StringUtils.isEmpty(businessTagSystem)){
+                    for (TagSystemDO tagSystemDO : businessTagSystem) {
+                    tagSystemDO.setTagCount(this.levelTagCount(tagSystemDO.getLevel(),businessTagCounts));
+                  }
+                }
+                // 存储各个体系下的 关于标签分类和标签的数量
+                // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+                HashMap<Integer,List<TagSystemDO>> map = new HashMap<>(ALL_TAG_SYSTEM_COUNT);
+                // 用户体系的数据组装完毕  用户体系的主键为1
+                map.put(USER_TAG_SYSTEM_ID,userTagSystem);
+                // 企业体系的数据组装完毕  用户体系的主键为2
+                map.put(ENTERPRISE_TAG_SYSTEM_ID,enterpriseTagSystem);
+                // 业务体系的数据组装完毕  用户体系的主键为3
+                map.put(BUSINESS_TAG_SYSTEM_ID,businessTagSystem);
+                return map;
+            }
+
+            private  List<TagSystemDO> getTagSystemCount(Integer sysId,TagLevelCountDO tagLevelCountDO){
+                List<TagSystemDO> tagSystem = new ArrayList<>();
+                // 处理用户标签体系
+                if(tagLevelCountDO.getSysId().equals(sysId)){
+                    TagSystemDO tagSystemDO = new TagSystemDO();
+                    tagSystemDO.setLevel(tagLevelCountDO.getLevel());
+                    tagSystemDO.setTagCategoryCount(tagLevelCountDO.getTagCount());
+                    tagSystem.add(tagSystemDO);
+                }
+                return tagSystem;
+            }
+
+             private  List<TagLevelCountDO> getTagCount(Integer sysId,TagLevelCountDO tagLevelCountDO){
+                List<TagLevelCountDO> tagCounts = new ArrayList<>();
+                // 处理用户标签体系
+                if(tagLevelCountDO.getSysId().equals(sysId)){
+                    tagCounts.add(tagLevelCountDO);
+                }
+                return tagCounts;
+            }
+
+            // 每一级标签数量的计算
+            private Integer levelTagCount(Integer level,List<TagLevelCountDO> tagLevelCounts){
+                Integer tagCount = 0;
+                // 统计大于等于当前级别的累加和
+                for (TagLevelCountDO tagLevelCount : tagLevelCounts) {
+                    if(tagLevelCount.getLevel()>=level){
+                        tagCount+=tagLevelCount.getTagCount();
+                    }
+                    System.out.println(tagCount+"-------------->");
+                }
+                return tagCount;
+            }
+
+
+
 
 
 

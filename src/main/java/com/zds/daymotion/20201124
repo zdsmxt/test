@@ -1,0 +1,1243 @@
+package com.data.web.backend.service.impl;
+
+import com.data.web.backend.domains.TagCategoryDO;
+import com.data.web.backend.domains.TagDO;
+import com.data.web.backend.domains.TagLevelCountDO;
+import com.data.web.backend.domains.TagSystemDO;
+import com.data.web.backend.domains.vo.TagVO;
+import com.data.web.backend.mapper.TagCategoryMapper;
+import com.data.web.backend.mapper.TagMapper;
+import com.data.web.backend.service.TagService;
+import com.data.web.backend.utils.BeanUtil;
+import com.data.web.backend.utils.UserUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * @author zhudongsheng
+ * @Description: TODO
+ * @date 2020/11/19 14:41
+ */
+@Service
+public class TagServiceImpl implements TagService {
+
+    @Autowired
+    private TagMapper tagMapper;
+
+    @Autowired
+    private TagCategoryMapper tagCategoryMapper;
+
+    /**
+     * 用户标签体系主键
+     */
+    public static final Integer USER_TAG_SYSTEM_ID = 1;
+
+    /**
+     * 企业标签体系主键
+     */
+    public static final Integer ENTERPRISE_TAG_SYSTEM_ID = 2;
+
+    /**
+     * 业务标签体系主键
+     */
+    public static final Integer BUSINESS_TAG_SYSTEM_ID = 3;
+
+    /**
+     * 所有级别总数只有四级 或 用来判定 各个级别下标签分类下的标签数量
+     */
+    public static final Integer ALL_LEVEL = 4;
+
+    /**
+     * 一级 或 用户标签体系id=1
+     */
+    public static final Integer FIRST_LEVEL = 1;
+
+    /**
+     * 二级 或 用来判定 各个级别下标签分类下的标签数量 或用来 企业体系主键id=2
+     */
+    public static final Integer SECOND_LEVEL = 2;
+
+    /**
+     * 三级 或 用来判定 各个级别下标签分类下的标签数量 或 业务标签体系id =3
+     */
+    public static final Integer THIRD_LEVEL = 3;
+
+   /**
+     * 三级
+     */
+    public static final Integer ZERO_TAG_COUNT = 0;
+
+   /**
+     * 总共的标签体系 三个 用户 企业 业务
+     */
+    public static final Integer ALL_TAG_SYSTEM_COUNT = 3;
+    @Override
+    public Object addTag(TagVO tagVO) {
+        TagDO tagDO = BeanUtil.copy(tagVO, new TagDO());
+        // 这里对于标签部门权限的处理 会用一张部门标签表来关联这种多对多的关系
+        Integer categoryId = tagDO.getCategoryId();
+        //这里给这个标签添加所属的标签分级的id
+        if(!StringUtils.isEmpty(categoryId)){
+            TagCategoryDO tagCategoryDO = tagCategoryMapper.selectTagCategoryById(categoryId);
+            Integer level = tagCategoryDO.getLevel();
+            Integer sysId = tagCategoryDO.getSysId();
+            if(!StringUtils.isEmpty(level)&&!StringUtils.isEmpty(level)){
+                tagDO.setLevel(level);
+                tagDO.setSysId(sysId);
+            }
+        }
+        Date currentTime = new Date();
+        String userName = UserUtil.getUserName();
+        tagDO.setCreateTime(currentTime);
+        tagDO.setCreateUser(userName);
+        tagDO.setUpdateTime(currentTime);
+        tagDO.setUpdateUser(userName);
+        // 如果使用默认的是不会返回 插入成功后返回的主键  这里是返回插入成功的状态值1
+        tagMapper.insertUseGeneratedKeys(tagDO);
+        /** 获取上一步插图标签成功的标签主键id 加上外部用户选择部门选择的下拉菜单deptId or deptIds 这里
+         * （如果目前用户只可可以选择自己所在的部门  考虑后期是否会有权限比较高用户 一次可以为这个标签 选择多个部门
+         * or标签审核 给别的部门赋予这个标签的部门 需要在部门标签表里面维护 被授权使用的标签id 和部门id 的关联关系）
+         */
+        //TODO：数据权限 添加部门标签关联表  id deptid tid sys_dept_tag
+        return tagMapper.selectByPrimaryKey(tagDO);
+    }
+
+    @Override
+    public Object updateTag(TagVO tagVO) {
+        TagDO tagDO = BeanUtil.copy(tagVO, new TagDO());
+        String userName = UserUtil.getUserName();
+        tagDO.setUpdateTime(new Date());
+        tagDO.setUpdateUser(userName);
+        tagMapper.updateByPrimaryKeySelective(tagDO);
+        return tagMapper.selectByPrimaryKey(tagDO);
+    }
+
+    @Override
+    public Object getTag(Integer id) {
+        return tagMapper.selectTagById(id);
+    }
+
+    @Override
+    public Object batchEnableTag(List<Integer> ids) {
+        tagMapper.batchEnableTag(ids);
+        return "batchEnableTag success";
+    }
+
+    @Override
+    public List<TagDO> getTagsCondition(TagVO tagVO) {
+        return tagMapper.getTagsByTagCategoryIdCondition(tagVO);
+    }
+
+    @Override
+    public Object getTagLevelCount() {
+
+        // 获取用户标签体系下的各个级别的标签分类数量
+        List<TagLevelCountDO> userTagCategoryLevelCount = tagCategoryMapper.getTagCategoryLevelCount(USER_TAG_SYSTEM_ID);
+        // 获取用户标签体系下的各个级别的标签数量
+        List<TagLevelCountDO> userTagLevelCount = tagMapper.getTagLevelCount(USER_TAG_SYSTEM_ID);
+        // 获取企业标签体系下的各个级别的标签分类数量
+        List<TagLevelCountDO> enterpriseTagCategoryLevelCount = tagCategoryMapper.getTagCategoryLevelCount(ENTERPRISE_TAG_SYSTEM_ID);
+        // 获取企业标签体系下的各个级别的标签数量
+        List<TagLevelCountDO> enterpriseTagLevelCount = tagMapper.getTagLevelCount(ENTERPRISE_TAG_SYSTEM_ID);
+        // 获取业务标签体系下的各个级别的标签分类数量
+        List<TagLevelCountDO> businessTagCategoryLevelCount = tagCategoryMapper.getTagCategoryLevelCount(BUSINESS_TAG_SYSTEM_ID);
+        // 获取业务标签体系下的各个级别的标签数量
+        List<TagLevelCountDO> businessTagLevelCount = tagMapper.getTagLevelCount(BUSINESS_TAG_SYSTEM_ID);
+
+
+        List<TagSystemDO> userTagSystems = this.combineEachTagSystem(userTagCategoryLevelCount, userTagLevelCount);
+        List<TagSystemDO> enterpriseTagSystems = this.combineEachTagSystem(enterpriseTagCategoryLevelCount, enterpriseTagLevelCount);
+        List<TagSystemDO> businessTagSystems = this.combineEachTagSystem(businessTagCategoryLevelCount, businessTagLevelCount);
+        // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+        HashMap<Integer,List<TagSystemDO>> map = new HashMap<>(ALL_TAG_SYSTEM_COUNT);
+        // 用户体系的数据组装完毕  用户体系的主键为1
+        map.put(USER_TAG_SYSTEM_ID,userTagSystems);
+        // 企业体系的数据组装完毕  用户体系的主键为2
+        map.put(ENTERPRISE_TAG_SYSTEM_ID,enterpriseTagSystems);
+        // 业务体系的数据组装完毕  用户体系的主键为3
+        map.put(BUSINESS_TAG_SYSTEM_ID,businessTagSystems);
+        return map;
+    }
+
+    private  List<TagSystemDO> combineEachTagSystem( List<TagLevelCountDO> sysTagCategoryLevelCount, List<TagLevelCountDO> sysTagLevelCount){
+        //组装各个标签体系下的数据
+        List<TagSystemDO> tagSystems = new ArrayList<>();
+        // 这里的数据是按照级别升序组装的
+        if(!StringUtils.isEmpty(sysTagCategoryLevelCount)){
+            for (TagLevelCountDO tagLevelCountDO : sysTagCategoryLevelCount) {
+                TagSystemDO tagSystemDO = new TagSystemDO();
+                tagSystemDO.setLevel(tagLevelCountDO.getLevel());
+                tagSystemDO.setTagCategoryCount(tagLevelCountDO.getTagCount());
+                tagSystems.add(tagSystemDO);
+            }
+        }
+        Integer firstLevelTagCount = null,secondLevelTagCount = null,thirdLevelTagCount = null, fourLevelTagCount = null;
+        if(!StringUtils.isEmpty(sysTagLevelCount)&&sysTagLevelCount!=null){
+            /** 这里需要计算各级标签的数量 计算规则
+             * 一级 = 一级 +二级 +三级 +四级
+             * 二级 = 二级 +三级 +四级
+             * 三级 = 三级 +四级
+             * 四级 = 四级
+             */
+            Integer firstTagCount = null, secondTagCount = null, thirdTagCount = null,fourTagCount = null;
+            // 如果标签表里面的返回的数据有《四条》 那就是包含一级到四级（这种情况 根据现有情况 可能永远碰不上 因为没有那个一级标签分类下直接挂标签的情况）
+            if(sysTagLevelCount.size()==ALL_LEVEL){
+                firstTagCount = sysTagLevelCount.get(0).getTagCount();
+                secondTagCount = sysTagLevelCount.get(1).getTagCount();
+                thirdTagCount = sysTagLevelCount.get(2).getTagCount();
+                fourTagCount = sysTagLevelCount.get(3).getTagCount();
+                // 这里是处理一级到四级 标签分类下 直接挂有标签的情况
+                firstLevelTagCount = firstTagCount+secondTagCount+thirdTagCount+fourTagCount;
+                countFourLevelTagCount(tagSystems, firstLevelTagCount, secondTagCount, thirdTagCount, fourTagCount);
+            }
+            /** 如果标签表里面的返回的数据有《三条》 那就是有可能 一级到三级   或者二级到四级
+             * 这里需要根据 你读到的级别level 进行设置值 否则容易出现NPE 问题
+            */
+            if(sysTagLevelCount.size()==THIRD_LEVEL){
+                // 如果从标签表获取的第一个下标级别是从level = 1级开始的  一级到三级
+                if( sysTagLevelCount.get(0).getLevel().equals(FIRST_LEVEL)){
+                    firstTagCount = sysTagLevelCount.get(0).getTagCount();
+                    secondTagCount = sysTagLevelCount.get(1).getTagCount();
+                    thirdTagCount = sysTagLevelCount.get(2).getTagCount();
+                    firstLevelTagCount = firstTagCount+secondTagCount+thirdTagCount;
+                    secondLevelTagCount = secondTagCount+thirdTagCount;
+                    thirdLevelTagCount = thirdTagCount;
+                    fourLevelTagCount = ZERO_TAG_COUNT;
+                    tagSystems.get(0).setTagCount(firstLevelTagCount);
+                    tagSystems.get(1).setTagCount(secondLevelTagCount);
+                    tagSystems.get(2).setTagCount(thirdLevelTagCount);
+                    tagSystems.get(3).setTagCount(fourLevelTagCount);
+                }
+                // 如果从标签表获取的第一个下标级别是从level = 2级开始的  二级到四级
+                if( sysTagLevelCount.get(0).getLevel().equals(SECOND_LEVEL)){
+                    secondTagCount = sysTagLevelCount.get(0).getTagCount();
+                    thirdTagCount = sysTagLevelCount.get(1).getTagCount();
+                    fourTagCount = sysTagLevelCount.get(2).getTagCount();
+                    countFourLevelTagCount(tagSystems, secondLevelTagCount, secondTagCount, thirdTagCount, fourTagCount);
+                }
+            }
+            // 如果标签表里面的返回的数据有《两条》 那就是有可能 二级到三级   或者三级到四级  或者二级，四级
+            if(sysTagLevelCount.size()==SECOND_LEVEL){
+                // 如果从标签表获取的第一个下标级别是从level = 2级开始的 二级到三级
+                if( sysTagLevelCount.get(0).getLevel().equals(SECOND_LEVEL)){
+                    countTwoLevelTagCount(sysTagLevelCount, tagSystems, ZERO_TAG_COUNT);
+                }
+                 // 如果从标签表获取的第一个下标级别是从level = 3级开始的 三级到四级
+                if( sysTagLevelCount.get(0).getLevel().equals(THIRD_LEVEL)){
+                    thirdTagCount = sysTagLevelCount.get(0).getTagCount();
+                    fourTagCount = sysTagLevelCount.get(1).getTagCount();
+                    thirdLevelTagCount = thirdTagCount+fourTagCount;
+                    fourLevelTagCount = fourTagCount;
+                    tagSystems.get(0).setTagCount(thirdLevelTagCount);
+                    tagSystems.get(1).setTagCount(thirdLevelTagCount);
+                    tagSystems.get(2).setTagCount(thirdLevelTagCount);
+                    tagSystems.get(3).setTagCount(fourLevelTagCount);
+                }
+                // 如果从标签表获取的第一个下标级别是从level = 2级开始的 二级和四级
+                if( sysTagLevelCount.get(0).getLevel().equals(SECOND_LEVEL)&&sysTagLevelCount.get(1).getLevel().equals(ALL_LEVEL)){
+                    countTwoLevelTagCount(sysTagLevelCount, tagSystems, fourTagCount);
+                }
+            }
+        }
+        return tagSystems;
+    }
+
+    private void countTwoLevelTagCount(List<TagLevelCountDO> sysTagLevelCount, List<TagSystemDO> tagSystems, Integer zeroTagCount) {
+        Integer secondTagCount;
+        Integer thirdTagCount;
+        Integer secondLevelTagCount;
+        Integer thirdLevelTagCount;
+        Integer fourLevelTagCount;
+        secondTagCount = sysTagLevelCount.get(0).getTagCount();
+        thirdTagCount = sysTagLevelCount.get(1).getTagCount();
+        secondLevelTagCount = secondTagCount+thirdTagCount;
+        thirdLevelTagCount = thirdTagCount;
+        fourLevelTagCount = zeroTagCount;
+        tagSystems.get(0).setTagCount(secondLevelTagCount);
+        tagSystems.get(1).setTagCount(secondLevelTagCount);
+        tagSystems.get(2).setTagCount(thirdLevelTagCount);
+        tagSystems.get(3).setTagCount(fourLevelTagCount);
+    }
+
+    private void countFourLevelTagCount(List<TagSystemDO> tagSystems, Integer firstLevelTagCount, Integer secondTagCount, Integer thirdTagCount, Integer fourTagCount) {
+        Integer secondLevelTagCount;
+        Integer thirdLevelTagCount;
+        Integer fourLevelTagCount;
+        secondLevelTagCount = secondTagCount+thirdTagCount+fourTagCount;
+        thirdLevelTagCount = thirdTagCount+fourTagCount;
+        fourLevelTagCount = fourTagCount;
+        tagSystems.get(0).setTagCount(firstLevelTagCount);
+        tagSystems.get(1).setTagCount(secondLevelTagCount);
+        tagSystems.get(2).setTagCount(thirdLevelTagCount);
+        tagSystems.get(3).setTagCount(fourLevelTagCount);
+    }
+
+
+
+    @Override
+    public Object getEveryLevelTagCount() {
+        //获取所有体系下的 标签分类数量
+        List<TagLevelCountDO> allSystemTagCategoryCount = tagCategoryMapper.getAllSystemTagCategoryCount();
+        List<TagLevelCountDO> userTagCounts = new ArrayList<>();
+        List<TagLevelCountDO> enterpriseTagCounts = new ArrayList<>();
+        List<TagLevelCountDO> businessTagCounts = new ArrayList<>();
+        //获取所有体系下的 标签分类数量
+        List<TagLevelCountDO> allSystemTagCount = tagMapper.getAllSystemTagCount();
+        for (TagLevelCountDO tagCountDO : allSystemTagCount) {
+            // 用户 根据标签分类所属的体系id 取出这个体系下的所有各个级别的标签分类数量
+            if(tagCountDO.getSysId().equals(FIRST_LEVEL)){
+                // 这里面最终只能获取这个体系下的最后一条数据 ？ 如何获取这个体系下的所有标签分类的数量
+//                userTagCounts = this.getTagCount(FIRST_LEVEL, tagCountDO);
+                userTagCounts.add(tagCountDO);
+            }
+            // 企业
+            if(tagCountDO.getSysId().equals(SECOND_LEVEL)){
+//                enterpriseTagCounts = this.getTagCount(SECOND_LEVEL, tagCountDO);
+                enterpriseTagCounts.add(tagCountDO);
+            }
+            // 业务
+            if(tagCountDO.getSysId().equals(THIRD_LEVEL)){
+//                businessTagCounts = this.getTagCount(THIRD_LEVEL, tagCountDO);
+                businessTagCounts.add(tagCountDO);
+            }
+        }
+        // 分离出 各个标签分类对应的 各级数量
+        List<TagLevelCountDO> userTagCategoryCounts = new ArrayList<>();
+        List<TagLevelCountDO> enterpriseCategoryTagCounts = new ArrayList<>();
+        List<TagLevelCountDO> businessTagCategoryCounts = new ArrayList<>();
+        for (TagLevelCountDO tagLevelCountDO : allSystemTagCategoryCount) {
+            // 处理用户标签体系
+            if(tagLevelCountDO.getSysId().equals(FIRST_LEVEL)){
+//                userTagSystem = this.getTagSystemCount(FIRST_LEVEL,tagLevelCountDO);
+                userTagCategoryCounts.add(tagLevelCountDO);
+            }
+            // 处理企业标签体系
+            if(tagLevelCountDO.getSysId().equals(SECOND_LEVEL)){
+//                enterpriseTagSystem = this.getTagSystemCount(SECOND_LEVEL,tagLevelCountDO);
+                enterpriseCategoryTagCounts.add(tagLevelCountDO);
+            }
+            // 处理业务标签体系
+            if(tagLevelCountDO.getSysId().equals(THIRD_LEVEL)){
+//                businessTagSystem = this.getTagSystemCount(THIRD_LEVEL,tagLevelCountDO);
+                businessTagCategoryCounts.add(tagLevelCountDO);
+            }
+
+        }
+        List<TagSystemDO> userTagSystem = new ArrayList<>();
+        List<TagSystemDO> enterpriseTagSystem = new ArrayList<>();
+        List<TagSystemDO> businessTagSystem = new ArrayList<>();
+        for (TagLevelCountDO userTagCategoryCount : userTagCategoryCounts) {
+            userTagSystem.add(this.getTagSystemDO(userTagCategoryCount));
+        }
+        for (TagLevelCountDO enterpriseCategoryTagCount : enterpriseCategoryTagCounts) {
+            enterpriseTagSystem.add(this.getTagSystemDO(enterpriseCategoryTagCount));
+        }
+        for (TagLevelCountDO businessTagCategoryCount : businessTagCategoryCounts) {
+            businessTagSystem.add(this.getTagSystemDO(businessTagCategoryCount));
+        }
+
+
+        if(!StringUtils.isEmpty(userTagSystem)){
+            for (TagSystemDO tagSystemDO : userTagSystem) {
+             tagSystemDO.setTagCount(this.levelTagCount(tagSystemDO.getLevel(),userTagCounts));
+           }
+        }
+        if(!StringUtils.isEmpty(enterpriseTagSystem)){
+            for (TagSystemDO tagSystemDO : enterpriseTagSystem) {
+            tagSystemDO.setTagCount(this.levelTagCount(tagSystemDO.getLevel(),enterpriseTagCounts));
+          }
+        }
+        if(!StringUtils.isEmpty(businessTagSystem)){
+            for (TagSystemDO tagSystemDO : businessTagSystem) {
+            tagSystemDO.setTagCount(this.levelTagCount(tagSystemDO.getLevel(),businessTagCounts));
+          }
+        }
+        // 存储各个体系下的 关于标签分类和标签的数量
+        // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+        HashMap<Integer,List<TagSystemDO>> map = new HashMap<>(ALL_TAG_SYSTEM_COUNT);
+        // 用户体系的数据组装完毕  用户体系的主键为1
+        map.put(USER_TAG_SYSTEM_ID,userTagSystem);
+        // 企业体系的数据组装完毕  用户体系的主键为2
+        map.put(ENTERPRISE_TAG_SYSTEM_ID,enterpriseTagSystem);
+        // 业务体系的数据组装完毕  用户体系的主键为3
+        map.put(BUSINESS_TAG_SYSTEM_ID,businessTagSystem);
+        return map;
+    }
+
+    private  List<TagSystemDO> getTagSystemCount(Integer sysId,TagLevelCountDO tagLevelCountDO){
+        List<TagSystemDO> tagSystem = new ArrayList<>();
+        // 处理用户标签体系
+        if(tagLevelCountDO.getSysId().equals(sysId)){
+            TagSystemDO tagSystemDO = new TagSystemDO();
+            tagSystemDO.setLevel(tagLevelCountDO.getLevel());
+            tagSystemDO.setTagCategoryCount(tagLevelCountDO.getTagCount());
+            tagSystem.add(tagSystemDO);
+        }
+        return tagSystem;
+    }
+
+    private  TagSystemDO getTagSystemDO(TagLevelCountDO tagLevelCountDO){
+        TagSystemDO tagSystemDO = new TagSystemDO();
+        tagSystemDO.setLevel(tagLevelCountDO.getLevel());
+        tagSystemDO.setTagCategoryCount(tagLevelCountDO.getTagCount());
+        return tagSystemDO;
+    }
+
+     private  List<TagLevelCountDO> getTagCount(Integer sysId,TagLevelCountDO tagLevelCountDO){
+        List<TagLevelCountDO> tagCounts = new ArrayList<>();
+        // 处理用户标签体系
+        if(tagLevelCountDO.getSysId().equals(sysId)){
+            tagCounts.add(tagLevelCountDO);
+        }
+        return tagCounts;
+    }
+
+    // 每一级标签数量的计算
+    private Integer levelTagCount(Integer level,List<TagLevelCountDO> tagLevelCounts){
+        Integer tagCount = 0;
+        // 统计大于等于当前级别的累加和
+        for (TagLevelCountDO tagLevelCount : tagLevelCounts) {
+            if(tagLevelCount.getLevel()>=level){
+                tagCount+=tagLevelCount.getTagCount();
+            }
+            System.out.println(tagCount+"-------------->");
+        }
+        return tagCount;
+    }
+
+
+}
+
+
+
+
+
+  @Override
+    public Object getEveryLevelTagCount() {
+        //获取所有体系下的 标签分类数量
+        List<TagLevelCountDO> allSystemTagCategoryCount = tagCategoryMapper.getAllSystemTagCategoryCount();
+        List<TagLevelCountDO> userTagCounts = new ArrayList<>();
+        List<TagLevelCountDO> enterpriseTagCounts = new ArrayList<>();
+        List<TagLevelCountDO> businessTagCounts = new ArrayList<>();
+        //获取所有体系下的 标签分类数量
+        List<TagLevelCountDO> allSystemTagCount = tagMapper.getAllSystemTagCount();
+        //按照体系分离标签
+        separateByTagSystem(userTagCounts, enterpriseTagCounts, businessTagCounts, allSystemTagCount);
+        // 分离出 各个标签分类对应的 各级数量
+        List<TagLevelCountDO> userTagCategoryCounts = new ArrayList<>();
+        List<TagLevelCountDO> enterpriseCategoryTagCounts = new ArrayList<>();
+        List<TagLevelCountDO> businessTagCategoryCounts = new ArrayList<>();
+        //按照体系分离标签分类
+        separateByTagSystem(userTagCategoryCounts, enterpriseCategoryTagCounts, businessTagCategoryCounts, allSystemTagCategoryCount);
+        List<TagSystemDO> userTagSystem = new ArrayList<>();
+        List<TagSystemDO> enterpriseTagSystem = new ArrayList<>();
+        List<TagSystemDO> businessTagSystem = new ArrayList<>();
+        userTagCategoryCounts.forEach(item -> userTagSystem.add(this.getTagSystemDO(item)));
+        enterpriseCategoryTagCounts.forEach(item -> enterpriseTagSystem.add(this.getTagSystemDO(item)));
+        businessTagCategoryCounts.forEach(item -> businessTagSystem.add(this.getTagSystemDO(item)));
+        // 给用户体系各个级别的标签计算数量并赋值
+        userTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), userTagCounts)));
+        // 给企业体系各个级别的标签计算数量并赋值
+        enterpriseTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), enterpriseTagCounts)));
+        // 给业务体系各个级别的标签计算数量并赋值
+        businessTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), businessTagCounts)));
+        // 存储各个体系下的 关于标签分类和标签的数量
+        // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+        HashMap<Integer,List<TagSystemDO>> map = new HashMap<>(ALL_TAG_SYSTEM_COUNT);
+        // 用户体系的数据组装完毕  用户体系的主键为1
+        map.put(USER_TAG_SYSTEM_ID,userTagSystem);
+        // 企业体系的数据组装完毕  用户体系的主键为2
+        map.put(ENTERPRISE_TAG_SYSTEM_ID,enterpriseTagSystem);
+        // 业务体系的数据组装完毕  用户体系的主键为3
+        map.put(BUSINESS_TAG_SYSTEM_ID,businessTagSystem);
+        return map;
+    }
+
+    private void separateByTagSystem(List<TagLevelCountDO> userTagCounts, List<TagLevelCountDO> enterpriseTagCounts, List<TagLevelCountDO> businessTagCounts, List<TagLevelCountDO> allSystemTagCount) {
+        for (TagLevelCountDO tagCountDO : allSystemTagCount) {
+            // 用户 根据标签分类所属的体系id 取出这个体系下的所有各个级别的标签分类数量
+            if(tagCountDO.getSysId().equals(FIRST_LEVEL)){
+                userTagCounts.add(tagCountDO);
+            }
+            // 企业
+            if(tagCountDO.getSysId().equals(SECOND_LEVEL)){
+                enterpriseTagCounts.add(tagCountDO);
+            }
+            // 业务
+            if(tagCountDO.getSysId().equals(THIRD_LEVEL)){
+                businessTagCounts.add(tagCountDO);
+            }
+        }
+    }
+
+    private  TagSystemDO getTagSystemDO(TagLevelCountDO tagLevelCountDO){
+        TagSystemDO tagSystemDO = new TagSystemDO();
+        tagSystemDO.setLevel(tagLevelCountDO.getLevel());
+        tagSystemDO.setTagCategoryCount(tagLevelCountDO.getTagCount());
+        return tagSystemDO;
+    }
+
+    /**
+     * @Description //TODO
+     * 每一级标签数量的计算 计算规则如下：
+     * 一级 = 一级 +二级 +三级 +四级
+     * 二级 = 二级 +三级 +四级
+     * 三级 = 三级 +四级
+     * 四级 = 四级
+     * @Date 2020/11/24 10:00
+     * @param level 遍历到的级别  tagLevelCounts 你从标签表里面获取的每一个级别下的标签数量
+     * @return 这个级别下的标签数量
+     */
+    private Integer levelTagCount(Integer level,List<TagLevelCountDO> tagLevelCounts){
+        Integer tagCount = 0;
+        // 统计大于等于当前级别的累加和
+        for (TagLevelCountDO tagLevelCount : tagLevelCounts) {
+            if(tagLevelCount.getLevel()>=level){
+                tagCount+=tagLevelCount.getTagCount();
+            }
+        }
+        return tagCount;
+    }
+
+
+    default EntityDO selectEntityByName(String name) {
+        Example example = new Example(EntityDO.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("name", name);
+        return this.selectOneByExample(example);
+    }
+
+
+ @Select("select level ,count(id) as tagCount from tag_category where sys_id = #{sysId, jdbcType=INTEGER} group by level")
+    List<TagLevelCountDO> getTagCategoryLevelCount(@Param("sysId")Integer sysId);
+
+
+    default TagCategoryDO getTagCategoryByName(String name) {
+        Example example = new Example(TagCategoryDO.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("name",name );
+        return this.selectOneByExample(example);
+    }
+
+
+
+    @Select("select level ,count(id) as tagCount from tag_sys where sys_id = #{sysId, jdbcType=INTEGER} group by level")
+    List<TagLevelCountDO> getTagLevelCount(@Param("sysId")Integer sysId);
+
+
+    default List<TagDO> getTagsByCategoryId(Integer tagCategoryId) {
+        Example example = new Example(TagDO.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("categoryId",tagCategoryId );
+        return this.selectByExample(example);
+    }
+
+
+    default TagDO getTagByName(String name) {
+        Example example = new Example(TagDO.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("name",name );
+        return this.selectOneByExample(example);
+    }
+
+    @Options(useGeneratedKeys=true,keyProperty="id",keyColumn="id")
+    default Integer insertTag(TagDO tagDO) {
+        return this.insert(tagDO);
+    }
+
+//        List<TagSystemDO> userTagSystem = userTagCategoryCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+//        List<TagSystemDO> enterpriseTagSystem = enterpriseCategoryTagCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+//        List<TagSystemDO> businessTagSystem = businessTagCategoryCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+
+
+
+//        List<TagSystemDO> userTagSystem = new ArrayList<>();
+        List<TagSystemDO> enterpriseTagSystem = new ArrayList<>();
+        List<TagSystemDO> businessTagSystem = new ArrayList<>();
+
+        List<TagSystemDO> userTagSystem = userTagCategoryCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+//        userTagCategoryCounts.forEach(item -> userTagSystem.add(this.getTagSystemDO(item)));
+        enterpriseCategoryTagCounts.forEach(item -> enterpriseTagSystem.add(this.getTagSystemDO(item)));
+        businessTagCategoryCounts.forEach(item -> businessTagSystem.add(this.getTagSystemDO(item)));
+
+
+
+        package com.data.web.backend.service.impl;
+
+        import com.data.web.backend.domains.TagCategoryDO;
+        import com.data.web.backend.domains.TagDO;
+        import com.data.web.backend.domains.TagLevelCountDO;
+        import com.data.web.backend.domains.TagSystemDO;
+        import com.data.web.backend.domains.vo.TagVO;
+        import com.data.web.backend.mapper.TagCategoryMapper;
+        import com.data.web.backend.mapper.TagMapper;
+        import com.data.web.backend.service.TagService;
+        import com.data.web.backend.utils.BeanUtil;
+        import com.data.web.backend.utils.UserUtil;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.stereotype.Service;
+        import org.springframework.util.StringUtils;
+
+        import java.util.ArrayList;
+        import java.util.Date;
+        import java.util.HashMap;
+        import java.util.List;
+        import java.util.stream.Collectors;
+
+        /**
+         * @author zhudongsheng
+         * @Description: TODO
+         * @date 2020/11/19 14:41
+         */
+        @Service
+        public class TagServiceImpl implements TagService {
+
+            @Autowired
+            private TagMapper tagMapper;
+
+            @Autowired
+            private TagCategoryMapper tagCategoryMapper;
+
+            /**
+             * 用户标签体系主键
+             */
+            public static final Integer USER_TAG_SYSTEM_ID = 1;
+
+            /**
+             * 企业标签体系主键
+             */
+            public static final Integer ENTERPRISE_TAG_SYSTEM_ID = 2;
+
+            /**
+             * 业务标签体系主键
+             */
+            public static final Integer BUSINESS_TAG_SYSTEM_ID = 3;
+
+            /**
+             * 所有级别总数只有四级 或 用来判定 各个级别下标签分类下的标签数量
+             */
+            public static final Integer ALL_LEVEL = 4;
+
+            /**
+             * 一级 或 用户标签体系id=1
+             */
+            public static final Integer FIRST_LEVEL = 1;
+
+            /**
+             * 二级 或 用来判定 各个级别下标签分类下的标签数量 或用来 企业体系主键id=2
+             */
+            public static final Integer SECOND_LEVEL = 2;
+
+            /**
+             * 三级 或 用来判定 各个级别下标签分类下的标签数量 或 业务标签体系id =3
+             */
+            public static final Integer THIRD_LEVEL = 3;
+
+           /**
+             * 三级
+             */
+            public static final Integer ZERO_TAG_COUNT = 0;
+
+           /**
+             * 总共的标签体系 三个 用户 企业 业务
+             */
+            public static final Integer ALL_TAG_SYSTEM_COUNT = 3;
+            @Override
+            public Object addTag(TagVO tagVO) {
+                TagDO tagDO = BeanUtil.copy(tagVO, new TagDO());
+                // 这里对于标签部门权限的处理 会用一张部门标签表来关联这种多对多的关系
+                Integer categoryId = tagDO.getCategoryId();
+                //这里给这个标签添加所属的标签分级的id
+                if(!StringUtils.isEmpty(categoryId)){
+                    TagCategoryDO tagCategoryDO = tagCategoryMapper.selectTagCategoryById(categoryId);
+                    Integer level = tagCategoryDO.getLevel();
+                    Integer sysId = tagCategoryDO.getSysId();
+                    if(!StringUtils.isEmpty(level)&&!StringUtils.isEmpty(level)){
+                        tagDO.setLevel(level);
+                        tagDO.setSysId(sysId);
+                    }
+                }
+                Date currentTime = new Date();
+                String userName = UserUtil.getUserName();
+                tagDO.setCreateTime(currentTime);
+                tagDO.setCreateUser(userName);
+                tagDO.setUpdateTime(currentTime);
+                tagDO.setUpdateUser(userName);
+                // 如果使用默认的是不会返回 插入成功后返回的主键  这里是返回插入成功的状态值1
+                tagMapper.insertUseGeneratedKeys(tagDO);
+                /** 获取上一步插图标签成功的标签主键id 加上外部用户选择部门选择的下拉菜单deptId or deptIds 这里
+                 * （如果目前用户只可可以选择自己所在的部门  考虑后期是否会有权限比较高用户 一次可以为这个标签 选择多个部门
+                 * or标签审核 给别的部门赋予这个标签的部门 需要在部门标签表里面维护 被授权使用的标签id 和部门id 的关联关系）
+                 */
+                //TODO：数据权限 添加部门标签关联表  id deptid tid sys_dept_tag
+                return tagMapper.selectByPrimaryKey(tagDO);
+            }
+
+            @Override
+            public Object updateTag(TagVO tagVO) {
+                TagDO tagDO = BeanUtil.copy(tagVO, new TagDO());
+                String userName = UserUtil.getUserName();
+                tagDO.setUpdateTime(new Date());
+                tagDO.setUpdateUser(userName);
+                tagMapper.updateByPrimaryKeySelective(tagDO);
+                return tagMapper.selectByPrimaryKey(tagDO);
+            }
+
+            @Override
+            public Object getTag(Integer id) {
+                return tagMapper.selectTagById(id);
+            }
+
+            @Override
+            public Object batchEnableTag(List<Integer> ids) {
+                tagMapper.batchEnableTag(ids);
+                return "batchEnableTag success";
+            }
+
+            @Override
+            public List<TagDO> getTagsCondition(TagVO tagVO) {
+                return tagMapper.getTagsByTagCategoryIdCondition(tagVO);
+            }
+
+            @Override
+            public Object getEveryLevelTagCount() {
+                //获取所有体系下的 标签分类数量
+                List<TagLevelCountDO> allSystemTagCategoryCount = tagCategoryMapper.getAllSystemTagCategoryCount();
+                List<TagLevelCountDO> userTagCounts = new ArrayList<>();
+                List<TagLevelCountDO> enterpriseTagCounts = new ArrayList<>();
+                List<TagLevelCountDO> businessTagCounts = new ArrayList<>();
+                //获取所有体系下的 标签分类数量
+                List<TagLevelCountDO> allSystemTagCount = tagMapper.getAllSystemTagCount();
+                //按照体系分离标签
+                separateByTagSystem(userTagCounts, enterpriseTagCounts, businessTagCounts, allSystemTagCount);
+                // 分离出 各个标签分类对应的 各级数量
+                List<TagLevelCountDO> userTagCategoryCounts = new ArrayList<>();
+                List<TagLevelCountDO> enterpriseCategoryTagCounts = new ArrayList<>();
+                List<TagLevelCountDO> businessTagCategoryCounts = new ArrayList<>();
+                //按照体系分离标签分类
+                separateByTagSystem(userTagCategoryCounts, enterpriseCategoryTagCounts, businessTagCategoryCounts, allSystemTagCategoryCount);
+        //        List<TagSystemDO> userTagSystem = new ArrayList<>();
+        //        List<TagSystemDO> enterpriseTagSystem = new ArrayList<>();
+        //        List<TagSystemDO> businessTagSystem = new ArrayList<>();
+                // 将标签分类的级别和数量组合到TagSystemDO
+                List<TagSystemDO> userTagSystem = userTagCategoryCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+                List<TagSystemDO> enterpriseTagSystem = enterpriseCategoryTagCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+                List<TagSystemDO> businessTagSystem = businessTagCategoryCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+
+        //        userTagCategoryCounts.forEach(item -> userTagSystem.add(this.getTagSystemDO(item)));
+        //        enterpriseCategoryTagCounts.forEach(item -> enterpriseTagSystem.add(this.getTagSystemDO(item)));
+        //        businessTagCategoryCounts.forEach(item -> businessTagSystem.add(this.getTagSystemDO(item)));
+                // 给用户体系各个级别的标签计算数量并赋值
+                userTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), userTagCounts)));
+                // 给企业体系各个级别的标签计算数量并赋值
+                enterpriseTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), enterpriseTagCounts)));
+                // 给业务体系各个级别的标签计算数量并赋值
+                businessTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), businessTagCounts)));
+                // 存储各个体系下的 关于标签分类和标签的数量
+                // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+                HashMap<Integer,List<TagSystemDO>> map = new HashMap<>(ALL_TAG_SYSTEM_COUNT);
+                // 用户体系的数据组装完毕  用户体系的主键为1
+                map.put(USER_TAG_SYSTEM_ID,userTagSystem);
+                // 企业体系的数据组装完毕  用户体系的主键为2
+                map.put(ENTERPRISE_TAG_SYSTEM_ID,enterpriseTagSystem);
+                // 业务体系的数据组装完毕  用户体系的主键为3
+                map.put(BUSINESS_TAG_SYSTEM_ID,businessTagSystem);
+                return map;
+            }
+
+            private void separateByTagSystem(List<TagLevelCountDO> userTagCounts, List<TagLevelCountDO> enterpriseTagCounts, List<TagLevelCountDO> businessTagCounts, List<TagLevelCountDO> allSystemTagCount) {
+                for (TagLevelCountDO tagCountDO : allSystemTagCount) {
+                    // 用户 根据标签分类所属的体系id 取出这个体系下的所有各个级别的标签分类数量
+                    if(tagCountDO.getSysId().equals(FIRST_LEVEL)){
+                        userTagCounts.add(tagCountDO);
+                    }
+                    // 企业
+                    if(tagCountDO.getSysId().equals(SECOND_LEVEL)){
+                        enterpriseTagCounts.add(tagCountDO);
+                    }
+                    // 业务
+                    if(tagCountDO.getSysId().equals(THIRD_LEVEL)){
+                        businessTagCounts.add(tagCountDO);
+                    }
+                }
+            }
+
+            private  TagSystemDO getTagSystemDO(TagLevelCountDO tagLevelCountDO){
+                TagSystemDO tagSystemDO = new TagSystemDO();
+                tagSystemDO.setLevel(tagLevelCountDO.getLevel());
+                tagSystemDO.setTagCategoryCount(tagLevelCountDO.getTagCount());
+                return tagSystemDO;
+            }
+
+            /**
+             * @Description //TODO
+             * 每一级标签数量的计算 计算规则如下：
+             * 一级 = 一级 +二级 +三级 +四级
+             * 二级 = 二级 +三级 +四级
+             * 三级 = 三级 +四级
+             * 四级 = 四级
+             * @Date 2020/11/24 10:00
+             * @param level 遍历到的级别  tagLevelCounts 你从标签表里面获取的每一个级别下的标签数量
+             * @return 这个级别下的标签数量
+             */
+            private Integer levelTagCount(Integer level,List<TagLevelCountDO> tagLevelCounts){
+                Integer tagCount = 0;
+                // 统计大于等于当前级别的累加和
+                for (TagLevelCountDO tagLevelCount : tagLevelCounts) {
+                    if(tagLevelCount.getLevel()>=level){
+                        tagCount+=tagLevelCount.getTagCount();
+                    }
+                }
+                return tagCount;
+            }
+
+
+        }
+
+
+
+    private Integer levelTagCount(Integer level,List<TagLevelCountDO> tagLevelCounts){
+//        Integer tagCount = 0;
+//        // 统计大于等于当前级别的累加和
+//        for (TagLevelCountDO tagLevelCount : tagLevelCounts) {
+//            if(tagLevelCount.getLevel()>=level){
+//                tagCount+=tagLevelCount.getTagCount();
+//            }
+//        }
+        return tagLevelCounts.stream()
+                             .filter(item -> item.getLevel()>=level)
+                             .mapToInt(TagLevelCountDO::getTagCount)
+                             .sum();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    package com.data.web.backend.service.impl;
+
+    import com.data.web.backend.domains.TagCategoryDO;
+    import com.data.web.backend.domains.TagDO;
+    import com.data.web.backend.domains.TagLevelCountDO;
+    import com.data.web.backend.domains.TagSystemDO;
+    import com.data.web.backend.domains.vo.TagVO;
+    import com.data.web.backend.mapper.TagCategoryMapper;
+    import com.data.web.backend.mapper.TagMapper;
+    import com.data.web.backend.service.TagService;
+    import com.data.web.backend.utils.BeanUtil;
+    import com.data.web.backend.utils.UserUtil;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+
+    import java.util.ArrayList;
+    import java.util.Date;
+    import java.util.HashMap;
+    import java.util.List;
+    import java.util.stream.Collectors;
+
+    /**
+     * @author zhudongsheng
+     * @Description: TODO
+     * @date 2020/11/19 14:41
+     */
+    @Service
+    public class TagServiceImpl implements TagService {
+
+        @Autowired
+        private TagMapper tagMapper;
+
+        @Autowired
+        private TagCategoryMapper tagCategoryMapper;
+
+        /**
+         * 用户标签体系主键
+         */
+        public static final Integer USER_TAG_SYSTEM_ID = 1;
+
+        /**
+         * 企业标签体系主键
+         */
+        public static final Integer ENTERPRISE_TAG_SYSTEM_ID = 2;
+
+        /**
+         * 业务标签体系主键
+         */
+        public static final Integer BUSINESS_TAG_SYSTEM_ID = 3;
+
+        /**
+         * 一级 或 用户标签体系id=1
+         */
+        public static final Integer FIRST_LEVEL = 1;
+
+        /**
+         * 二级 或 用来判定 各个级别下标签分类下的标签数量 或用来 企业体系主键id=2
+         */
+        public static final Integer SECOND_LEVEL = 2;
+
+        /**
+         * 三级 或 用来判定 各个级别下标签分类下的标签数量 或 业务标签体系id =3
+         */
+        public static final Integer THIRD_LEVEL = 3;
+
+       /**
+         * 总共的标签体系 三个 用户 企业 业务
+         */
+        public static final Integer ALL_TAG_SYSTEM_COUNT = 3;
+        @Override
+        public Object addTag(TagVO tagVO) {
+            TagDO tagDO = BeanUtil.copy(tagVO, new TagDO());
+            // 这里对于标签部门权限的处理 会用一张部门标签表来关联这种多对多的关系
+            Integer categoryId = tagDO.getCategoryId();
+            //这里给这个标签添加所属的标签分级的id
+            if(categoryId!=null){
+                TagCategoryDO tagCategoryDO = tagCategoryMapper.selectTagCategoryById(categoryId);
+                Integer level = tagCategoryDO.getLevel();
+                Integer sysId = tagCategoryDO.getSysId();
+                tagDO.setLevel(level);
+                tagDO.setSysId(sysId);
+            }
+            Date currentTime = new Date();
+            String userName = UserUtil.getUserName();
+            tagDO.setCreateTime(currentTime);
+            tagDO.setCreateUser(userName);
+            tagDO.setUpdateTime(currentTime);
+            tagDO.setUpdateUser(userName);
+            // 如果使用默认的是不会返回 插入成功后返回的主键  这里是返回插入成功的状态值1
+            tagMapper.insertUseGeneratedKeys(tagDO);
+            /** 获取上一步插图标签成功的标签主键id 加上外部用户选择部门选择的下拉菜单deptId or deptIds 这里
+             * （如果目前用户只可可以选择自己所在的部门  考虑后期是否会有权限比较高用户 一次可以为这个标签 选择多个部门
+             * or标签审核 给别的部门赋予这个标签的部门 需要在部门标签表里面维护 被授权使用的标签id 和部门id 的关联关系）
+             */
+            //TODO：数据权限 添加部门标签关联表  id deptid tid sys_dept_tag
+            return tagMapper.selectByPrimaryKey(tagDO);
+        }
+
+        @Override
+        public Object updateTag(TagVO tagVO) {
+            TagDO tagDO = BeanUtil.copy(tagVO, new TagDO());
+            String userName = UserUtil.getUserName();
+            tagDO.setUpdateTime(new Date());
+            tagDO.setUpdateUser(userName);
+            tagMapper.updateByPrimaryKeySelective(tagDO);
+            return tagMapper.selectByPrimaryKey(tagDO);
+        }
+
+        @Override
+        public Object getTag(Integer id) {
+            return tagMapper.selectTagById(id);
+        }
+
+        @Override
+        public Object batchEnableTag(List<Integer> ids) {
+            tagMapper.batchEnableTag(ids);
+            return "batchEnableTag success";
+        }
+
+        @Override
+        public List<TagDO> getTagsCondition(TagVO tagVO) {
+            return tagMapper.getTagsByTagCategoryIdCondition(tagVO);
+        }
+
+        @Override
+        public Object getEveryLevelTagCount() {
+            //获取所有体系下的 标签分类数量
+            List<TagLevelCountDO> allSystemTagCategoryCount = tagCategoryMapper.getAllSystemTagCategoryCount();
+            List<TagLevelCountDO> userTagCounts = new ArrayList<>();
+            List<TagLevelCountDO> enterpriseTagCounts = new ArrayList<>();
+            List<TagLevelCountDO> businessTagCounts = new ArrayList<>();
+    //        allSystemTagCategoryCount.stream().map()
+            //获取所有体系下的 标签分类数量
+            List<TagLevelCountDO> allSystemTagCount = tagMapper.getAllSystemTagCount();
+            //按照体系分离标签
+            separateByTagSystem(userTagCounts, enterpriseTagCounts, businessTagCounts, allSystemTagCount);
+            // 分离出 各个标签分类对应的 各级数量
+            List<TagLevelCountDO> userTagCategoryCounts = new ArrayList<>();
+            List<TagLevelCountDO> enterpriseCategoryTagCounts = new ArrayList<>();
+            List<TagLevelCountDO> businessTagCategoryCounts = new ArrayList<>();
+            //按照体系分离标签分类
+            separateByTagSystem(userTagCategoryCounts, enterpriseCategoryTagCounts, businessTagCategoryCounts, allSystemTagCategoryCount);
+            // 将各个体系下的标签分类的级别和数量组合到TagSystemDO
+            List<TagSystemDO> userTagSystem = userTagCategoryCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+            List<TagSystemDO> enterpriseTagSystem = enterpriseCategoryTagCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+            List<TagSystemDO> businessTagSystem = businessTagCategoryCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+            // 给用户体系各个级别的标签计算数量并赋值
+            userTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), userTagCounts)));
+            // 给企业体系各个级别的标签计算数量并赋值
+            enterpriseTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), enterpriseTagCounts)));
+            // 给业务体系各个级别的标签计算数量并赋值
+            businessTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), businessTagCounts)));
+            // 存储各个体系下的 关于标签分类和标签的数量
+            // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+            HashMap<Integer,List<TagSystemDO>> map = new HashMap<>(ALL_TAG_SYSTEM_COUNT);
+            // 用户体系的数据组装完毕  用户体系的主键为1
+            map.put(USER_TAG_SYSTEM_ID,userTagSystem);
+            // 企业体系的数据组装完毕  用户体系的主键为2
+            map.put(ENTERPRISE_TAG_SYSTEM_ID,enterpriseTagSystem);
+            // 业务体系的数据组装完毕  用户体系的主键为3
+            map.put(BUSINESS_TAG_SYSTEM_ID,businessTagSystem);
+            return map;
+        }
+
+        private void separateByTagSystem(List<TagLevelCountDO> userTagCounts, List<TagLevelCountDO> enterpriseTagCounts, List<TagLevelCountDO> businessTagCounts, List<TagLevelCountDO> allSystemTagCount) {
+            for (TagLevelCountDO tagCountDO : allSystemTagCount) {
+                // 用户 根据标签分类所属的体系id 取出这个体系下的所有各个级别的标签分类数量
+                if(tagCountDO.getSysId().equals(FIRST_LEVEL)){
+                    userTagCounts.add(tagCountDO);
+                }
+                // 企业
+                if(tagCountDO.getSysId().equals(SECOND_LEVEL)){
+                    enterpriseTagCounts.add(tagCountDO);
+                }
+                // 业务
+                if(tagCountDO.getSysId().equals(THIRD_LEVEL)){
+                    businessTagCounts.add(tagCountDO);
+                }
+            }
+        }
+
+        private  TagSystemDO getTagSystemDO(TagLevelCountDO tagLevelCountDO){
+            TagSystemDO tagSystemDO = new TagSystemDO();
+            tagSystemDO.setLevel(tagLevelCountDO.getLevel());
+            tagSystemDO.setTagCategoryCount(tagLevelCountDO.getTagCount());
+            return tagSystemDO;
+        }
+
+        /**
+         * @Description //TODO
+         * 每一级标签数量的计算 计算规则如下：
+         * 一级 = 一级 +二级 +三级 +四级
+         * 二级 = 二级 +三级 +四级
+         * 三级 = 三级 +四级
+         * 四级 = 四级
+         * @Date 2020/11/24 10:00
+         * @param level 遍历到的级别  tagLevelCounts 你从标签表里面获取的每一个级别下的标签数量
+         * @return 这个级别下的标签数量
+         */
+        private Integer levelTagCount(Integer level,List<TagLevelCountDO> tagLevelCounts){
+            return tagLevelCounts.stream()
+                   .filter(item -> item.getLevel()>=level)
+                   .mapToInt(TagLevelCountDO::getTagCount)
+                   .sum();
+        }
+
+        /**
+         * @Description //TODO 获取某一个体系下的各个 级别下的 标签分类数量 和标签数量
+         * @Date 2020/11/24 14:22
+         * @param
+         * sysId 标签体系的id
+         * allSystemTagCategoryCount 所有体系的标签分类各级数量
+         * allSystemTagCount 所有体系的标签分类直接挂的数量
+         * @return 这个体系下各个级别对应的标签数和标签分类数
+         */
+        private List<TagSystemDO> getTagSystemCount(Integer sysId,List<TagLevelCountDO> allSystemTagCategoryCount,List<TagLevelCountDO> allSystemTagCount){
+            //分离出 这个体系id sysId 下的各个级别的标签分类数量
+            List<TagLevelCountDO> tagCategoryCounts = new ArrayList<>();
+            // 这个体系id 下各级标签分类直接配置的标签数量
+            List<TagLevelCountDO> tagCounts = new ArrayList<>();
+            for (TagLevelCountDO tagCountDO : allSystemTagCategoryCount) {
+                // 根据标签分类所属的体系id 取出这个体系下的所有各个级别的标签分类数量
+                if(tagCountDO.getSysId().equals(sysId)){
+                    tagCategoryCounts.add(tagCountDO);
+                }
+            }
+            for (TagLevelCountDO tagCountDO : allSystemTagCount) {
+                // 根据标签分类所属的体系id 取出这个体系下的所有各个级别的标签分类数量
+                if(tagCountDO.getSysId().equals(sysId)){
+                    tagCounts.add(tagCountDO);
+                }
+            }
+            // 将各个体系下的标签分类的级别和数量组合到TagSystemDO
+            List<TagSystemDO> tagSystem = tagCategoryCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+            // 给用户体系各个级别的标签计算数量并赋值
+            tagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), tagCounts)));
+            return tagSystem;
+        }
+
+        @Override
+        public Object getLevelTagCount() {
+            //获取所有体系下的 标签分类数量
+            List<TagLevelCountDO> allSystemTagCategoryCount = tagCategoryMapper.getAllSystemTagCategoryCount();
+            List<TagLevelCountDO> allSystemTagCount = tagMapper.getAllSystemTagCount();
+            // 获取用户的各级标签分类和标签数量
+            List<TagSystemDO> userTagSystem = this.getTagSystemCount(USER_TAG_SYSTEM_ID,allSystemTagCategoryCount,allSystemTagCount);
+            // 获取企业的各级标签分类和标签数量
+            List<TagSystemDO> enterpriseTagSystem = this.getTagSystemCount(ENTERPRISE_TAG_SYSTEM_ID,allSystemTagCategoryCount,allSystemTagCount);
+            // 获取业务的各级标签分类和标签数量
+            List<TagSystemDO> businessTagSystem = this.getTagSystemCount(BUSINESS_TAG_SYSTEM_ID,allSystemTagCategoryCount,allSystemTagCount);
+            // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+            HashMap<Integer,List<TagSystemDO>> map = new HashMap<>(ALL_TAG_SYSTEM_COUNT);
+            // 用户体系的数据组装完毕  用户体系的主键为1
+            map.put(USER_TAG_SYSTEM_ID,userTagSystem);
+            // 企业体系的数据组装完毕  用户体系的主键为2
+            map.put(ENTERPRISE_TAG_SYSTEM_ID,enterpriseTagSystem);
+            // 业务体系的数据组装完毕  用户体系的主键为3
+            map.put(BUSINESS_TAG_SYSTEM_ID,businessTagSystem);
+            return map;
+        }
+    }
+
+
+
+
+
+
+// 权限 默认数据表 全为空的情况
+
+
+  @Override
+    public Object getLevelTagCount() {
+        // 获取所有体系下的 标签分类数量
+        List<TagLevelCountDO> allSystemTagCategoryCount = tagCategoryMapper.getAllSystemTagCategoryCount();
+        // 获取所有体系下的 标签分类下直接有的标签数量
+        List<TagLevelCountDO> allSystemTagCount = tagMapper.getAllSystemTagCount();
+        // 获取所有标签体系的主键   目前只有三个（用户 企业 业务）所以初始化的值为 3
+        ArrayList<Integer> sysIds = new ArrayList<>(ALL_TAG_SYSTEM_COUNT);
+        sysIds.add(USER_TAG_SYSTEM_ID);
+        sysIds.add(ENTERPRISE_TAG_SYSTEM_ID);
+        sysIds.add(BUSINESS_TAG_SYSTEM_ID);
+        // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+        HashMap<Integer,List<TagSystemDO>> map = new HashMap<>(ALL_TAG_SYSTEM_COUNT);
+        for (Integer sysId : sysIds) {
+            map.put(sysId,this.getTagSystemCount(sysId,allSystemTagCategoryCount,allSystemTagCount));
+        }
+//        // 获取用户的各级标签分类和标签数量
+//        List<TagSystemDO> userTagSystem = this.getTagSystemCount(USER_TAG_SYSTEM_ID,allSystemTagCategoryCount,allSystemTagCount);
+//        // 获取企业的各级标签分类和标签数量
+//        List<TagSystemDO> enterpriseTagSystem = this.getTagSystemCount(ENTERPRISE_TAG_SYSTEM_ID,allSystemTagCategoryCount,allSystemTagCount);
+//        // 获取业务的各级标签分类和标签数量
+//        List<TagSystemDO> businessTagSystem = this.getTagSystemCount(BUSINESS_TAG_SYSTEM_ID,allSystemTagCategoryCount,allSystemTagCount);
+//        // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+//        HashMap<Integer,List<TagSystemDO>> map = new HashMap<>(ALL_TAG_SYSTEM_COUNT);
+//        // 用户体系的数据组装完毕  用户体系的主键为1
+//        map.put(USER_TAG_SYSTEM_ID,userTagSystem);
+//        // 企业体系的数据组装完毕  用户体系的主键为2
+//        map.put(ENTERPRISE_TAG_SYSTEM_ID,enterpriseTagSystem);
+//        // 业务体系的数据组装完毕  用户体系的主键为3
+//        map.put(BUSINESS_TAG_SYSTEM_ID,businessTagSystem);
+        return map;
+    }
+
+
+
+
+
+
+    @Override
+    public Object getEveryLevelTagCount() {
+        //获取所有体系下的 标签分类数量
+        List<TagLevelCountDO> allSystemTagCategoryCount = tagCategoryMapper.getAllSystemTagCategoryCount();
+        List<TagLevelCountDO> userTagCounts = new ArrayList<>();
+        List<TagLevelCountDO> enterpriseTagCounts = new ArrayList<>();
+        List<TagLevelCountDO> businessTagCounts = new ArrayList<>();
+//        allSystemTagCategoryCount.stream().map()
+        //获取所有体系下的 标签分类数量
+        List<TagLevelCountDO> allSystemTagCount = tagMapper.getAllSystemTagCount();
+        //按照体系分离标签
+        separateByTagSystem(userTagCounts, enterpriseTagCounts, businessTagCounts, allSystemTagCount);
+        // 分离出 各个标签分类对应的 各级数量
+        List<TagLevelCountDO> userTagCategoryCounts = new ArrayList<>();
+        List<TagLevelCountDO> enterpriseCategoryTagCounts = new ArrayList<>();
+        List<TagLevelCountDO> businessTagCategoryCounts = new ArrayList<>();
+        //按照体系分离标签分类
+        separateByTagSystem(userTagCategoryCounts, enterpriseCategoryTagCounts, businessTagCategoryCounts, allSystemTagCategoryCount);
+        // 将各个体系下的标签分类的级别和数量组合到TagSystemDO
+        List<TagSystemDO> userTagSystem = userTagCategoryCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+        List<TagSystemDO> enterpriseTagSystem = enterpriseCategoryTagCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+        List<TagSystemDO> businessTagSystem = businessTagCategoryCounts.stream().map(this::getTagSystemDO).collect(Collectors.toList());
+        // 给用户体系各个级别的标签计算数量并赋值
+        userTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), userTagCounts)));
+        // 给企业体系各个级别的标签计算数量并赋值
+        enterpriseTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), enterpriseTagCounts)));
+        // 给业务体系各个级别的标签计算数量并赋值
+        businessTagSystem.forEach(item -> item.setTagCount(this.levelTagCount(item.getLevel(), businessTagCounts)));
+        // 存储各个体系下的 关于标签分类和标签的数量
+        // 这里定义一个map 用来存放 某一个标签体系下的标签分类和标签各个级别的数据
+        HashMap<Integer,List<TagSystemDO>> map = new HashMap<>(ALL_TAG_SYSTEM_COUNT);
+        // 用户体系的数据组装完毕  用户体系的主键为1
+        map.put(USER_TAG_SYSTEM_ID,userTagSystem);
+        // 企业体系的数据组装完毕  用户体系的主键为2
+        map.put(ENTERPRISE_TAG_SYSTEM_ID,enterpriseTagSystem);
+        // 业务体系的数据组装完毕  用户体系的主键为3
+        map.put(BUSINESS_TAG_SYSTEM_ID,businessTagSystem);
+        return map;
+    }
+
+    private void separateByTagSystem(List<TagLevelCountDO> userTagCounts, List<TagLevelCountDO> enterpriseTagCounts, List<TagLevelCountDO> businessTagCounts, List<TagLevelCountDO> allSystemTagCount) {
+        for (TagLevelCountDO tagCountDO : allSystemTagCount) {
+            // 用户 根据标签分类所属的体系id 取出这个体系下的所有各个级别的标签分类数量
+            if(tagCountDO.getSysId().equals(FIRST_LEVEL)){
+                userTagCounts.add(tagCountDO);
+            }
+            // 企业
+            if(tagCountDO.getSysId().equals(SECOND_LEVEL)){
+                enterpriseTagCounts.add(tagCountDO);
+            }
+            // 业务
+            if(tagCountDO.getSysId().equals(THIRD_LEVEL)){
+                businessTagCounts.add(tagCountDO);
+            }
+        }
+    }
+
+
+
+首页的界面数据 以后 会不会放在redis 里面
+
+考虑 首页的响应速度的要求 和 获取首页的数据 涉及到全表扫描 所以还是
+
+
+/user/roles
+
+rids
+uids
+
+返回值 放在data 里面
+
+//        allSystemTagCategoryCount.forEach((item)->item.getSysId().equals(sysId)
+//            ::tagCategoryCounts.add(item)
+//        );
+
+
+
+
+
+  20201124daylog
+
+        一 工作进度：
+        1.重写首页接口
+        2.补充维仲提出的缺失接口和修改个别字段显示不标准的问题
+
+        二 存在的疑问：
+        1.暂无
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
