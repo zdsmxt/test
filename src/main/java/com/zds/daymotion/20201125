@@ -1,0 +1,174 @@
+上午：
+接口联调：
+  1.接口的返回值 的字段 非驼峰 tk.mybatis
+   @Result(column = "parent_id", property = "parentId"),
+   补充字段
+  2.用户里面的角色 接口 传的参数 只有用户id uid 和 角色id
+  3.用户里面的根据 角色 获取用户 接口有问题
+  4.标签列表查询 逻辑分析
+       用户点击标签分类
+
+
+**************系统标签 和组合标签都存在标签表里面
+（是否需要加个标识字段来判定
+当前标签是由标签管理员直接根据数仓里面的大宽表创建的初始标签
+还是由业务人员基于系统标签创建的组合标签）**************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+下午：
+    1.标签筛选需求评审
+      1）用户分群  这里的用户指的是那些用户 （1.公司用户2.客户用户）
+      2）根据标签的筛选 获取 这个筛选下 用户群体的数量
+      3）用户分群 是基于那些数据产生的 基于某一个体系的多个标签的组合筛选逻辑 得出相应的覆盖人群值
+
+
+
+
+
+
+
+    2.看原型图 分析出可能需要的接口
+    3.
+
+
+     获取所有体系的标签分类
+     这里设置两个权限码
+     标黄的这一期先不做
+     枚举值 编辑用户分群  弹枚举值
+     分页 分批次 导出 防止jvm内存溢出
+     预估人群 这期暂时不做
+     跑任务
+     查询条件count
+     用户分群  导出 更新 就是重跑
+     昨天跑完的结果  今天直接导出 昨天计算的结果
+     没有重跑导出的就是上一次
+     ES 最新一天的数据
+     关于历史数据 的分析
+     关于导出 这一块的数据 是否要保存 每一天的数据
+     每天导出的数据 要不要后台存库
+     便于分析连续好几天的数据规律
+     导出之间的时间间隔 避免 这个时候的实时数据的变动
+     输入 查看的逻辑 分开UI 上
+     涉及公式的展示
+     导出之间 间隔多长时间 直接刷新 重新计算
+     对于筛选 这个筛选之后的公式 如何实现
+     分群名称唯一
+     编辑的时候 分群名称 唯一校验
+     筛选 这一块 后台
+     分群删除 先不做
+     非系统管理员 只能 导出 用户id
+     管理员 可以选择用户的所有字段
+     先导出 单一体系
+     年底之前
+     以后会有 多体系 交叉的 多条件查询
+
+
+         @ApiOperation(value = "根据标签分类的所属的体系id获取这个体系下的所有标签分类 标签分类树使用",notes = "没有权限访问的限制")
+         @ApiImplicitParam(paramType = "query",name = "sysId",value = "标签分类主键id",required = true)
+         @Result
+         @GetMapping
+         public Object getTagCategoryList(Integer sysId){
+             return tagCategoryService.getTagCategoryList(sysId);
+         }
+         List<TagCategoryDO> getTagCategoryList(Integer sysId);
+
+         @Override
+         public List<TagCategoryDO> getTagCategoryList(Integer sysId) {
+             return tagCategoryMapper.getTagCategoryList(sysId);
+         }
+
+
+        //    default List<TagCategoryDO> getTagCategoryList(Integer sysId) {
+        //        Example example = new Example(TagCategoryDO.class);
+        //        Example.Criteria criteria = example.createCriteria();
+        //        criteria.andEqualTo("sysId",sysId );
+        //        return this.selectByExample(example);
+        //    }
+
+
+
+
+
+
+
+      20201125daylog
+            一 工作进度：
+            1.接口联调
+              1）补充用户 - 是否可用状态切换接口
+              2）实体列表查询里面的标签数 改为从标签表动态统计获取
+              3）修改标签分类查询 必须传体系id 的限制
+              4）标签列表查询 由于里面涉及多条件组合判断
+                 代码code:这一块书写在mapper 层里面对条件字段的判空不优雅
+                 没有深入理解tk.mybatis里面 criteria.andEqualTo()方法在源码上做了判空处理
+                 源码如下：
+                  if (value == null) {
+                      if (notNull) {
+                           throw new MapperException("Value for " + property + " cannot be null");
+                         } else {
+                            return;
+                         }
+                   }
+            二 存在的疑问：
+            1.项目解决冲突后 启动不了（维仲更新代码后也是项目运行不起来）
+            报错信息：
+            org.yaml.snakeyaml.Yaml.<init>(Lorg/yaml/snakeyaml/constructor/BaseConstructor;
+            Lorg/yaml/snakeyaml/representer/Representer;Lorg/yaml/snakeyaml/DumperOptions;
+            Lorg/yaml/snakeyaml/LoaderOptions;Lorg/yaml/snakeyaml/resolver/Resolver;)V
+            怀疑方向：jar包依赖冲突 亚乾 合的代码 引的jar 是否与之前的是否有依赖冲突
+            问题解决进度：还在解决中。。。
+            2.关于首页接口重写的反思：
+               一开始的思维误区：最初认为三大体系是 可以抽象成一个体系来处理的 但是看了excel数据决定情况了 导致代码单个方法过长
+              1）之前由于考虑三大标签体系展示已占满系统首页 并跟俊雅 确认 这一块 不会扩体系 且标签体系就三个
+              所以就没有考虑把单个体系看成一行数据进行循环处理多个标签体系
+              2）一直纠结在excel表格用户画像标签里面的数据规律  一开始以为每一个标签体系 四级标签分类都是满的 所以最开始想过用循环处理
+              但是在 插数据的过程中 比如我没有插满每一级标签的数据 就会出现 我说的那种多情况（具体情况
+              就是我把直接从tag_sys获取的各级标签分类直接挂的标签的时候 这个地方的各级标签数量的计算 我一开始没有抽离成一个函数 而是根据具体每一种情况
+              含有的可以列举出的 结合excel里面已有的数据 出现的层级规律计算的 分出的五种情况 分别写的各个情况代码 汇总到一个方法里面显得代码不好 ）
+              分情况处理的情况 由于每种情况 会有一部分代码重复
+              但是 这一部分的处理 我已经抽离出所在类的私有方法
+              以后面出现这种情况：我会跟你多次反馈 并且尽快的出代码 及时更正代码重复的部分
+            3.关于 idea里面 识别重复代码那块 tagDO  tagCategoryDO 这个是由于idea的自动侦测代码重复部分过严导致的
+            4.代码合并冲突的部分解决 我原来是在远端 gitlab 上解决 但是 这个我在bitbucket 没有找到操作按钮 今天在本地解决冲突完后 由于项目没有起起来 所以没有
+            commit 到远程分支
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
