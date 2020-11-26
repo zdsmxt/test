@@ -1,0 +1,168 @@
+
+
+关于数据权限的思考：
+      1.之前讨论的计划是建立一张部门标签的关联表
+      create table dept_tag  id  did  tid
+      标签值分布详情数据指的是：点击具体标签 只有访客不可以查看这个标签下的分群
+      2.用户登录 cas 那一块拿到用户的邮箱信息 系统管理员具有编辑用户的权限码use:edit
+      所以可以 给他可以管理的用户添加关联的部门
+
+ org.springframework.boot.actuate.elasticsearch.ElasticsearchRestHealthIndicator [87]- Elasticsearch health check failed
+ java.net.ConnectException: Timeout connecting to [localhost/127.0.0.1:9200]
+
+#
+#  data:
+#    elasticsearch:
+#      rest:
+#          uris: ["http://121.41.131.237:9200"]
+  management:
+    health:
+      elasticsearch:
+        enabled: false
+
+
+
+
+-1未启用、0启用、1停用 改为
+
+-1未启用、1启用、0停用
+
+标签值类型
+1.连续型数值、2.枚举值、3.字符型、4.日期时间
+
+
+
+    default List<EntityDO> queryEntityList(EntityDO entityDO) {
+        Example example = new Example(EntityDO.class);
+        Example.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(entityDO.getCode())) {
+            criteria.andLike("code", entityDO.getCode() + "%");
+        }
+        if (StringUtils.isNotBlank(entityDO.getName())) {
+            criteria.andLike("name", entityDO.getName() + "%");
+        }
+        example.orderBy("createTime").desc();
+        return this.selectByExample(example);
+    }
+
+    default List<TagDO> getTagsByTagCategoryIdCondition(TagVO tagVO) {
+        Example example = new Example(TagDO.class);
+        Example.Criteria criteria = example.createCriteria();
+        Integer updateCycleId = tagVO.getUpdateCycleId();
+        criteria.andEqualTo("categoryId",tagVO.getCategoryId());
+        criteria.andEqualTo("status",tagVO.getStatus());
+        criteria.andEqualTo("authority",tagVO.getAuthority());
+        criteria.andEqualTo("updateCycleId",updateCycleId);
+        criteria.andEqualTo("sysId",tagVO.getSysId());
+        criteria.andEqualTo("entityId",tagVO.getEntityId());
+        criteria.andEqualTo("tagTypeId",tagVO.getTagTypeId());
+        return this.selectByExample(example);
+    }
+
+
+
+#删除is_delete 字段修改实体在所在表的主键id 为20
+ALTER TABLE `tag_entity`
+DROP COLUMN `is_delete`,
+MODIFY COLUMN `primary_key`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '这个实体在所在表的主键' AFTER `update_user`;
+
+# 修改标签分类表
+
+ALTER TABLE `tag_category`
+MODIFY COLUMN `code`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '标签分类编码' AFTER `id`,
+MODIFY COLUMN `name`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '标签分类名' AFTER `code`,
+MODIFY COLUMN `level`  tinyint(3) NOT NULL COMMENT '标签分类所属的分级id' AFTER `parent_id`,
+MODIFY COLUMN `create_user`  varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL AFTER `create_time`,
+MODIFY COLUMN `update_user`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL AFTER `update_time`;
+
+
+
+覆盖人数
+
+esutil
+
+tag_sys
+
+@transient
+private Integer coveredPeopleNumber
+覆盖人数
+Number of people covered
+
+
+
+getCount(index,field)
+
+getCount(table_name,table_comment)
+
+
+获取单个实体
+实体修改
+
+
+Microsoft Windows [版本 10.0.18362.1198]
+(c) 2019 Microsoft Corporation。保留所有权利。
+
+C:\Users\admin\IdeaProjects\data-web>git status
+On branch feature/HDATA-32
+Your branch is up to date with 'origin/feature/HDATA-32'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   data-backend/sql/data_web.sql
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        data-backend/backend/src/test/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+C:\Users\admin\IdeaProjects\data-web>git fetch
+
+C:\Users\admin\IdeaProjects\data-web>git merge origin/feature/esutil
+Merge made by the 'recursive' strategy.
+ .../web/backend/controller/MetadataController.java |   3 -
+ .../java/com/data/web/backend/utils/EsUtil.java    |  27 ++
+ data-backend/sql/V1.0.0_houyq.sql                  | 289 +++++++++++++++++++--
+ 3 files changed, 301 insertions(+), 18 deletions(-)
+
+C:\Users\admin\IdeaProjects\data-web>^A
+
+
+    default List<TagCategoryDO> getSubTagCategoryByParentId(Integer parentId) {
+        Example example = new Example(TagCategoryDO.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("parentId",parentId );
+        return this.selectByExample(example);
+    }
+
+规划一下角色之间的关系 和每个角色拥有的权限码 与俊雅讨论确定
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  20201126daylog
+
+        一 工作进度：
+        1.今天jenkins 打包的时候 打包时间比较长花了五分钟还没有完成 我怀疑是不是报错了
+        结果是亚乾引入的ES jar包下载比较慢导致的 （我新建的文件不是很多 所以认为不会话费在很长时间在这一块）
+        2.联调完实体的接口，标签分类联调完一半
+        3.给标签查询接口 添加覆盖人数的字段（来自ES 里面标签覆盖人数统计的数据）
+
+        二 存在的疑问：
+        1.关于添加接口 参数忘加@RequestBody 注解 导致传入的参数异常
+        2.关于返回结果 没有判空 导致的 返给前端的 data里面字段是有空和非空的情况
+        3.组合出来的标签是否要存在标签表里面
+
+
