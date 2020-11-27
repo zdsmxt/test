@@ -1,0 +1,208 @@
+
+标签分类的接口联调：
+
+       /**这里标签展示的时候 选用从ES 那儿拿到这个标签覆盖的人数
+         *获取当前这个标签的实体id 根据实体id 获取实体所在的表   ES对应的索引
+         * mysql table tab_metadata     table_name   field_name
+         * mysql table tag_sys                       field
+         * mysql table tag_entity       dw_table
+         * ES          index           table_name   field_name
+         *根据表和这个标签名称 获取 这个标签的覆盖人数
+         *这里有没有必要耦合一个标签所属的实体对应的表名在标签表中
+         */
+        try {
+            Long coverCount = esUtil.getCount(tableName, tagDO.getName());
+            tagDO.setCoveredPeopleNumber(coverCount);
+        }catch (IOException e){
+            log.info("ES 连接异常 ,tagDo为：{}",tagDO);
+        }finally {
+            return tagDO;
+
+
+
+      涉及标签的申请审批
+         捋一下逻辑
+      想使用的人提交申请 记录   申请表
+
+      具有审批的人 可以看到这个申请表 点击审批通过 修改这个申请单的状态
+
+      涉及的关系数据维护的操作
+      则是 需要在部门 标签表里面 加上这个 部门标签的关系
+      申请人的部门id  标签id
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+用户组合标签条件的筛选
+
+多条件的回显 的数据组合
+
+筛选组合条件 名称唯一 输入值查询避免重复
+
+
+ for (TagCoverRatioVO tagCoverRatioVO : tagCoverRatioVOS) {
+            tagCoverRatioVO.setTagValueType(tagValueType);
+        }
+
+
+
+    private String getTagValueType(String id){
+       Map<String, String> tagValueTypes = new HashMap<>();
+        // 处理枚举和字符的两种情况
+        tagValueTypes.put(TagValueTypeEnum.TAG_VALUE_TYPE_CONTINUOUS_VALUE.getId(),TagValueTypeEnum.TAG_VALUE_TYPE_CONTINUOUS_VALUE.getName());
+        tagValueTypes.put(TagValueTypeEnum.TAG_VALUE_TYPE_ENUM.getId(),TagValueTypeEnum.TAG_VALUE_TYPE_ENUM.getName());
+        tagValueTypes.put(TagValueTypeEnum.TAG_VALUE_TYPE_CHAR.getId(),TagValueTypeEnum.TAG_VALUE_TYPE_CHAR.getName());
+        tagValueTypes.put(TagValueTypeEnum.TAG_VALUE_TYPE_DATE.getId(),TagValueTypeEnum.TAG_VALUE_TYPE_DATE.getName());
+        return tagValueTypes.get(id);
+    }
+
+  @Override
+    public Object getTagDetail(Integer id) throws ElasticsearchException, IOException {
+        TagDO tagDO = tagMapper.selectTagById(id);
+        if(null==tagDO){
+            return null;
+        }
+        String entityTableName = this.getEntityTableName(tagDO.getEntityId());
+        String tagField = tagDO.getField();
+        // 获取标签值类型
+        Integer tagValueTypeId = tagDO.getTagValueType();
+        String tagValueType = this.getTagValueType(tagValueTypeId.toString());
+        List<TagSpreadRatioVO> fieldSpread = esUtil.getFieldSpread(entityTableName, tagField);
+        log.info("从ES读对应的索引表为：{},对应的标签字段为：{}",entityTableName,tagField);
+        List<TagCoverRatioVO> tagCoverRatios = BeanUtil.copyList(fieldSpread, TagCoverRatioVO.class);
+        tagCoverRatios.forEach(item -> item.setTagValueType(tagValueType));
+        // 这里分两种情况来处理 枚举 和 字符的类型
+        return tagCoverRatios;
+    }
+
+    /**
+     * @Description //TODO 获取实体所在的表名  对应ES里面的索引
+     * @Date 2020/11/27 15:49
+     * @param
+     * @return
+     */
+    private String getEntityTableName(Integer entityId){
+        EntityDO entityDO = entityMapper.selectByPrimaryKey(entityId);
+        String tableName = null;
+        if(null!=entityDO){
+            tableName = entityDO.getDwTable();
+        }
+        return tableName;
+    }
+
+
+    @ApiOperation(value = "获取所有标签类型",notes = "没有权限限制")
+    @Result
+    @GetMapping(value="tag/types")
+    public Object getAllTagTypes() {
+        HashMap<String, String> tagTypes = new HashMap<>(TagServiceImpl.ALL_TAG_SYSTEM_COUNT);
+        tagTypes.put(TagTypeEnum.TAG_TYPE_FACT.getId(),TagTypeEnum.TAG_TYPE_FACT.getName());
+        tagTypes.put(TagTypeEnum.TAG_TYPE_STATISTICAL.getId(),TagTypeEnum.TAG_TYPE_STATISTICAL.getName());
+        tagTypes.put(TagTypeEnum.TAG_TYPE_ALGORITHM.getId(),TagTypeEnum.TAG_TYPE_ALGORITHM.getName());
+        return tagTypes;
+    }
+
+    @ApiOperation(value = "获取所有标签体系类型",notes = "没有权限限制")
+    @Result
+    @GetMapping(value="tag/systems")
+    public Object getAllTagSystems() {
+        return dictService.getAllTagSystems();
+    }
+
+package com.data.web.backend.domains.vo;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * @author zhudongsheng
+ * @Description: TODO 用户展示标签详情里面 各行 标签值覆盖的人群比率
+ * @date 2020/11/27 15:57
+ */
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class TagCoverRatioVO {
+
+    /**
+     * 标签值
+     */
+    private String name;
+
+    /**
+     * 每一个标签值的人数占总的人数下的覆盖比率
+     */
+    private String ratio;
+
+    /**
+     * 这个标签值下覆盖的人数
+     */
+    private Long count;
+
+    /**
+     * 标签值类型
+     */
+    private String tagValueType;
+}
+
+
+标签列表 加一个分类名称
+
+  @Override
+    public List<TagDO> getTagsCondition(TagConditionVO tagConditionVO) {
+        List<TagDO> tagDos = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO);
+        for (TagDO tagDo : tagDos) {
+            tagDo.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(tagDo.getId()));
+        }
+        tagDos.forEach(item -> item.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(item.getId())));
+        return tagDos;
+    }
+
+        if(null==tagDos|| tagDos.size()==0){
+            return null;
+        }
+
+
+
+  private String getEntityTableName(Integer entityId){
+        EntityDO entityDO = entityMapper.selectByPrimaryKey(entityId);
+        if(entityDO==null){
+            return null;
+        }
+        return entityDO.getDwTable();
+    }
+
+  20201127daylog
+
+        一 工作进度：
+        1.联调标签分类接口
+        2.添加标签详情接口 返回ES 获取的数据
+        3.与俊雅确定规划角色与权限码的关系
+
+        二 存在的疑问：
+        1.关于查询 获取集合对象 转stream流 之后 返回对象 用peek 不返回的用map
+        2.关于返回多个结果 是因为用了tk.mybatis 里面的传入id 结果id 为空导致的全表扫描多行数据
+        3.下午会议讨论 存组合条件 那一块 数据的组织 和回显时候 如何分类出每一个条件
+
+
+
