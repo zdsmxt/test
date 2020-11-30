@@ -1,0 +1,118 @@
+    /**
+     * 每月3号
+     */
+    EVERY_MONTH_3(4, "每月3号"),
+
+    /**
+     * 每月6号
+     */
+    EVERY_MONTH_6(5, "每月6号"),
+
+    /**
+     * 每月9号
+     */
+    EVERY_MONTH_9(6, "每月9号"),
+
+    /**
+     * 每月12号
+     */
+    EVERY_MONTH_12(7, "每月12号"),
+
+    /**
+     * 每月9号
+     */
+    EVERY_MONTH_15(8, "每月15号"),
+
+    /**
+     * 每月18号
+     */
+    EVERY_MONTH_18(9, "每月18号"),
+
+    /**
+     * 每月19号
+     */
+    EVERY_MONTH_19(10, "每月19号"),
+
+    /**
+     * 每月24号
+     */
+    EVERY_MONTH_24(11, "每月24号"),
+
+    /**
+     * 每月29号
+     */
+    EVERY_MONTH_29(12, "每月24号"),
+
+
+
+
+
+      20201128daylog
+
+            一 工作进度：
+            1.联调完成所有接口
+
+
+            二 存在的疑问：
+            1.关于查询 获取集合对象 转stream流 之后 返回对象 用peek 不返回的用map
+
+
+//        return tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO)
+//                .stream()
+//                .peek(item -> item.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(item.getCategoryId())))
+//                .collect(Collectors.toList());
+
+        List<TagDO> tagDos = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO);
+        for (TagDO tagDo : tagDos) {
+            tagDo.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(tagDo.getCategoryId()));
+        }
+        System.out.println("============================");
+        return tagDos;
+
+        标签列表  加一个覆盖人数 加一个标签人数覆盖是否查询的判断状态 判断是否要插覆盖人数
+
+        //        return tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO)
+        //                .stream()
+        //                .peek(item -> item.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(item.getCategoryId())))
+        //                .peek(item -> item.setCoveredPeopleNumber(tagCategoryMapper.getTagCategoryNameById(item.getCategoryId())))
+        //                .collect(Collectors.toList());
+
+
+    @Override
+    public List<TagDO> getTagsCondition(TagConditionVO tagConditionVO) throws ElasticsearchException, IOException{
+
+        List<TagDO> tags = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO);
+        for (TagDO tag : tags) {
+            tag.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(tag.getCategoryId()));
+            tag.setCoveredPeopleNumber(this.getCoveredPeopleNumberByTag(tag));
+        }
+        return tags;
+        //        return tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO)
+//                .stream()
+//                .peek(item -> item.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(item.getCategoryId())))
+//                .peek(item -> item.setCoveredPeopleNumber(this.getCoveredPeopleNumberByTag(item)))
+//                .collect(Collectors.toList());
+    }
+
+        用户 一个
+    return tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO)
+                .stream()
+                .peek(item -> item.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(item.getCategoryId())))
+                .peek(item -> {
+                    try {
+                        item.setCoveredPeopleNumber(this.getCoveredPeopleNumberByTag(item));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }finally {
+                        item.setCoveredPeopleNumber(COVER_PEOPLE_ZERO);
+                    }
+                })
+                .collect(Collectors.toList());
+
+
+
+                   return tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO)
+                                .stream()
+                                .peek(item -> item.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(item.getCategoryId())))
+                                .peek(item -> item.setCoveredPeopleNumber(this.getCoveredPeopleNumberByTag(item)))
+                                .collect(Collectors.toList());
