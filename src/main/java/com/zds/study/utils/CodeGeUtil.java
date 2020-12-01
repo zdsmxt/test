@@ -1,6 +1,7 @@
 package com.zds.study.utils;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -36,7 +37,8 @@ public class CodeGeUtil {
 
     public static void main(String[] args) {
         // if bit = 8   208,827,064,576  是会有2000 亿个code 码的
-        System.out.println(generateRandomString(6,"tag").toString());
+//        System.out.println(generateRandomString(6,"tag").toString());
+        System.out.println(new Date());
     }
 
 }
