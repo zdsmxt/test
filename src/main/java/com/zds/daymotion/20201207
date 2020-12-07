@@ -1,0 +1,337 @@
+
+
+
+1.标签筛选项 的组合条件的数据权限的控制
+  产品需求的几个关键的话：
+     1）某个部门的某个人创建的组合条件
+        除了创建人本身可以看（标签筛选项） 实现逻辑数据获取 获取当前登录的用户角色 如果是普通业务人员
+        查看 直接根据这个业务人员在标签筛选表里面的创建人账号获取这个业务人员创建的标签筛选项
+        创建人所在的部门标签管理员也可以看
+        如果当前的用户是标签管理员 查看他所在的部门
+        根据他所在的部门获取 这个部门下所有的员工邮箱
+        根据这个部门的所有邮箱账号的集合 获取这个部门所有人创建的标签筛选条件
+        系统管理员看所有 根据获取的角色 如果是 系统管理员 直接查看标签筛选表所有（全表查询）
+
+
+
+
+角色 权限码 功能权限
+
+标签管理员 查看本部门（限定数据查看的范围了）和公开的标签  修改本部门（限定数据修改的范围了）
+本部门的业务人员 修改
+
+
+
+本部门的业务人员 只具有对本部门标签 和公共标签查看 不具有对标签的修改操作对吧 修改和添加这一块是需要超级管理员或者
+
+本部门的标签管理员 只能修改本部门的标签
+拿到当前登录用户的账号 获取角色信息 部门信息
+如果是超级管理员 查询所有
+如果是本部门的标签管理员 根据标签部门表获取 所有可看的自己部门的标签和公开的标签
+
+
+    private String isExistTagName(String tagName){
+        if(null != tagName || !tagName.equals("")){
+            String field = tagMapper.getFieldByName(tagName);
+            if(null!=field){
+                AssertUtil.assertNotNull(tagName,"当前添加的标签名称"+tagName+"重复请修改后重新添加");
+                return tagName;
+            }
+        }
+        return null;
+    }
+
+    private String isExistTagField(String tagField){
+        if(null != tagField || !tagField.equals("")){
+            String name = tagMapper.getNameByField(tagField);
+            if(null != name){
+                AssertUtil.assertNotNull(tagField,"当前添加的标签字段"+tagField+"已存在请修改后重新添加");
+                return tagField;
+            }
+        }
+        return null;
+    }
+
+    @Select("select field from tag_sys where name =#{name,jdbcType =VARCHAR}")
+    String getFieldByName(@Param("name") String name);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ return tagMapper.selectByPrimaryKey(tagDO);
+
+ TooManyResultsException
+
+ ALTER TABLE `tag_sys`
+ ADD UNIQUE INDEX `uniq_tag_field` (`field`) USING BTREE COMMENT '标签字段不可重复',
+ AUTO_INCREMENT=3;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+反思：
+   我这个半小时的大段时间 要干什么事 时刻提醒 自己 完成一件 再干另一件 除非另一件 非常紧急
+
+
+   Q9)当标签值类型选择错误时ES报错此问题被产品组多次提出,
+   ???问题点:需要后端返回标签值类型（这个需要 再插入标签时 维护标签字段 和 标签值类型的关系 也就是 不让 用户选标签值类型）
+   需要在元数据表里面 耦合一个标签值类型的字段 需要ES加上 让后同步到元数据表中
+
+
+   关于乾哥 书写 那个关于条件查询的里面 针对不同的运算符 使用的switch case分支语句 是否可以改为别的写法 比较好
+
+
+
+   组织机构的问题是：
+
+  为了防止 插入重复的值  数据库 唯一索引
+  代码 对于实体添加前回表 查询
+
+
+        if(null != tagName || !tagName.equals("")){
+            String field = tagMapper.getFieldByName(tagName);
+            if(null!=field){
+                AssertUtil.assertNotNull(tagName,"当前添加的标签名称"+tagName+"重复请修改后重新添加");
+            }
+        }
+
+            if(null != field || !field.equals("")){
+                    String name = tagMapper.getNameByField(field);
+                    if(null!=name){
+                        AssertUtil.assertNotNull(field,"当前添加的标签字段"+field+"已存在请修改后重新添加");
+                    }
+                }
+
+                select name as 标签分类名称 ,level as 标签级别,sys_id as 标签所属体系
+                from tag_category where name = '基础信息'
+
+
+truncate tag_category;
+
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('1', 'PSFNP76C', '基本信息', '0', '1', '用户一级类目', '2020-11-28 11:01:29', 'zhudongsheng@kungeek.com', '2020-11-28 11:01:29', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('2', 'Y77ZL7KT', '人口属性', '1', '2', '用户二级类目', '2020-11-28 11:01:59', 'zhudongsheng@kungeek.com', '2020-11-28 11:01:59', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('3', '67717Q4K', '社会属性', '1', '2', '用户二级目录', '2020-11-28 11:03:00', 'zhudongsheng@kungeek.com', '2020-11-28 11:03:00', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('4', 'KAEN4DFL', '地理位置', '1', '2', '用户二级类目', '2020-11-28 11:03:27', 'zhudongsheng@kungeek.com', '2020-11-28 11:03:27', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('5', 'PF43PLL7', '设备属性', '0', '1', NULL, '2020-11-28 11:04:01', 'zhudongsheng@kungeek.com', '2020-11-28 11:04:01', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('6', '7GRLGGU7', '操作系统', '5', '2', NULL, '2020-11-28 11:04:15', 'zhudongsheng@kungeek.com', '2020-11-28 11:04:15', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('7', 'XS6X6VSX', '手机品牌', '5', '2', NULL, '2020-11-28 11:04:36', 'zhudongsheng@kungeek.com', '2020-11-28 11:04:36', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('8', '3ECCNSNQ', '网络', '5', '2', NULL, '2020-11-28 11:04:47', 'zhudongsheng@kungeek.com', '2020-11-28 11:04:47', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('9', '2V82Z3QT', '运营商', '5', '2', NULL, '2020-11-28 11:05:09', 'zhudongsheng@kungeek.com', '2020-11-28 11:05:09', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('10', 'NE86P8JS', '行为信息', '0', '1', NULL, '2020-11-28 11:05:37', 'zhudongsheng@kungeek.com', '2020-11-28 11:05:37', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('11', 'T2KKT9CQ', '访问行为', '10', '2', NULL, '2020-11-28 11:05:48', 'zhudongsheng@kungeek.com', '2020-11-28 11:05:48', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('12', 'V7B6G9AQ', '登录注册行为', '10', '2', NULL, '2020-11-28 11:06:00', 'zhudongsheng@kungeek.com', '2020-11-28 11:06:00', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('13', '7BE99XNL', '点击特征', '10', '2', NULL, '2020-11-28 11:06:11', 'zhudongsheng@kungeek.com', '2020-11-28 11:06:11', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('14', 'SEBVL4JZ', '营销活动点击', '13', '3', NULL, '2020-11-28 11:06:28', 'zhudongsheng@kungeek.com', '2020-11-28 11:06:28', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('15', '5P1H5UA8', '菜单按钮点击', '13', '3', NULL, '2020-11-28 11:06:40', 'zhudongsheng@kungeek.com', '2020-11-28 11:06:40', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('16', '2CW3RN4K', '活跃特征', '10', '2', NULL, '2020-11-28 11:06:56', 'zhudongsheng@kungeek.com', '2020-11-28 11:06:56', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('17', 'QST6S2UG', '访问活跃', '16', '3', NULL, '2020-11-28 11:07:08', 'zhudongsheng@kungeek.com', '2020-11-28 11:07:08', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('18', 'AVCJFC3Q', '营销活跃', '16', '3', NULL, '2020-11-28 11:07:22', 'zhudongsheng@kungeek.com', '2020-11-28 11:07:22', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('19', 'ESMB15PQ', '留资信息', '10', '2', NULL, '2020-11-28 11:08:02', 'zhudongsheng@kungeek.com', '2020-11-28 11:08:02', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('20', 'M3D8PB7Z', '留资渠道', '19', '3', NULL, '2020-11-28 11:08:13', 'zhudongsheng@kungeek.com', '2020-11-28 11:08:13', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('21', 'WYKSK6MU', '服务咨询', '19', '3', NULL, '2020-11-28 11:08:28', 'zhudongsheng@kungeek.com', '2020-11-28 11:08:28', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('22', 'QPUYHLKJ', '业务反馈情况', '10', '2', NULL, '2020-11-28 11:08:44', 'zhudongsheng@kungeek.com', '2020-11-28 11:08:44', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('23', '8SUH58P7', '业务偏好', '0', '1', NULL, '2020-11-28 11:09:08', 'zhudongsheng@kungeek.com', '2020-11-28 11:09:08', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('24', '8SUH58P7', '开公司', '23', '2', NULL, '2020-11-28 11:09:21', 'zhudongsheng@kungeek.com', '2020-11-28 11:09:21', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('25', 'JNXHJLDT', '代理记账', '23', '2', NULL, '2020-11-28 11:09:31', 'zhudongsheng@kungeek.com', '2020-11-28 11:09:31', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('26', '2FED3UMS', '税务代办', '23', '2', NULL, '2020-11-28 11:09:41', 'zhudongsheng@kungeek.com', '2020-11-28 11:09:41', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('27', 'C7BBZZWD', '审计税筹', '23', '2', NULL, '2020-11-28 11:09:51', 'zhudongsheng@kungeek.com', '2020-11-28 11:09:51', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('28', 'QF89G2D8', '增值服务', '23', '2', NULL, '2020-11-28 11:10:09', 'zhudongsheng@kungeek.com', '2020-11-28 11:10:09', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('29', '111QEDAY', '资讯关注偏好', '23', '2', NULL, '2020-11-28 11:10:19', 'zhudongsheng@kungeek.com', '2020-11-28 11:10:19', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('30', 'FX5QAZAP', '行业关注偏好', '23', '2', NULL, '2020-11-28 11:10:32', 'zhudongsheng@kungeek.com', '2020-11-28 11:10:32', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('31', '2DGW3HR9', '工商注册', '24', '3', NULL, '2020-11-28 11:10:49', 'zhudongsheng@kungeek.com', '2020-11-28 11:10:49', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('32', 'ECSPV3CB', '公司法人变更', '24', '3', NULL, '2020-11-28 11:11:03', 'zhudongsheng@kungeek.com', '2020-11-28 11:11:03', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('33', 'CYQH1VGL', '小规模代理记账', '25', '3', NULL, '2020-11-28 11:11:15', 'zhudongsheng@kungeek.com', '2020-11-28 11:11:15', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('34', 'A6FX7FTW', '旧账梳理', '25', '3', NULL, '2020-11-28 11:11:31', 'zhudongsheng@kungeek.com', '2020-11-28 11:11:31', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('35', 'FMVKPAGU', '税控器托管', '26', '3', NULL, '2020-11-28 11:11:55', 'zhudongsheng@kungeek.com', '2020-11-28 11:11:55', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('36', '7HQYB7JS', '税务异常处理', '26', '3', NULL, '2020-11-28 11:12:09', 'zhudongsheng@kungeek.com', '2020-11-28 11:12:09', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('37', 'LBK2FSWS', '财务报表审计', '27', '3', NULL, '2020-11-28 11:12:28', 'zhudongsheng@kungeek.com', '2020-11-28 11:12:28', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('38', 'V9L6UXR5', '企业税收筹划', '27', '3', NULL, '2020-11-28 11:12:45', 'zhudongsheng@kungeek.com', '2020-11-28 11:12:45', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('39', 'SMWXN5FM', '灵活用工', '28', '3', NULL, '2020-11-28 11:13:03', 'zhudongsheng@kungeek.com', '2020-11-28 11:13:03', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('40', 'KKURS2VJ', '客户档案', '0', '1', NULL, '2020-11-28 11:15:51', 'zhudongsheng@kungeek.com', '2020-11-28 11:15:51', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('41', 'K8QRLH14', '线索来源', '40', '2', NULL, '2020-11-28 11:16:10', 'zhudongsheng@kungeek.com', '2020-11-28 11:16:10', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('42', '29YM3CWA', '阶段标志', '40', '2', NULL, '2020-11-28 11:16:19', 'zhudongsheng@kungeek.com', '2020-11-28 11:16:19', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('43', 'VZC958UN', '客户态度', '40', '2', NULL, '2020-11-28 11:16:30', 'zhudongsheng@kungeek.com', '2020-11-28 11:16:30', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('44', 'JP1X2FG9', '客户意向', '40', '2', NULL, '2020-11-28 11:16:41', 'zhudongsheng@kungeek.com', '2020-11-28 11:16:41', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('45', 'TA29KPDB', '现状和需求', '40', '2', NULL, '2020-11-28 11:16:52', 'zhudongsheng@kungeek.com', '2020-11-28 11:16:52', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('46', 'J5GXQU43', '沟通偏好', '40', '2', NULL, '2020-11-28 11:17:02', 'zhudongsheng@kungeek.com', '2020-11-28 11:17:02', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('47', 'VMG5Z1T6', '服务偏好', '40', '2', NULL, '2020-11-28 11:17:11', 'zhudongsheng@kungeek.com', '2020-11-28 11:17:11', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('48', 'G8N1ST4X', '纳税意识', '40', '2', NULL, '2020-11-28 11:17:19', 'zhudongsheng@kungeek.com', '2020-11-28 11:17:19', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('49', 'FN78A5M2', '客户投诉', '40', '2', NULL, '2020-11-28 11:17:29', 'zhudongsheng@kungeek.com', '2020-11-28 11:17:29', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('50', 'X1RHD2U1', '金融业务信息', '0', '1', NULL, '2020-11-28 11:17:45', 'zhudongsheng@kungeek.com', '2020-11-28 11:17:45', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('51', '8UEXHXVW', '营销转化', '50', '2', NULL, '2020-11-28 11:18:09', 'zhudongsheng@kungeek.com', '2020-11-28 11:18:09', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('52', 'EPTTS83H', '处理问题', '50', '2', NULL, '2020-11-28 11:18:21', 'zhudongsheng@kungeek.com', '2020-11-28 11:18:21', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('53', 'C6XK63N7', '风控信息', '0', '1', NULL, '2020-11-28 11:18:32', 'zhudongsheng@kungeek.com', '2020-11-28 11:18:32', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('54', '8JRA7MTZ', '信贷风险评分', '53', '2', NULL, '2020-11-28 11:18:47', 'zhudongsheng@kungeek.com', '2020-11-28 11:18:47', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('55', '9DJZFLWN', '人行征信信息', '53', '2', NULL, '2020-11-28 11:18:58', 'zhudongsheng@kungeek.com', '2020-11-28 11:18:58', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('56', 'RCTQLQ1K', '反欺诈风险评价', '53', '2', NULL, '2020-11-28 11:19:08', 'zhudongsheng@kungeek.com', '2020-11-28 11:19:08', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('57', '3L7L37VT', '黑白灰名单', '53', '2', NULL, '2020-11-28 11:19:17', 'zhudongsheng@kungeek.com', '2020-11-28 11:19:17', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('58', 'RXHEZL21', '申请历史', '53', '2', NULL, '2020-11-28 11:19:29', 'zhudongsheng@kungeek.com', '2020-11-28 11:19:29', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('59', 'C4X7WUWM', '多头', '54', '3', NULL, '2020-11-28 11:19:47', 'zhudongsheng@kungeek.com', '2020-11-28 11:19:47', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('60', 'YETKMP96', '法诉', '54', '3', NULL, '2020-11-28 11:20:02', 'zhudongsheng@kungeek.com', '2020-11-28 11:20:02', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('61', 'XBWUP6X4', '征信评级', '55', '3', NULL, '2020-11-28 11:20:17', 'zhudongsheng@kungeek.com', '2020-11-28 11:20:17', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('62', 'N8748M2B', '风险提示', '55', '3', NULL, '2020-11-28 11:20:29', 'zhudongsheng@kungeek.com', '2020-11-28 11:20:29', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('63', 'HU1BUMA5', '负债统计', '55', '3', NULL, '2020-11-28 11:20:44', 'zhudongsheng@kungeek.com', '2020-11-28 11:20:44', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('64', 'JRPFPJ5L', '购买信息', '0', '1', NULL, '2020-11-28 11:21:05', 'zhudongsheng@kungeek.com', '2020-11-28 11:21:05', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('65', 'BG2MZWZJ', '产品购买情况', '64', '2', NULL, '2020-11-28 11:21:15', 'zhudongsheng@kungeek.com', '2020-11-28 11:21:15', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('66', 'MYDFT1QC', '价值属性', '0', '1', NULL, '2020-11-28 11:21:25', 'zhudongsheng@kungeek.com', '2020-11-28 11:21:25', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('67', 'Q3GLEWZQ', '用户分层', '66', '2', NULL, '2020-11-28 11:21:35', 'zhudongsheng@kungeek.com', '2020-11-28 11:21:35', 'zhudongsheng@kungeek.com', '1');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('68', 'F5YFAZDU', '基础信息', '0', '1', NULL, '2020-11-28 11:23:01', 'zhudongsheng@kungeek.com', '2020-12-02 01:57:41', 'guojunya@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('69', 'N7CWM4LZ', '工商信息', '68', '2', NULL, '2020-11-28 11:23:23', 'zhudongsheng@kungeek.com', '2020-11-28 11:23:23', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('70', '531KHXMR', '司法涉诉', '68', '2', NULL, '2020-11-28 11:23:34', 'zhudongsheng@kungeek.com', '2020-11-28 11:23:34', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('71', '8KC9VQSG', '税务信息', '68', '2', NULL, '2020-11-28 11:23:44', 'zhudongsheng@kungeek.com', '2020-11-28 11:23:44', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('72', 'JLDDWQVM', '企业客户信息', '68', '2', NULL, '2020-11-28 11:23:56', 'zhudongsheng@kungeek.com', '2020-11-28 11:23:56', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('73', 'ZFCBRHEY', '合作信息', '0', '1', NULL, '2020-11-28 11:24:08', 'zhudongsheng@kungeek.com', '2020-11-28 11:24:08', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('74', 'QR9RMCS8', '合同', '73', '2', NULL, '2020-11-28 11:24:22', 'zhudongsheng@kungeek.com', '2020-12-03 03:55:37', 'liuxiao@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('75', 'X33ANAVQ', '合作产品套餐信息', '73', '2', NULL, '2020-11-28 11:24:32', 'zhudongsheng@kungeek.com', '2020-11-28 11:24:32', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('76', '32ULBMCT', '派工人员信息', '73', '2', NULL, '2020-11-28 11:24:46', 'zhudongsheng@kungeek.com', '2020-11-28 11:24:46', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('77', 'JW9Y36PT', '合作时长', '73', '2', NULL, '2020-11-28 11:24:54', 'zhudongsheng@kungeek.com', '2020-11-28 11:24:54', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('78', '4HG2LAUQ', '合同', '73', '2', NULL, '2020-11-28 11:25:05', 'zhudongsheng@kungeek.com', '2020-12-03 03:55:51', 'liuxiao@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('79', '489YKPWV', '续费信息', '73', '2', NULL, '2020-11-28 11:25:14', 'zhudongsheng@kungeek.com', '2020-11-28 11:25:14', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('80', 'UXPLZYCZ', '退款情况', '73', '2', NULL, '2020-11-28 11:25:24', 'zhudongsheng@kungeek.com', '2020-11-28 11:25:24', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('81', 'QUGFLN3R', '企业经营信息', '0', '1', NULL, '2020-11-28 11:26:07', 'zhudongsheng@kungeek.com', '2020-11-28 11:26:07', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('82', '2RN5GTV9', '往来单位情况', '81', '2', NULL, '2020-11-28 11:26:29', 'zhudongsheng@kungeek.com', '2020-11-28 11:26:29', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('83', 'PJXLBAJS', '营收情况', '81', '2', NULL, '2020-11-28 11:26:44', 'zhudongsheng@kungeek.com', '2020-11-28 11:26:44', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('84', 'HTM713ET', '利润情况', '81', '2', NULL, '2020-11-28 11:26:53', 'zhudongsheng@kungeek.com', '2020-11-28 11:26:53', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('85', 'D7AER6LK', '支出情况', '81', '2', NULL, '2020-11-28 11:27:11', 'zhudongsheng@kungeek.com', '2020-11-28 11:27:11', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('86', 'X3UG9Z8U', '票据情况', '81', '2', NULL, '2020-11-28 11:27:53', 'zhudongsheng@kungeek.com', '2020-11-28 11:27:53', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('87', 'VXNYYGEY', '资金流水情况', '81', '2', NULL, '2020-11-28 11:28:11', 'zhudongsheng@kungeek.com', '2020-11-28 11:28:11', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('88', '9BC4BQ5G', '资产负债情况', '81', '2', NULL, '2020-11-28 11:28:26', 'zhudongsheng@kungeek.com', '2020-11-28 11:28:26', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('89', 'M9GTF612', '企业财务信息', '81', '2', NULL, '2020-11-28 11:28:39', 'zhudongsheng@kungeek.com', '2020-11-28 11:28:39', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('90', 'MDHSSBFJ', '下游往来方情况', '82', '3', NULL, '2020-11-28 11:29:18', 'zhudongsheng@kungeek.com', '2020-11-28 11:29:18', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('91', 'TZ9TWGB5', '上游往来方情况', '82', '3', NULL, '2020-11-28 11:29:31', 'zhudongsheng@kungeek.com', '2020-11-28 11:29:31', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('92', 'QQBVYTRZ', '上下游往来方交叉情况', '82', '3', NULL, '2020-11-28 11:29:43', 'zhudongsheng@kungeek.com', '2020-11-28 11:29:43', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('93', 'MP6N6FY8', '收入规模', '83', '3', NULL, '2020-11-28 11:29:56', 'zhudongsheng@kungeek.com', '2020-11-28 11:29:56', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('94', 'C44VPMPS', '收入成长性', '83', '3', NULL, '2020-11-28 11:30:06', 'zhudongsheng@kungeek.com', '2020-11-28 11:30:06', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('95', 'D6U6QR27', '收入连续性', '83', '3', NULL, '2020-11-28 11:30:17', 'zhudongsheng@kungeek.com', '2020-11-28 11:30:17', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('96', 'XM8F5HVW', '成本费用情况', '85', '3', NULL, '2020-11-28 11:30:47', 'zhudongsheng@kungeek.com', '2020-11-28 11:30:47', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('97', 'JDAPQN1V', '纳税情况', '85', '3', NULL, '2020-11-28 11:31:26', 'zhudongsheng@kungeek.com', '2020-11-28 11:31:26', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('98', 'JSK11QAX', '工资情况', '85', '3', NULL, '2020-11-28 11:31:37', 'zhudongsheng@kungeek.com', '2020-11-28 11:31:37', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('99', 'BXY3ZDSU', '销售费用', '96', '4', NULL, '2020-11-28 11:32:15', 'zhudongsheng@kungeek.com', '2020-11-28 11:32:15', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('100', '8Z9XFUDT', '管理费用', '96', '4', NULL, '2020-11-28 11:32:41', 'zhudongsheng@kungeek.com', '2020-11-28 11:32:41', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('101', 'UTGNVL58', '财务费用', '96', '4', NULL, '2020-11-28 11:32:54', 'zhudongsheng@kungeek.com', '2020-11-28 11:32:54', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('102', '25NBR1WY', '银行流水', '87', '3', NULL, '2020-11-28 11:33:36', 'zhudongsheng@kungeek.com', '2020-11-28 11:33:36', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('103', 'YX7HH3A9', '回款规模', '87', '3', NULL, '2020-11-28 11:34:20', 'zhudongsheng@kungeek.com', '2020-11-28 11:34:20', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('104', 'TXEAJYWW', '回款成长性', '87', '3', NULL, '2020-11-28 11:34:46', 'zhudongsheng@kungeek.com', '2020-11-28 11:34:46', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('105', 'WGTHBE8M', '回款连续性', '87', '3', NULL, '2020-11-28 11:35:08', 'zhudongsheng@kungeek.com', '2020-11-28 11:35:08', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('106', 'CG7P5KLN', '现金流水', '87', '3', NULL, '2020-11-28 11:35:22', 'zhudongsheng@kungeek.com', '2020-11-28 11:35:22', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('107', 'SDJL66BH', '公户流水信息', '102', '4', NULL, '2020-11-28 11:35:50', 'zhudongsheng@kungeek.com', '2020-11-28 11:35:50', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('108', 'NJSKLHA3', '私户往来信息', '102', '4', NULL, '2020-11-28 11:36:21', 'zhudongsheng@kungeek.com', '2020-11-28 11:36:21', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('109', '7H8SQ4UN', '资产情况', '88', '3', NULL, '2020-11-28 11:37:33', 'zhudongsheng@kungeek.com', '2020-11-28 11:37:33', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('110', 'Z5KKYWS7', '负债情况', '88', '3', NULL, '2020-11-28 11:37:52', 'zhudongsheng@kungeek.com', '2020-11-28 11:37:52', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('111', 'S2SGMRTD', '所有者权益', '88', '3', NULL, '2020-11-28 11:38:05', 'zhudongsheng@kungeek.com', '2020-11-28 11:38:05', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('112', '29YFUUEF', '风控信息', '0', '1', NULL, '2020-11-28 11:38:44', 'zhudongsheng@kungeek.com', '2020-11-28 11:38:44', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('113', 'HRS6VDB4', '信贷风险等级', '112', '2', NULL, '2020-11-28 11:38:53', 'zhudongsheng@kungeek.com', '2020-11-28 11:38:53', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('114', 'QPQ3ETMB', '信贷风险评价', '112', '2', NULL, '2020-11-28 11:39:10', 'zhudongsheng@kungeek.com', '2020-11-28 11:39:10', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('115', 'TPJ8BNUB', '反欺诈风险评价', '112', '2', NULL, '2020-11-28 11:39:21', 'zhudongsheng@kungeek.com', '2020-11-28 11:39:21', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('116', '8AZ82U95', '黑白灰名单', '112', '2', NULL, '2020-11-28 11:39:31', 'zhudongsheng@kungeek.com', '2020-11-28 11:39:31', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('117', '6ZTSUL9S', '风险提示', '112', '2', NULL, '2020-11-28 11:39:41', 'zhudongsheng@kungeek.com', '2020-11-28 11:39:41', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('118', 'MMKHK3RV', '申请历史', '112', '2', NULL, '2020-11-28 11:39:51', 'zhudongsheng@kungeek.com', '2020-11-28 11:39:51', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('119', 'F995BVZG', '价值属性', '0', '1', NULL, '2020-11-28 11:40:06', 'zhudongsheng@kungeek.com', '2020-11-28 11:40:06', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('120', 'YXXRB6FA', '生命周期', '119', '2', NULL, '2020-11-28 11:40:16', 'zhudongsheng@kungeek.com', '2020-11-28 11:40:16', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('122', 'C2P7BSSQ', '综合价值', '119', '2', NULL, '2020-11-28 11:40:25', 'zhudongsheng@kungeek.com', '2020-11-28 11:40:25', 'zhudongsheng@kungeek.com', '2');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('123', 'QR9BQ6K4', '销售业务信息', '0', '1', NULL, '2020-11-28 11:41:02', 'zhudongsheng@kungeek.com', '2020-11-28 11:41:02', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('124', '7MX1RJWT', '线索信息', '122', '2', NULL, '2020-11-28 11:41:13', 'zhudongsheng@kungeek.com', '2020-11-28 11:41:13', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('125', '4B7DMYXF', '电话沟通情况', '122', '2', NULL, '2020-11-28 11:41:21', 'zhudongsheng@kungeek.com', '2020-11-28 11:41:21', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('126', '7UGKMHCA', '跟进记录情况', '122', '2', NULL, '2020-11-28 11:41:46', 'zhudongsheng@kungeek.com', '2020-11-28 11:41:46', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('127', 'Z6B1YZJE', '出单业绩信息', '122', '2', NULL, '2020-11-28 11:41:57', 'zhudongsheng@kungeek.com', '2020-11-28 11:41:57', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('128', 'GVGFY39P', '退款信息', '122', '2', NULL, '2020-11-28 11:42:05', 'zhudongsheng@kungeek.com', '2020-11-28 11:42:05', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('129', 'RB1RTZD3', '线索基本情况', '124', '3', NULL, '2020-11-28 11:42:20', 'zhudongsheng@kungeek.com', '2020-11-28 11:42:20', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('130', 'ER8N7BBC', '公私海流转情况', '124', '3', NULL, '2020-11-28 11:42:34', 'zhudongsheng@kungeek.com', '2020-11-28 11:42:34', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('131', 'AMTHDLPK', '销售跟进状态', '126', '3', NULL, '2020-11-28 11:42:53', 'zhudongsheng@kungeek.com', '2020-11-28 11:42:53', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('132', 'ZSZZYB39', '企业微信跟进', '126', '3', NULL, '2020-11-28 11:43:04', 'zhudongsheng@kungeek.com', '2020-11-28 11:43:04', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('133', 'MZSDRM2F', '会计业务信息', '0', '1', NULL, '2020-11-28 11:43:19', 'zhudongsheng@kungeek.com', '2020-11-28 11:43:19', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('134', '4G4SXFY1', '客户分配情况', '133', '2', NULL, '2020-11-28 11:43:32', 'zhudongsheng@kungeek.com', '2020-11-28 11:43:32', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('135', '6AVK433S', '沟通转化情况', '133', '2', NULL, '2020-11-28 11:43:41', 'zhudongsheng@kungeek.com', '2020-11-28 11:43:41', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('136', '3KNHP4Z6', '客户档案完善', '133', '2', NULL, '2020-11-28 11:43:50', 'zhudongsheng@kungeek.com', '2020-11-28 11:43:50', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('137', 'NQW56UVF', '合同信息', '133', '2', NULL, '2020-11-28 11:43:59', 'zhudongsheng@kungeek.com', '2020-11-28 11:43:59', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('138', 'QT5MN45N', '账套维护信息', '133', '2', NULL, '2020-11-28 11:44:13', 'zhudongsheng@kungeek.com', '2020-11-28 11:44:13', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('139', '43D4AYC1', '账务处理信息', '133', '2', NULL, '2020-11-28 11:44:23', 'zhudongsheng@kungeek.com', '2020-11-28 11:44:23', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('140', 'W4FDVBWD', '纳税申报信息', '133', '2', NULL, '2020-11-28 11:44:34', 'zhudongsheng@kungeek.com', '2020-11-28 11:44:34', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('141', 'GK2T6LL9', '汇算清缴', '133', '2', NULL, '2020-11-28 11:44:51', 'zhudongsheng@kungeek.com', '2020-11-28 11:44:51', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('142', 'CXGQBCU7', '返账情况', '133', '2', NULL, '2020-11-28 11:45:00', 'zhudongsheng@kungeek.com', '2020-11-28 11:45:00', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('143', 'MH3ULM3J', '工商年报信息', '133', '2', NULL, '2020-11-28 11:45:10', 'zhudongsheng@kungeek.com', '2020-11-28 11:45:10', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('144', 'H465D82X', '续费签单信息', '133', '2', NULL, '2020-11-28 11:45:19', 'zhudongsheng@kungeek.com', '2020-11-28 11:45:19', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('145', 'PPJNL5VC', '记账报税', '140', '3', NULL, '2020-11-28 11:45:38', 'zhudongsheng@kungeek.com', '2020-11-28 11:45:38', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('146', 'W4WTUK8C', '税控盘处理', '140', '3', NULL, '2020-11-28 11:45:51', 'zhudongsheng@kungeek.com', '2020-11-28 11:45:51', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('147', '83QTL841', '增值附加税', '140', '3', NULL, '2020-11-28 11:46:02', 'zhudongsheng@kungeek.com', '2020-11-28 11:46:02', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('148', 'EJYPVZVH', '企业所得税', '140', '3', NULL, '2020-11-28 11:46:12', 'zhudongsheng@kungeek.com', '2020-11-28 11:46:12', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('149', 'ASWPHFHG', '个人所得税', '140', '3', NULL, '2020-11-28 11:46:24', 'zhudongsheng@kungeek.com', '2020-11-28 11:46:24', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('150', 'H5Z9RD19', '印花税', '140', '3', NULL, '2020-11-28 11:46:35', 'zhudongsheng@kungeek.com', '2020-11-28 11:46:35', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('151', 'MV1ZYDC5', '社保申报', '140', '3', NULL, '2020-11-28 11:46:46', 'zhudongsheng@kungeek.com', '2020-11-28 11:46:46', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('152', 'KEYV5E7B', '业务人员信息', '0', '1', NULL, '2020-11-28 11:47:12', 'zhudongsheng@kungeek.com', '2020-11-28 11:47:12', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('153', 'A9R1SFQB', '基础信息', '152', '2', NULL, '2020-11-28 11:47:23', 'zhudongsheng@kungeek.com', '2020-11-28 11:47:23', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('154', 'JBAT1QAC', '职业信息', '152', '2', NULL, '2020-11-28 11:47:32', 'zhudongsheng@kungeek.com', '2020-11-28 11:47:32', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('155', 'LKMW784V', '所属机构', '152', '2', NULL, '2020-11-28 11:47:41', 'zhudongsheng@kungeek.com', '2020-11-28 11:47:41', 'zhudongsheng@kungeek.com', '3');
+INSERT INTO `data_web_uat`.`tag_category` (`id`, `code`, `name`, `parent_id`, `level`, `note`, `create_time`, `create_user`, `update_time`, `update_user`, `sys_id`) VALUES ('156', 'D7H9S8AW', '客户投诉情况', '152', '2', NULL, '2020-11-28 11:47:50', 'zhudongsheng@kungeek.com', '2020-11-28 11:47:50', 'zhudongsheng@kungeek.com', '3');
+
+
+
+ALTER TABLE `sys_role`
+DROP COLUMN `associate_group`;
+
+
+ALTER TABLE `sys_permission`
+DROP COLUMN `associate_group`;
+
+
+
+
+
+  20201207daylog
+        一 工作进度：
+        1.梳理标签筛选项 和 标签的数据权限
+        2.基于俊雅 提的标签同一体系下的标签分类不可重复和标签字段 名称不可重复修改代码自测
+        3.修改之前准备好的标签分类sql 今早新的需求 删除之前标签画像里面重复的分类
+        4.
+
+        二 存在的疑问：
+        1.对于断言的使用理解
+        2.关于异常的捕获
+        3.今天耗时的地方 想给前端传送 精确的字段重复信息
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+重复的响应码
+
