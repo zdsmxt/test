@@ -1,0 +1,190 @@
+
+
+
+求一份线上环境的日志可读账号和数据库的只读账号
+
+select id,field ,name,category_id ,status,level from tag_sys where sys_id = 1
+and entity_id = 1
+
+select id from tag_category where name = "电话沟通情况"
+
+select* from tag_category where id = 121
+
+select * from tag_sys where category_id in (152,153,154)
+
+由于删除企业标签体系导致的 数据的parent_id 插入 错误
+产生的42 条
+
+
+
+public  class UniqueStringUtil {
+    public static String generateUniqueString(Integer num) {
+        char[] letters = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                'K', 'L', 'M', 'N', 'O', 'P','Q', 'R', 'S', 'T', 'U', 'V',
+                'W', 'X', 'Y', 'Z','0','1','2','3','4','5','6','7','8','9'};
+        boolean[] flags = new boolean[letters.length];
+        char[] chs = new char[num];
+        for (int i = 0; i < chs.length; i++) {
+            int index;
+            do {
+                index = (int) (Math.random() * (letters.length));
+              // 判断生成的字符是否重复
+            } while (flags[index]);
+            chs[i] = letters[index];
+            flags[index] = true;
+        }
+        String s = String.valueOf(chs);
+        return s;
+    }
+}
+
+//        for (TagFilterItemDO tagFilterItemDO : tagFilterItemDOS) {
+//            tagFilterItemDO.setFilterId(tagFilterDO.getId());
+//            tagFilterItemDO.setCreateTime(now);
+//            tagFilterItemDO.setCreateUser(userName);
+//            tagFilterItemDO.setUpdateTime(now);
+//            tagFilterItemDO.setUpdateUser(userName);
+//        }
+
+        tagFilterItemDOS.stream()
+                .peek(item -> item.setFilterId(tagFilterDO.getId()))
+                .peek(item -> item.setFilterId(tagFilterDO.getId()))
+                .peek(item -> item.setCreateTime(now))
+                .peek(item -> item.setCreateUser(userName))
+                .peek(item -> item.setUpdateUser(userName))
+                .peek(item -> item.setUpdateTime(now))
+                .collect(Collectors.toList());
+
+                //        for (TagFilterItemDO tagFilterItemDO : tagFilterItemDOS) {
+                //            tagFilterItemDO.setUpdateTime(now);
+                //            tagFilterItemDO.setUpdateUser(userName);
+                //            tagFilterItemMapper.updateByPrimaryKeySelective(tagFilterItemDO);
+                //        }
+                        return tagFilterItemDOS.stream()
+                                .peek(item -> item.setUpdateUser(userName))
+                                .peek(item -> item.setUpdateTime(now))
+                                .peek(item -> tagFilterItemMapper.updateByPrimaryKeySelective(item));
+
+
+
+
+
+
+
+
+    ES 里面的根据标签筛选项 获取 ES 里面的统计的结果
+    这里 如何使用
+
+
+    标签筛选的构成
+     标签筛选项下有多个组 每个组又有多个细则
+     List<List<TagFilterItemDO>> filters
+     外层List 里面的元素 是多个组
+     里层List 里面的元素 是各个组下的标签细则
+
+    @Override
+    public Object getAssignTagEnumValue(String tagField, Integer tagValueType) throws IOException {
+        // 根据标签字段 tagField  获取 index 对应ES 里面的索引 从元数据表db_metadata里面拿到table_name 索引
+        DbMetadataDO dbMetadataDO = new DbMetadataDO();
+        dbMetadataDO.setFieldName(tagField);
+        List<DbMetadataDO> dbMetadataDOS = dbMetadataMapper.getMetadataByParam(dbMetadataDO);
+        String index = dbMetadataDOS.get(0).getTableName();
+        List<TagSpreadRatioVO> tagSpreadRatioVOS = esUtil.calEnumFieldSpread(index, tagField, tagValueType);
+        List<String> tagEnumValues = new ArrayList<>(tagSpreadRatioVOS.size());
+        for (TagSpreadRatioVO tagSpreadRatioVO : tagSpreadRatioVOS) {
+            tagEnumValues.add(tagSpreadRatioVO.getName());
+        }
+        return tagEnumValues;
+    }
+
+   赶快分析各个接口的调用依赖关系
+   如增改查删的顺序
+
+   二期各个接口需要的是
+
+   三大类 用户 企业 员工 里面的数据 是怎么用的   结合标签筛选体系里面的标签体系吗
+
+   用户 添加标签筛选项
+       用户显示查找某个体系下 他可见的标签(************1.可见标签接口 需要仔细调试)
+       用户对于选好的标签 要获取 具体这个标签下的那些值组成一个细则(************2.这个标签在ES里面的枚举值 接口)
+       基于这些标签筛选条件 查询这些标签组合条件下的用户分群数据 (3.标签组合条件查询ES的接口？？？？？？
+        public <T> List<T> query(String index,
+                                 List<List<TagFilterItemDO>> filters,
+                                 Class<T> resultClazz,
+                                 Integer pageSize,
+                                 Integer fromIndex)
+       )
+       用ES 定义好的工具类 来查询
+       (4.标签选项和标签细则的创建)
+       (5.标签组合条件下查询的数据的 导出(这个地方需要考虑 当前用户的角色信息 来确定 那些字段 不能导  能导出多少条数据))
+       (传参如何定义 集合套集合 还是 一个集合 里面 获取是 这个具体的每一个标签细则 可是这样标签细则组之间的关系如何维护)
+       标签筛选列表的查询(6.考虑不同角色 可见范围 过滤数据 多条件过滤数据)
+       (7.标签细则的删除)
+
+
+疑问 1.如何 让前端 定义多标签条件组合的入参的json
+    前端需要处理 标签筛选项里面的各个组的顺序
+    前端需要处理 标签筛选项里面的各个细则在这个组的顺序
+    前端需要处理 标签筛选项里面的一个组内的第一个细则是否带运算符
+    前端需要处理 标签筛选项里面的一个标签筛选项内的第一个组是否带运算符
+    (传参如何定义 集合套集合 还是 一个集合 里面 获取是 这个具体的每一个标签细则 可是这样标签细则组之间的关系如何维护)
+
+
+
+
+标签值的模糊匹配没法实现 业务我是直接从 ES 取的某个标签 的所有标签取值
+
+最紧急的事情
+   梳理自己的代码思路
+   标签筛选的入参json 确定下来
+
+
+
+
+生产环境的问题
+前端 发版 切的是 BitBucket合代码的时候 选的是 release/v1.0.0 但是
+jenkins 里面检出的分支 checkout 是二期的 44 分支
+jenkins 配置出了问题
+
+
+mysql 的三类用户实际是对应 三大标签体系的三大类索引
+
+梳理一下逻辑
+
+问题来了： 不是每一个标签组合筛选项 都可以 获得数据
+基于数据的问题排查
+用户创建必选体系 选择这个体系下可看的标签 进行组合(如何防止用户随意组合 标签筛选项)(多个组里的标签细则小条件 构成标签筛选项大条件)
+前端传入tagFilterItem List 接着 基于这个组合条件 调用esUtil.query()
+返回给前端 展示用户列表样例使用(这里需要处理 mysql 里面的三张表导入的数据 和 es获取的数据进行组合)
+导出时候 用户基于之前 的标签组合条件 作文可以查询的标签列表范围
+用户选几个标签字段 结合当前用户的角色 返回导出是否带有()除了用户标识id 以外的其他信息
+
+in 一下 (es.query 获取的数据里面 会带回 具有用户标识id的数据 拿到es 里面的用户id 作为 用户表里面的in 里面的取值  )
+
+
+
+
+
+
+  20201209daylog
+        一 工作进度：
+        1.修改生成环境的实体下标签数量 和标签体系下标签数量(标签分类脏数据)产生的问题
+        2.测试线上的具体标签是否有es报错
+        3.与乾哥讨论 关于基于标签筛选组合条件 如何从ES 获取值及确定前端传入标签组合条件参数里面的
+          每一个组的第一个标签细则这一行数据 不用带逻辑运算符  一个标签筛选项里面的第一个组 不用带逻辑运算符
+        4.与乾哥讨论 数据导出 那块用户标识(基于es 获取的来自标签体系下的用户标识id 来获取 es 刷到mysql 用户表里面的数据)
+
+
+        二 存在的疑问：
+        1.维仲 今天提的分支 为什么会 间隔性复现 jenkins 打错包的情况
+        2.今天的脏数据 问题：
+          问题的产生：主要是标签分类文件频繁修改 导致的 俊雅那边 没有及时同步 还有 我自己给的标签分类 由于其中业务体系里面有两个一级分类
+          作为parent_id(122 131) 的标签分类写错了 导致前端标签分类树展示异常 标签分类树下的标签无法正常显示
+          之所以 有15条正常显示  那是业务那15条标签数据的标签分类parent_id是正确的
+          解决办法：对于频繁变动的文件  要及时同步其他合作的人员 对于数据要反复核对 严禁大量手动修改数据
+
+
+
+
+
+
