@@ -1,0 +1,148 @@
+
+
+
+
+
+1.分群数据查询接口
+2.分群数据导出接口
+
+问题的产生：
+      添加标签筛选项 筛选项里面的 多个组 组里面的多个标签价条件的细则
+      传入一个标签细则集合
+      传入一个标签选项的对象
+
+      如何在swagger 分离出 这两个对象
+      考虑几种写的情况
+        如果是用户进入页面 直接写添加的时候
+        不用传标签细则id
+        如果是用户进入页面 直接写编辑的时候
+        需用传标签细则id  我需要把这部分数据 结合之前的标签选项id 如标签细则库
+昨晚没有休息好写代码 满脸疲惫
+
+# mysql 给字段添加默认值的语句
+ALTER TABLE tag_filter_item ALTER del_flag SET DEFAULT 0
+
+ALTER TABLE tag_filter ALTER del_flag SET DEFAULT 0
+
+
+        tagFilterItemDOS.stream()
+//                .peek(item -> item.setFilterId(tagFilterDO.getId()))
+                .peek(item -> item.setFilterId(i))
+                .peek(item -> item.setCreateUser(userName))
+                .peek(item -> item.setCreateTime(now))
+                .peek(item -> item.setUpdateUser(userName))
+                .peek(item -> item.setUpdateTime(now))
+                .collect(Collectors.toList());
+
+
+                给删除字段 设置默认值 用tk.mybatis 里面的方法 没有传入del_flag 的值 新添加一条数据 并没有出发默认值0
+
+System.out.println(tagFilterMapper.selectOne(tagFilterDO)); 不好使
+
+按标签分类末端直接取值 不要累加
+标签汇总
+
+
+     * 每一级标签数量的计算 计算规则如下：
+     * 一级 = 一级 +二级 +三级 +四级
+     * 二级 = 二级 +三级 +四级
+     * 三级 = 三级 +四级
+     * 四级 = 四级
+     * 不用lamada表达式的写法
+     * <hr><blockquote><pre>
+     * private Integer levelTagCount(Integer level,List<TagLevelCountDO> tagLevelCounts){
+     *  Integer tagCount = 0;
+     *  // 统计大于等于当前级别的累加和
+     *  for (TagLevelCountDO tagLevelCount : tagLevelCounts) {
+     *      if(tagLevelCount.getLevel()>=level){
+     *           tagCount+=tagLevelCount.getTagCount();
+     *      }
+     *  }
+     *   return tagCount;
+     * }
+     * </pre></blockquote><hr>
+
+
+     format 单独提交
+
+
+
+
+/**
+ * @author zhudongsheng
+ * @Description: TODO
+ * @date 2020/12/9 0:26
+ */
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class TagFilterVO extends PageQueryParam {
+    private Integer id;
+
+    /**
+     * 标签筛选项名称
+     */
+    @NotBlank(message = "filterName not allow null")
+    private String filterName;
+
+    /**
+     * 标签体系id
+     */
+    @NotNull(message = "tagSystemId not allow null")
+    private Integer tagSystemId;
+
+    /**
+     * 是否要分页
+     */
+    private Boolean unPagination;
+
+    /**
+     * 创建人
+     */
+    private String createUser;
+
+    /**
+     * 部门主键id
+     */
+    private Integer deptId;
+
+
+            tagDeptDO.setTagId(tagDO.getId());
+            tagDeptDO.setDeptId();
+            tagDeptDO.setSysId(sysId);
+            tagDeptDO.setCreateTime(currentTime);
+            tagDeptDO.setCreateUser(userName);
+            tagDeptDO.setUpdateTime(currentTime);
+            tagDeptDO.setUpdateUser(userName);
+
+
+
+
+    @Override
+    public Object getAssignTagEnumValue(String tagField, Integer tagValueType) throws IOException {
+        // 根据标签字段 tagField  获取 index 对应ES 里面的索引 从元数据表db_metadata里面拿到table_name 索引
+        List<TagSpreadRatioVO> tagSpreadRatioVOS = esUtil.calEnumFieldSpread(dbMetadataMapper.getTableNameByTagField(tagField), tagField, tagValueType);
+        List<String> tagEnumValues = new ArrayList<>(tagSpreadRatioVOS.size());
+        for (TagSpreadRatioVO tagSpreadRatioVO : tagSpreadRatioVOS) {
+            tagEnumValues.add(tagSpreadRatioVO.getName());
+        }
+        return tagEnumValues;
+    }
+
+       AssertUtil.assertBlank(tagField, "tagField not allow null");
+            AssertUtil.assertNotNull(tagValueType, "tagValueType not allow null");
+
+
+
+  20201210daylog
+        一 工作进度：
+        1.自测标签选项添加和编辑接口
+        2.修改一期首页各个体系各级标签数的显示
+        3.开发标签筛选查询数据的接口
+        4.完善获取标签枚举值的接口（基于乾哥新增的esUtil 里面的方法）
+
+        二 存在的疑问：
+        1.关于反思自己沟通 效率 深度思考的问题
