@@ -1,0 +1,185 @@
+
+
+@Override
+    public List<TagDO> getCurrentUserVisibleTag(Integer sysId, String tagName) {
+        // 获取当前用户的部门id
+        Integer deptId = userMapper.getDeptIdByUserName(UserUtil.getUserName());
+        // 根据部门id 和体系id 获取标签部门表里面的 这个用户可以查看的标签id
+        List<Integer> tagIds = tagDeptMapper.getTagIdListBysysIdDeptId(sysId, deptId);
+        // 根据前端传入的模糊标签值 进行模糊搜索
+        // 用户所在部门的体系下的标签集合
+        List<TagDO> userDeptTags = tagMapper.getTagDos(tagIds, tagName);
+        List<Integer> publicTagIds;
+        // 获取公共部门的主键
+        Integer publicDeptId = deptService.getDeptIdDeptName(DeptServiceImpl.PUBLIC);
+        // 获取这个体系下所有的公共部门标签
+        List<TagDO> publicDeptTags = null;
+        if (null != publicDeptId) {
+            // 获取这个体系下所有属于公共部门的标签集合
+            publicTagIds = tagDeptMapper.getTagIdListBysysIdDeptId(sysId, publicDeptId);
+            if (publicTagIds.size() != 0) {
+                publicDeptTags = tagMapper.getTagDos(publicTagIds, tagName);
+            }
+        }
+        // 这里需要把公共部门的这个体系标签组合进来
+        List<TagDO> mergeList = new ArrayList<>();
+        Stream.of(userDeptTags, publicDeptTags).forEach(mergeList::addAll);
+        return mergeList;
+    }
+
+
+
+
+      @Override
+        public boolean equals(Object that) {
+            if (this == that) {
+                return true;
+            }
+            if (that == null) {
+                return false;
+            }
+            if (getClass() != that.getClass()) {
+                return false;
+            }
+            TagFilterDO other = (TagFilterDO) that;
+            return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+                    && (this.getFilterName() == null ? other.getFilterName() == null : this.getFilterName().equals(other.getFilterName()))
+                    && (this.getTagSystemId() == null ? other.getTagSystemId() == null : this.getTagSystemId().equals(other.getTagSystemId()))
+                    && (this.getCreateUser() == null ? other.getCreateUser() == null : this.getCreateUser().equals(other.getCreateUser()))
+                    && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
+                    && (this.getUpdateUser() == null ? other.getUpdateUser() == null : this.getUpdateUser().equals(other.getUpdateUser()))
+                    && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
+                    && (this.getDelFlag() == null ? other.getDelFlag() == null : this.getDelFlag().equals(other.getDelFlag()))
+                    && (this.getDeptId() == null ? other.getDeptId() == null : this.getDeptId().equals(other.getDeptId()));
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+            result = prime * result + ((getFilterName() == null) ? 0 : getFilterName().hashCode());
+            result = prime * result + ((getTagSystemId() == null) ? 0 : getTagSystemId().hashCode());
+            result = prime * result + ((getCreateUser() == null) ? 0 : getCreateUser().hashCode());
+            result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
+            result = prime * result + ((getUpdateUser() == null) ? 0 : getUpdateUser().hashCode());
+            result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
+            result = prime * result + ((getDelFlag() == null) ? 0 : getDelFlag().hashCode());
+            result = prime * result + ((getDeptId() == null) ? 0 : getDeptId().hashCode());
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(getClass().getSimpleName());
+            sb.append(" [");
+            sb.append("Hash = ").append(hashCode());
+            sb.append(", id=").append(id);
+            sb.append(", filterName=").append(filterName);
+            sb.append(", tagSystemId=").append(tagSystemId);
+            sb.append(", createUser=").append(createUser);
+            sb.append(", createTime=").append(createTime);
+            sb.append(", updateUser=").append(updateUser);
+            sb.append(", updateTime=").append(updateTime);
+            sb.append(", delFlag=").append(delFlag);
+            sb.append(", deptId=").append(deptId);
+            sb.append("]");
+            return sb.toString();
+        }
+
+
+
+
+//    @ApiOperation(value = "根据标签体系的主键id获取当前用户可见的标签,用于标签筛选", notes = "需要的权限码是 tag:query")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(paramType = "query", name = "sysId", value = "标签体系主键id", required = true),
+//            @ApiImplicitParam(paramType = "query", name = "tagName", value = "标签名称")
+//    })
+//    @Result
+//    @GetMapping("visible")
+//    @RequiresPermissions(value = {"tag:query"})
+//    public Object getCurrentUserVisibleTag(Integer sysId, String tagName) {
+//        AssertUtil.assertNotNull(sysId, "标签体系主键为空，请检查数据");
+//        return tagFilterService.getCurrentUserVisibleTag(sysId, tagName);
+//    }
+
+
+    @Override
+    public Object getSingleTagFilterData(Integer tagFilterId) {
+        return tagFilterItemMapper.getItemsByFilterId(tagFilterId);
+    }
+
+//    Object getTagFilterData(TagFilterVO tagFilterVO) throws IOException;
+
+
+    Object getSingleTagFilterData(Integer tagFilterId);
+
+    @Override
+    public Object getSingleTagFilterData(Integer tagFilterId) {
+        return null;
+    }
+
+
+    @ApiOperation(value = "回显保存的单个标签选项里面的标签细则", notes = "需要的权限码是 tagFilter:query")
+    @Result
+    @GetMapping("show")
+    @RequiresPermissions(value = {"tagFilter:query"})
+    public Object getSingleTagFilterData(Integer tagFilterId) {
+        AssertUtil.assertNotNull(tagFilterId, "标签筛选主键id为空，请检查数据");
+        return tagFilterService.getSingleTagFilterData(tagFilterId);
+    }
+
+
+
+    @Override
+    public void deleteTagFilterItem(Integer itemId) {
+        TagFilterItemDO itemDO = tagFilterItemMapper.selectByPrimaryKey(itemId);
+        itemDO.setDelFlag(ConstantEnum.YES);
+        tagFilterItemMapper.updateByPrimaryKey(itemDO);
+    }
+
+
+    /**
+     * 删除指定id的筛选细项
+     *
+     * @param itemId 细项主键
+     */
+    void deleteTagFilterItem(Integer itemId);
+
+    List<TagDO> getCurrentUserVisibleTag(Integer sysId, String tagName);
+
+
+
+    /**
+     * @param
+     * @return
+     * @Description //TODO  这个接口和 标签查询的接口
+     * @Date 2020/12/11 14:20
+     */
+    @Override
+    public List<TagDO> getCurrentUserVisibleTag(Integer sysId, String tagName) {
+        // 获取当前用户的部门id
+        Integer deptId = userMapper.getDeptIdByUserName(UserUtil.getUserName());
+        // 根据部门id 和体系id 获取标签部门表里面的 这个用户可以查看的标签id
+        List<Integer> tagIds = tagDeptMapper.getTagIdListBysysIdDeptId(sysId, deptId);
+        // 根据前端传入的模糊标签值 进行模糊搜索
+        // 用户所在部门的体系下的标签集合
+        List<TagDO> userDeptTags = tagMapper.getTagDos(tagIds, tagName);
+        List<Integer> publicTagIds;
+        // 获取公共部门的主键
+        Integer publicDeptId = deptService.getDeptIdDeptName(DeptServiceImpl.PUBLIC);
+        // 获取这个体系下所有的公共部门标签
+        List<TagDO> publicDeptTags = null;
+        if (null != publicDeptId) {
+            // 获取这个体系下所有属于公共部门的标签集合
+            publicTagIds = tagDeptMapper.getTagIdListBysysIdDeptId(sysId, publicDeptId);
+            if (publicTagIds.size() != 0) {
+                publicDeptTags = tagMapper.getTagDos(publicTagIds, tagName);
+            }
+        }
+        // 这里需要把公共部门的这个体系标签组合进来
+        List<TagDO> mergeList = new ArrayList<>();
+        Stream.of(userDeptTags, publicDeptTags).forEach(mergeList::addAll);
+        return mergeList;
+    }
