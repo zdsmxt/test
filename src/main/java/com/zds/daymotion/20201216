@@ -1,0 +1,353 @@
+
+
+
+dataType = "int",
+
+
+    @ApiOperation(value = "获取用户各个字段展示", notes = "需要的权限码是 tagFilter:query")
+    @Result
+    @GetMapping("user/identity")
+    @RequiresPermissions(value = {"tagFilter:query"})
+    public Object getUserIdentification(Integer tagSystemId) throws Exception {
+
+        return null;
+    }
+
+    @ApiModelProperty(value="标签筛选项细则所属标签筛选项id",hidden = true)
+
+    @ApiModelProperty(value="标签筛选项细则id",hidden = true)
+
+      @ApiModelProperty(value="标签筛选项主键",hidden = true)
+
+
+          /**
+           * 新增的标签字段集合
+           */
+          private List<String> tagFields;
+
+          /**
+           * 传入的用户标识字段集合
+           */
+          private List<String> userFields;
+
+          加入存在 mysql 数据库对应的标签 没有对应的刷新到es 的数据
+          是否需要 添加一个 判空逻辑 防止 取不到值的时候 报空指针异常
+
+    @Override
+    public Object exportUserGroup(TagFilterVO tagFilterVO, List<String> userFields) throws IOException {
+        List<Map<String, String>> tagFilterDatas = (List<Map<String, String>>) this.getTagFilterData(tagFilterVO);
+        // 关联本地mysql 里面的三大用户主键 和从es 基于标签筛选条件获取的数据 进行组合
+        DataPermissionTO dataPermission = this.getCurrentUserDataPermission();
+        // 处理数据权限相关
+        Set<String> permissions = dataPermission.getPermissions();
+        List<Map<String, String>> exportData = new ArrayList<>();
+        // 获取es 里面返回的所有用户id
+        ArrayList<String> userIds = new ArrayList<>();
+        for (Map<String, String> tagFilterData : tagFilterDatas) {
+            userIds.add(tagFilterData.get("id"));
+        }
+        // 如果当前用户超级管理员
+        if (permissions.contains(DATA_ADMIN)) {
+            //关联mysql 里面的数据一块返回
+            // 获取当前这些标签所属的体系id 获取这个体系所属的用户实体 (确定 in 那张用户表) 企业主用户
+            Integer tagSystemId = tagFilterVO.getTagFilter().getTagSystemId();
+            if (tagSystemId.equals(TagSystemEnum.USER_TAG_SYSTEM.getId())) {
+                List<EuInfoDO> EuInfoDOS = euInfoMapper.selectByIds(userIds);
+                HashMap<String, EuInfoDO> userMap = new HashMap<>();
+                for (EuInfoDO euInfoDO : EuInfoDOS) {
+                    userMap.put(euInfoDO.getEuId(), euInfoDO);
+                }
+                for (Map<String, String> tagFilterData : tagFilterDatas) {
+                    // 根据用户id作为键 获取 用户map 里面的用户值
+                    this.resolveEu(tagFilterData, userFields, userMap);
+                }
+                exportData.addAll(tagFilterDatas);
+            }
+            // 企业
+            if (tagSystemId.equals(TagSystemEnum.ENTERPRISE_TAG_SYSTEM.getId())) {
+                List<CustInfoDO> custInfoDOS = custInfoMapper.selectByIds(userIds);
+                HashMap<String, CustInfoDO> userMap = new HashMap<>();
+                for (CustInfoDO custInfoDO : custInfoDOS) {
+                    userMap.put(custInfoDO.getQyzUserId(), custInfoDO);
+                }
+                for (Map<String, String> tagFilterData : tagFilterDatas) {
+                    // 根据用户id作为键 获取 用户map 里面的用户值
+                    this.resolveCust(tagFilterData, userFields, userMap);
+                }
+                exportData.addAll(tagFilterDatas);
+            }
+            // 业务员工
+            if (tagSystemId.equals(TagSystemEnum.BUSINESS_TAG_SYSTEM.getId())) {
+                List<StaffInfoDO> staffInfoDOS = staffInfoMapper.selectByIds(userIds);
+                HashMap<String, StaffInfoDO> userMap = new HashMap<>();
+                for (StaffInfoDO staffInfoDO : staffInfoDOS) {
+                    userMap.put(staffInfoDO.getStaffId(), staffInfoDO);
+                }
+                for (Map<String, String> tagFilterData : tagFilterDatas) {
+                    // 根据用户id作为键 获取 用户map 里面的用户值
+                    this.resolveStaff(tagFilterData, userFields, userMap);
+                }
+                exportData.addAll(tagFilterDatas);
+            }
+            // 如果当前用户是标签管理员或业务人员
+        } else if (permissions.contains(DATA_TAGADMIN) || permissions.contains(DATA_BUSINESS)) {
+            // 将用户id 和es 里面的每一行id 进行关联查询  数据权限 除了超级管理员可以获取所有用户标识其他角色 只可获取 用户id和从es 里面拿的数据
+            exportData = tagFilterDatas;
+        } else {
+            exportData = null;
+        }
+        return exportData;
+    }
+
+    private void resolveStaff(Map<String, String> tagFilterData, List<String> userFields, HashMap<String, StaffInfoDO> userMap) {
+        // 根据用户id作为键 获取 用户map 里面的用户值
+        StaffInfoDO staffInfoDO = userMap.get(tagFilterData.get(ES_USER_ID));
+        for (String userField : userFields) {
+            if (userField.equals(StaffInfoEnum.STAFF_ID)) {
+                tagFilterData.put(StaffInfoEnum.STAFF_ID, staffInfoDO.getStaffId());
+            }
+            if (userField.equals(StaffInfoEnum.STAFF_NAME)) {
+                tagFilterData.put(StaffInfoEnum.STAFF_NAME, staffInfoDO.getStaffName());
+            }
+            if (userField.equals(StaffInfoEnum.STAFF_NO)) {
+                tagFilterData.put(StaffInfoEnum.STAFF_NO, staffInfoDO.getStaffNo());
+            }
+            if (userField.equals(StaffInfoEnum.MOBILE_PHONE)) {
+                tagFilterData.put(StaffInfoEnum.MOBILE_PHONE, staffInfoDO.getMobilePhone());
+            }
+            if (userField.equals(StaffInfoEnum.EMAIL)) {
+                tagFilterData.put(StaffInfoEnum.EMAIL, staffInfoDO.getEmail());
+            }
+        }
+    }
+
+    private void resolveEu(Map<String, String> tagFilterData, List<String> userFields, HashMap<String, EuInfoDO> userMap) {
+        // 根据用户id作为键 获取 用户map 里面的用户值
+        EuInfoDO euInfoDO = userMap.get(tagFilterData.get(ES_USER_ID));
+        for (String userField : userFields) {
+            if (userField.equals(EuInfoEnum.EU_NAME)) {
+                tagFilterData.put(EuInfoEnum.EU_NAME, euInfoDO.getEuName());
+            }
+            if (userField.equals(EuInfoEnum.MOBILE_PHONE)) {
+                tagFilterData.put(EuInfoEnum.MOBILE_PHONE, euInfoDO.getMobilePhone());
+            }
+            if (userField.equals(EuInfoEnum.WECHAT_NO)) {
+                tagFilterData.put(EuInfoEnum.WECHAT_NO, euInfoDO.getWechatNo());
+            }
+            if (userField.equals(EuInfoEnum.OPENID)) {
+                tagFilterData.put(EuInfoEnum.OPENID, euInfoDO.getOpenid());
+            }
+            if (userField.equals(EuInfoEnum.QQ)) {
+                tagFilterData.put(EuInfoEnum.QQ, euInfoDO.getQq());
+            }
+            if (userField.equals(EuInfoEnum.EMAIL)) {
+                tagFilterData.put(EuInfoEnum.EMAIL, euInfoDO.getEmail());
+            }
+            if (userField.equals(EuInfoEnum.IDCARD_NO)) {
+                tagFilterData.put(EuInfoEnum.IDCARD_NO, euInfoDO.getIdcardNo());
+            }
+            if (userField.equals(EuInfoEnum.IMEI)) {
+                tagFilterData.put(EuInfoEnum.IMEI, euInfoDO.getImei());
+            }
+            if (userField.equals(EuInfoEnum.IDFA)) {
+                tagFilterData.put(EuInfoEnum.IDFA, euInfoDO.getIdfa());
+            }
+        }
+    }
+
+    private void resolveCust(Map<String, String> tagFilterData, List<String> userFields, HashMap<String, CustInfoDO> userMap) {
+        // 根据用户id作为键 获取 用户map 里面的用户值
+        CustInfoDO custInfoDO = userMap.get(tagFilterData.get(ES_USER_ID));
+        for (String userField : userFields) {
+            if (userField.equals(CustInfoEnum.CUST_NAME)) {
+                tagFilterData.put(CustInfoEnum.CUST_NAME, custInfoDO.getCustName());
+            }
+            if (userField.equals(CustInfoEnum.LEGAL_NAME)) {
+                tagFilterData.put(CustInfoEnum.LEGAL_NAME, custInfoDO.getLegalName());
+            }
+            if (userField.equals(CustInfoEnum.LEGAL_IDCARD_NO)) {
+                tagFilterData.put(CustInfoEnum.LEGAL_IDCARD_NO, custInfoDO.getLegalIdcardNo());
+            }
+            if (userField.equals(CustInfoEnum.YYZZ_NO)) {
+                tagFilterData.put(CustInfoEnum.YYZZ_NO, custInfoDO.getYyzzNo());
+            }
+            if (userField.equals(CustInfoEnum.ZZJG_DM)) {
+                tagFilterData.put(CustInfoEnum.ZZJG_DM, custInfoDO.getZzjgDm());
+            }
+            if (userField.equals(CustInfoEnum.TYSHXY_DM)) {
+                tagFilterData.put(CustInfoEnum.TYSHXY_DM, custInfoDO.getTyshxyDm());
+            }
+            if (userField.equals(CustInfoEnum.NSRSBH)) {
+                tagFilterData.put(CustInfoEnum.NSRSBH, custInfoDO.getNsrsbh());
+            }
+            if (userField.equals(CustInfoEnum.PHONE)) {
+                tagFilterData.put(CustInfoEnum.PHONE, custInfoDO.getPhone());
+            }
+        }
+    }
+
+    /**
+     * 标签id tagld
+     */
+    @NotBlank(message = "tagField not allow null")
+    private Integer tagId;
+
+    /** 获取上一步插入标签成功的标签主键id 加上外部用户选择部门选择的下拉菜单deptId or deptIds 这里
+         * （如果目前用户只可可以选择自己所在的部门  考虑后期是否会有权限比较高用户 一次可以为这个标签 选择多个部门
+         * or标签审核 给别的部门赋予这个标签的部门 需要在部门标签表里面维护 被授权使用的标签id 和部门id 的关联关系）
+         */
+        //TODO：数据权限 添加部门标签关联表  id deptid tid sys_dept_tag
+        /**
+         * 数据权限的产生背景： 标签筛选里面 针对不同的用户 来自的部门不同  有些系统标签根据wiki
+         * @https://zlfzb.kungeek.com/confluence/pages/viewpage.action?pageId=92766225
+         * 上的画像标签体系里面的 具体系统标签 归属的部门 来设置这个标签权限的所属 也就是说 标签管理员通过 数据平台录入系统标签的时候
+         * 这里都需要维护 这个标签id 和 这个部门id 的关联关系 存到部门标签表里面
+         * 实现判定用户是否具有查看某个标签的逻辑：
+         * 根据用户通过cas 认证 在本系统内获取这个用户的邮箱账号 根据用户端邮箱账号获取这个账号在用户表里面的这个用户所在的部门
+         * 根据这个部门 获取标签部门表里面的这个部门拥有的标签集合 所展示的标签 就是这个用户可以使用 和看到的标签（用于标签组合条件筛选二期）
+         */
+
+
+
+    /**
+     * 查询数据开始下标
+     */
+    private static final int DEFAULT_START_INDEX = 0;
+    /**
+     * 默认分页数
+     */
+    private static final int DEFAULT_SIZE = 20;
+
+
+        /**
+         *代码控制 标签名称name  标签字段field不可重复
+         *根据传入的标签名称tagName 由于这里的tagField 是从元数据表拉取es直接获取的
+         *标签字段 field用户没法编辑但是建不同的标签可以选同一个field 这时在新增和编辑的时候都会出现重复
+         *暂时 这里的需求是不同体系下的标签 是不能重复的
+         */
+
+
+
+
+
+
+
+
+
+
+
+
+
+log.info("index为：{},=====================tagField 为：{}",index,tagField);
+
+
+
+
+
+
+                System.out.println(index+"============"+tagField);
+                List<String> allEnumValue = esUtil.getAllEnumValue(index, tagField);
+                System.out.println(allEnumValue+"88888888888888888");
+                return allEnumValue;
+
+System.out.println((User) SecurityUtils.getSubject().getSession(false).getAttribute("user"));
+
+
+         1.删除获取标签枚举值 多余的校验
+
+
+         TagDeptDO tagDeptDO = TagDeptDO.builder()
+                             .sysId(tagDO.getSysId())
+                             .tagId(tagDO.getId())
+                             .deptId(tagDO.getAuthority())
+                             .delFlag(ConstantEnum.NO)
+                             .createUser(userName)
+                             .updateUser(userName)
+                             .createTime(new Date())
+                             .updateTime(new Date())
+                             .build();
+
+
+          for (TagDO tagDO : tagDOS) {
+                     log.info("插入部门标签表的数据为:{}", tagDO);
+                     TagDeptDO tagDeptDO = new TagDeptDO();
+                     tagDeptDO.setSysId(tagDO.getSysId());
+                     tagDeptDO.setTagId(tagDO.getId());
+                     tagDeptDO.setDeptId(tagDO.getAuthority());
+                     tagDeptDO.setDelFlag(ConstantEnum.NO);
+                     tagDeptDO.setCreateTime(currentTime);
+                     tagDeptDO.setCreateUser(userName);
+                     tagDeptDO.setUpdateUser(userName);
+                     tagDeptDO.setUpdateTime(currentTime);
+                     tagDeptMapper.insertUseGeneratedKeys(tagDeptDO);
+                 }
+
+查看java 进程
+
+top $(ps -e | grep java | awk '{print $1}' | sed 's/^/-p/')
+
+
+ @Override
+    public List<TagDO> getTagsCondition(TagConditionVO tagConditionVO) throws ElasticsearchException, IOException {
+        // 添加是否需要走数据权限的代码
+        if (null != tagConditionVO && tagConditionVO.getIsDataPermission()) {
+            DataPermissionTO dataPermission = tagFilterService.getCurrentUserDataPermission();
+            Set<String> permissions = dataPermission.getPermissions();
+            // 获取当前用户所在的部门id
+            Integer currentUserDeptId = dataPermission.getCurrentUserDeptId();
+            // 获取公共部门的id
+            Integer publicDeptId = deptService.getDeptIdDeptName(DeptServiceImpl.PUBLIC);
+            String tagName = tagConditionVO.getTagName();
+            List<TagDO> tagDOS = new ArrayList<>();
+            // 如果当前用户超级管理员
+            if (permissions.contains(TagFilterServiceImpl.DATA_ADMIN)) {
+                // 这里超级管理员 可以选多个标签体系(一个标签体系下的标签 可以属于不同的部门)
+//                tagDOS = tagMapper.queryTagList(tagConditionVO.getSysId(), tagName, null);
+                tagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, null);
+                // 如果当前用户标签管理员或业务人员
+            } else if (permissions.contains(TagFilterServiceImpl.DATA_TAGADMIN) || permissions.contains(TagFilterServiceImpl.DATA_BUSINESS)) {
+                // 分别获取本部门 和 公共部门的标签  这里可以获取的是这个体系下 这个用户部门权限的标签 和 公共部门的标签
+                // 考虑到后面 有标签授权的情况 这里 把部门标签表里面的这个体系下 当前用户所在部门的标签id集合取出来
+                TagDeptDO currentUserDeptTag = TagDeptDO.builder().
+                        deptId(dataPermission.getCurrentUserDeptId()).
+                        delFlag(ConstantEnum.NO).
+                        sysId(tagConditionVO.getSysId()).
+                        build();
+                List<Integer> currentUserTagIds = tagDeptMapper.select(currentUserDeptTag).stream().map(item -> item.getId()).collect(Collectors.toList());
+                List<TagDO> currentUserDeptTagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, currentUserTagIds);
+                TagDeptDO assignTagSystemIdPublicTag = TagDeptDO.builder().
+                        deptId(dataPermission.getPublicDeptId()).
+                        delFlag(ConstantEnum.NO).
+                        sysId(tagConditionVO.getSysId()).
+                        build();
+                List<Integer> publicDeptTagIds = tagDeptMapper.select(assignTagSystemIdPublicTag).stream().map(item -> item.getId()).collect(Collectors.toList());
+//                List<TagDO> currentUserDeptTagDOS = tagMapper.queryTagList(tagConditionVO.getSysId(), tagName, currentUserDeptId);
+                List<TagDO> publicDeptTagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, publicDeptTagIds);
+//                List<TagDO> publicDeptTagDOS = tagMapper.queryTagList(tagConditionVO.getSysId(), tagName, publicDeptId);
+                tagDOS.addAll(currentUserDeptTagDOS);
+                tagDOS.addAll(publicDeptTagDOS);
+            } else {
+                tagDOS = null;
+            }
+            return tagDOS;
+        }
+        List<TagDO> tags = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, null);
+        for (TagDO tag : tags) {
+            tag.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(tag.getCategoryId()));
+            Boolean isQueryES = tagConditionVO.getIsQueryES();
+            if (null != isQueryES && isQueryES) {
+                tag.setCoveredPeopleNumber(this.getCoveredPeopleNumberByTag(tag));
+            } else {
+                tag.setCoveredPeopleNumber(COVER_PEOPLE_ZERO);
+            }
+        }
+        return tags;
+    }
+
+
+
+//                tagDOS = tagMapper.queryTagList(tagConditionVO.getSysId(), tagName, null);
+
+
+
+

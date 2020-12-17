@@ -1,0 +1,220 @@
+
+
+1.传的接口文档里面的json 不必出现的参数 不传 如创建人 创建时间
+  关于参数 数据类型 是否必传 传的时候 用的是null 还是 有默认值
+
+
+2.催人调接口
+
+
+
+
+
+注意下面 这两种写法 的时间复杂度
+
+//        tagFilterItemDOS.stream()
+//                .peek(item -> item.setFilterId(tagFilterId))
+//                .peek(item -> item.setCreateUser(userName))
+//                .peek(item -> item.setCreateTime(now))
+//                .peek(item -> item.setUpdateUser(userName))
+//                .peek(item -> item.setUpdateTime(now))
+//                .peek(item -> item.setDelFlag(ConstantEnum.NO))
+//                .peek(item -> item.setDeptId(deptId))
+//                .collect(Collectors.toList());
+
+         tagFilterItemDOS.stream()
+                .peek(item -> {
+                    item.setFilterId(tagFilterId);
+                    item.setCreateUser(userName);
+                    item.setUpdateUser(userName);
+                    item.setUpdateTime(now);
+                    item.setDelFlag(ConstantEnum.NO);
+                    item.setDeptId(deptId);
+                })
+                .collect(Collectors.toList());
+
+
+{minigram_first_time=2020-06-29 18:59:38,first_service_project=查询类,
+ is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序},
+
+
+
+    @Override
+    public Object updateTagFilter(List<TagFilterItemVO> tagFilters, TagFilterVO tagFilterVO) {
+        TagFilterDO tagFilterDO = BeanUtil.copy(tagFilterVO, new TagFilterDO());
+        tagFilterMapper.updateByPrimaryKeySelective(tagFilterDO);
+        List<TagFilterItemDO> tagFilterItemDOS = BeanUtil.copyList(tagFilters, TagFilterItemDO.class);
+        String userName = UserUtil.getUserName();
+        Date currentTime = new Date();
+        return tagFilterItemDOS.stream()
+                .peek(item -> {
+                    item.setUpdateUser(userName);
+                    item.setUpdateTime(currentTime);
+                    tagFilterItemMapper.updateByPrimaryKeySelective(item);
+                });
+    }
+
+
+
+    Object updateTagFilter(List<TagFilterItemVO> tagFilters, TagFilterVO tagFilterVO);
+
+
+
+    @ApiOperation(value = "删除指定的标签筛选项细则", notes = "需要的权限码是 tagFilterItem:delete")
+    @Result
+    @DeleteMapping
+    @RequiresPermissions(value = {"tagFilterItem:delete"})
+    public Object delSingleTagFilterItem(Integer tagFilterItemId) {
+        AssertUtil.assertNotNull(tagFilterItemId, "标签细则id不允许为空");
+        return tagFilterService.delSingleTagFilterItem(tagFilterItemId);
+    }
+
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void insertOrUpdate(TagFilterVO tagFilter) {
+        List<TagFilterItemDO> addTagFilterItem = new ArrayList<>();
+        List<TagFilterItemDO> updateTagFilterItem = new ArrayList<>();
+        List<TagFilterItemDO> tagFilterItems = tagFilter.getTagFilterItems();
+        TagFilterDO tagFilterDO = tagFilter.getTagFilter();
+        for (TagFilterItemDO tagFilterItemDO : tagFilterItems) {
+            if (null != tagFilterItemDO.getId()) {
+                updateTagFilterItem.add(tagFilterItemDO);
+            } else {
+                addTagFilterItem.add(tagFilterItemDO);
+            }
+        }
+        // 这个地方 万一保存的时候 修改了标签选项名称会出现查询的标签筛选为空的情况  所以采用之前 标签细则里面
+        String userName = UserUtil.getUserName();
+        Integer deptId = userMapper.getDeptIdByUserName(userName);
+        Date currentTime = new Date();
+        tagFilterMapper.updateByPrimaryKeySelective(tagFilterDO);
+        addTagFilterItem.stream()
+                .forEach(item -> {
+                    item.setFilterId(tagFilterDO.getId());
+                    item.setCreateUser(userName);
+                    item.setCreateTime(currentTime);
+                    item.setUpdateUser(userName);
+                    item.setUpdateTime(currentTime);
+                    item.setDelFlag(ConstantEnum.NO);
+                    item.setDeptId(deptId);
+                });
+        // 批量添加  有可能用户传的数据 全部是更新的细则
+        if (null != addTagFilterItem && addTagFilterItem.size() != 0) {
+            tagFilterItemMapper.insertList(addTagFilterItem);
+        }
+        // 批量编辑
+        updateTagFilterItem.stream()
+                .forEach(item -> {
+                    item.setUpdateUser(userName);
+                    item.setUpdateTime(currentTime);
+                    item.setDelFlag(ConstantEnum.NO);
+                    item.setDeptId(deptId);
+                });
+        for (TagFilterItemDO tagFilterItemDO : updateTagFilterItem) {
+            tagFilterItemMapper.updateByPrimaryKeySelective(tagFilterItemDO);
+        }
+    }
+
+        // 这个地方 万一保存的时候 修改了标签选项名称会出现查询的标签筛选为空的情况  所以采用之前 标签细则里面
+        String userName = UserUtil.getUserName();
+        Integer deptId = userMapper.getDeptIdByUserName(userName);
+        Date currentTime = new Date();
+        tagFilterMapper.updateByPrimaryKeySelective(tagFilterDO);
+        addTagFilterItem.stream()
+                .forEach(item -> {
+                    item.setFilterId(tagFilterDO.getId());
+                    item.setCreateUser(userName);
+                    item.setCreateTime(currentTime);
+                    item.setUpdateUser(userName);
+                    item.setUpdateTime(currentTime);
+                    item.setDelFlag(ConstantEnum.NO);
+                    item.setDeptId(deptId);
+                });
+        // 批量添加  有可能用户传的数据 全部是更新的细则
+        if (null != addTagFilterItem && addTagFilterItem.size() != 0) {
+            tagFilterItemMapper.insertList(addTagFilterItem);
+        }
+        // 批量编辑
+        updateTagFilterItem.stream()
+                .forEach(item -> {
+                    item.setUpdateUser(userName);
+                    item.setUpdateTime(currentTime);
+                    item.setDelFlag(ConstantEnum.NO);
+                    item.setDeptId(deptId);
+                });
+        for (TagFilterItemDO tagFilterItemDO : updateTagFilterItem) {
+            tagFilterItemMapper.updateByPrimaryKeySelective(tagFilterItemDO);
+        }
+
+        {minigram_first_time=2020-06-29 18:59:38,
+        first_service_project=查询类,
+        is_register=是,
+        first_is_valid=无效,
+        first_src=智齿电话,
+        is_coop=是,
+        channel=慧算账助手小程序,
+        id=0093B88C94C04F37A1435C18B8AB6473}
+
+        数据如何组织
+
+
+        es 只返回 id 具体是哪类用户标识
+        这里需要  代码里面 结合 用户所选择的 标签体系 下所属的实体 来获取这个用户的id 所选择的标签 确定 与那张表进行关联查询
+        mysql里面的三大类用户 id 和es 里面的id 进行关联
+        跟俊雅确认 每一类角色 可以查看的 用户分群 用户标识 除了 用户id 之外的其他数据
+
+        添加标签筛选项 后端去重逻辑校验
+
+
+
+[
+
+{minigram_first_time=2020-06-29 18:59:38,
+first_service_project=查询类,
+is_register=是,
+first_is_valid=无效,
+first_src=智齿电话,
+is_coop=是,
+channel=慧算账助手小程序
+, id=0093B88C94C04F37A1435C18B8AB6473},
+{minigram_first_time=2020-07-29 18:15:35, first_service_project=查询类, is_register=是, first_is_valid=无效,
+first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=01AAE0C032C343288FDD54286E00294A},
+ {minigram_first_time=2020-09-30 11:37:55, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=05F931BB62CE4669B80475D5A0456A1D}, {minigram_first_time=2020-06-01 17:10:09, first_service_project=直接登记, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=0731E504F39348AF890429DCCADF6484}, {minigram_first_time=2020-06-29 15:46:48, first_service_project=查询类, is_register=是, app_first_time=2017-08-17 18:30:14, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=07471DA0F3BE454BBF8610C1D7351F3A}, {minigram_first_time=2020-06-05 19:43:33, first_service_project=其他, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=0A95AA8113F948738F2A74917C424BF8}, {minigram_first_time=2020-05-29 14:23:03, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=122684685F38439C8245ADF5A298FFA9}, {minigram_first_time=2020-06-28 17:29:49, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=217664A3FD3444F28A29ABBC976FC130, fwh_first_time=2020-10-29 18:09:46}, {minigram_first_time=2020-06-28 17:50:46, first_service_project=其他, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=266c7304468e42dcaaae1f5c3a1dfa67}, {minigram_first_time=2020-06-28 18:53:52, first_service_project=直接登记, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=28B8B2D3D01049448A645EBFBEF382DA, fwh_first_time=2020-08-27 12:27:27},
+{minigram_first_time=2020-08-03 10:55:35, first_service_project=直接登记, is_register=是, app_first_time=2018-09-20 12:13:34, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=26EFB2844CE44E13B0F717C640896972, fwh_first_time=2020-09-11 15:52:41}, {minigram_first_time=2020-08-25 15:16:48, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=2C60F49E5DC649DE9250887C48E674D9}, {minigram_first_time=2020-07-15 14:26:30, first_service_project=工商业务, is_register=是, first_is_valid=有效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=2C0BBCE8B24C408E8A0E398E026478B0, fwh_first_time=2020-07-15 14:27:54}, {minigram_first_time=2020-05-29 23:10:45, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=2EF6D7B43BC9489E8A8A075DF7B437B5}, {minigram_first_time=2020-06-28 22:00:37, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=2DE2B921BDCA436B9B11AA2A18CADF38}, {minigram_first_time=2020-08-31 12:14:09, first_service_project=其他, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=2E9D5D7090A64DA4B11151B66016105B}, {minigram_first_time=2020-06-01 20:10:53, first_service_project=直接登记, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=2FC0A27AFBC04D0D80D2125A58011869}, {minigram_first_time=2020-08-04 09:52:33, first_service_project=查询类, is_register=是, app_first_time=2017-11-17 12:40:44, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=32B1B097F2FA47C5B92CAEB9482F03BB}, {minigram_first_time=2020-06-29 17:40:12, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=3315CABA270A40809C5D6ED35753C38A}, {minigram_first_time=2020-10-28 11:03:40, first_service_project=直接登记, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=32550776B3274E6C9C8A7F506863734C}, {minigram_first_time=2020-06-28 19:24:59, first_service_project=直接登记, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=3820DA01E1854A24B8897CA1679B9DA3, fwh_first_time=2020-06-12 18:06:34}, {minigram_first_time=2020-06-30 13:38:58, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=46A58F52C6754566AF05012F14B23D83}, {minigram_first_time=2020-06-05 18:42:16, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=477E0FAD0285463D8B2C9299AE46547C}, {minigram_first_time=2020-06-30 11:07:02, first_service_project=直接登记, is_register=是, app_first_time=2018-06-09 18:20:21, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=51BAD42B59D04945BC3F95B164535D64}, {minigram_first_time=2020-06-01 20:37:02, first_service_project=直接登记, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=5230994AA5D54B5A93E454818B726FDB}, {minigram_first_time=2020-08-26 13:06:53, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=52BF9CED876D473484665A64A51B2745}, {minigram_first_time=2020-08-04 10:11:37, first_service_project=直接登记, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=5391A30D63F14A88916F81F6B9333566}, {minigram_first_time=2020-07-30 17:27:05, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=53eab09a1c3c468d871cd859640361ee}, {minigram_first_time=2020-06-01 10:15:34, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=571085718B7B428A86D53EA97B227290}, {minigram_first_time=2020-08-27 11:46:07, first_service_project=其他, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=5B49862718D743C0A8E0DDD6DEB301A2}, {minigram_first_time=2020-06-30 18:59:56, first_service_project=查询类, is_register=是, app_first_time=2017-12-27 22:10:55, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=5E0B5B0B4F664D3D93E27708D2E4A4EB}, {minigram_first_time=2020-05-28 10:36:01, first_service_project=直接登记, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=5FA86BA7C8B244E4B93A76B6C3A7A65A}, {minigram_first_time=2020-05-28 15:03:20, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=60ADB76B3E8347F7822F0C099475D73A}, {minigram_first_time=2020-06-28 21:32:13, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=62BD6E04D0B843A1BAEAF348978FC8A4}, {minigram_first_time=2020-07-30 15:19:28, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=634E0D2D108044D2B2186287CDCF947C}, {minigram_first_time=2020-07-03 08:12:44, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=649cde4658e0439ba97a56083666a086}, {minigram_first_time=2020-05-29 10:02:24, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=656143A61852418FB5078FC6AD3CEBD6}, {minigram_first_time=2020-10-29 15:33:27, first_service_project=查询类, is_register=是, app_first_time=2018-04-02 14:54:13, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=6840BDAACAC344558E59866644A0C4FA}, {minigram_first_time=2020-06-30 10:02:46, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=6AA70B3FCD11472DBAE8111B88345A8A}, {minigram_first_time=2020-06-24 18:24:20, first_service_project=直接登记, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=61C1F5AA80744419B861FD3355140CDD}, {minigram_first_time=2020-05-27 13:15:37, first_service_project=直接登记, is_register=是, app_first_time=2017-09-14 15:55:10, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=728E1C7E1B094F08893BEDC71100AD40}, {minigram_first_time=2020-07-29 17:51:55, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=743F0C7C541E423FA67F62F9A364F55F}, {minigram_first_time=2020-08-26 17:28:51, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=75033E4226A1460EAAD7A19B9672A528}, {minigram_first_time=2020-07-30 10:49:29, first_service_project=其他, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=764F622870B444949ABD86201232DFB6}, {minigram_first_time=2020-08-31 09:26:39, first_service_project=直接登记, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=7737AA7BFB0644CB8220AB7D21E6BB9B}, {minigram_first_time=2020-06-28 17:08:45, first_service_project=其他, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=77bba2b981514233a9333a4b3e442e55}, {minigram_first_time=2020-06-29 15:50:20, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=791F4FAAF16C40D4B6B7650C385E747B}, {minigram_first_time=2020-07-27 17:27:25, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=79E98F60CAF44398BF7248590142C7AD}, {minigram_first_time=2020-07-30 12:46:38, first_service_project=其他, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=7C3A13042D594788B26EE0DD2376A2BC}, {minigram_first_time=2020-09-01 09:33:01, first_service_project=查询类, is_register=是, first_is_valid=无效, first_src=智齿电话, is_coop=是, channel=慧算账助手小程序, id=8117B25EF0DB431BB716678BB3A6289F}]
+
+
+
+tag/query
+标签查询
+
+
+    @Override
+    public List<HashMap> queryDataByFilters(String index, List<TagFilterItemDO> filters) throws IOException {
+        Map<Integer, List<TagFilterItemDO>> groupFilters = filters.stream()
+                .collect(Collectors.groupingBy(TagFilterItemDO::getGroupOrder));
+        List<List<TagFilterItemDO>> filtersByGroup = new ArrayList<>(groupFilters.size());
+        List<Integer> groupKey = Arrays.asList(groupFilters.keySet().toArray(new Integer[]{}));
+        groupKey.sort(Comparator.comparingInt(o -> o));
+        for (Integer i : groupKey) {
+            groupFilters.get(i).sort(Comparator.comparingInt(TagFilterItemDO::getGroupInnerOrder));
+            filtersByGroup.add(groupFilters.get(i));
+        }
+        return esUtil.query(index, filtersByGroup, HashMap.class, DEFAULT_START_INDEX, DEFAULT_SIZE,null);
+    }
+
+  20201214daylog
+        一 工作进度：
+        1.确认 导出接口涉及的入参 和用户分群的覆盖人数数据的获取
+        2.开发导出的接口
+
+        二 存在的疑问：
+        1.导出数据那一部分 关于关联mysql遇到障碍
+          具体表现 是现在返回的是List<map>
+          所以 我需要把超级管理员 可导出的用户标识(键 自定义常量进行映射)
+          获取数据库字段 对应的值 需要看入参时候 传了那些 用户标识字段
+          导致 现在有三层for 循环
+          而且最内层循环 我需要 把对应某个用户的各个字段逐个判断 进行设置值
+          所以这样会导致 最内层 循环有多个判断 具体取决于 三大类用户表的字段数量
+

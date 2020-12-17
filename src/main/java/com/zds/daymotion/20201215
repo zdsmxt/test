@@ -1,0 +1,207 @@
+关于导出接口的疑问
+
+
+目前的思路
+  通过ES.Utils.query() 获取含有用户id(这里三大类用户都用同一个id)的标签筛选数据
+  通过拿到的es 数据获取 用户id 集合
+  通过es拿到的用户id 关联es的各个用户的组合标签值 和 mysql 里面的只有超级管理员 可看的所有用户标识
+  将数据按照不同体系下的三类用户 将es  和 mysql的数据组合成 一个map
+
+  实际遇到的问题：
+    遍历es 获取的数据（可能是上万条数据组成的一个map list）
+    遍历之前 根据用户体系和es 的用户id 获取的mysql 里面的
+
+    根据用户传入的 用户field 集合 作为查询的列 in 查询用户集合id
+
+
+  // 如果当前用户超级管理员
+        if (permissions.contains(DATA_ADMIN)) {
+            //关联mysql 里面的数据一块返回
+            // 获取当前这些标签所属的体系id 获取这个体系所属的用户实体 (确定 in 那张用户表)
+            Integer tagSystemId = tagFilterVO.getTagFilter().getTagSystemId();
+            if (tagSystemId.equals(TagSystemEnum.USER_TAG_SYSTEM)) {
+                List<CustInfoDO> custInfoDOS = custInfoMapper.selectByIds(userIds);
+                for (Map<String, String> tagFilterData : tagFilterDatas) {
+                    for (CustInfoDO custInfoDO : custInfoDOS) {
+                        if (tagFilterData.get(ES_USER_ID).equals(custInfoDO.getQyzUserId())) {
+                            for (String userField : userFields) {
+                                if (userField.equals(CustInfoEnum.CUST_NAME)) {
+                                    tagFilterData.put(CustInfoEnum.CUST_NAME, custInfoDO.getCustName());
+
+                                    HashMap<String, String> hashMap = new HashMap<>();
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+            // 如果当前用户是标签管理员或业务人员
+        }
+
+
+
+        用传入的 用户标识集合 作为 查询用户表的 列字段 in (es 取的userid 集合)
+        然后 把每一个获取的用户实体 封装成一个 以主键id 作为key
+
+
+   @Override
+    public Object exportUserGroup(TagFilterVO tagFilterVO, List<String> userFields) throws IOException {
+        List<Map<String, String>> tagFilterDatas = (List<Map<String, String>>) this.getTagFilterData(tagFilterVO);
+        // 关联本地mysql 里面的三大用户主键 和从es 基于标签筛选条件获取的数据 进行组合
+//        DataPermissionTO dataPermission = this.getCurrentUserDataPermission();
+        // 处理数据权限相关
+//        Set<String> permissions = dataPermission.getPermissions();
+        UserGroupVO userGroupVO = new UserGroupVO();
+        List<Map<String, String>> exportData = new ArrayList<>();
+        // 获取es 里面返回的所有用户id
+        ArrayList<String> userIds = new ArrayList<>();
+        for (Map<String, String> tagFilterData : tagFilterDatas) {
+            userIds.add(tagFilterData.get("id"));
+        }
+        // 如果当前用户超级管理员
+//        if (permissions.contains(DATA_ADMIN)) {
+            //关联mysql 里面的数据一块返回
+            // 获取当前这些标签所属的体系id 获取这个体系所属的用户实体 (确定 in 那张用户表) 企业主用户
+            Integer tagSystemId = tagFilterVO.getTagFilter().getTagSystemId();
+            if (tagSystemId.equals(TagSystemEnum.USER_TAG_SYSTEM.getId())) {
+                List<EuInfoDO> EuInfoDOS = euInfoMapper.selectByIds(userIds);
+                HashMap<String, EuInfoDO> userMap = new HashMap<>();
+                for (EuInfoDO euInfoDO : EuInfoDOS) {
+                    userMap.put(euInfoDO.getEuId(), euInfoDO);
+                }
+                for (Map<String, String> tagFilterData : tagFilterDatas) {
+                    // 根据用户id作为键 获取 用户map 里面的用户值
+                    this.resolveEu(tagFilterData, userFields, userMap);
+                }
+                exportData.addAll(tagFilterDatas);
+            }
+            // 企业
+            if (tagSystemId.equals(TagSystemEnum.ENTERPRISE_TAG_SYSTEM.getId())) {
+                List<CustInfoDO> custInfoDOS = custInfoMapper.selectByIds(userIds);
+                HashMap<String, CustInfoDO> userMap = new HashMap<>();
+                for (CustInfoDO custInfoDO : custInfoDOS) {
+                    userMap.put(custInfoDO.getQyzUserId(), custInfoDO);
+                }
+                for (Map<String, String> tagFilterData : tagFilterDatas) {
+                    // 根据用户id作为键 获取 用户map 里面的用户值
+                    this.resolveCust(tagFilterData, userFields, userMap);
+                }
+                exportData.addAll(tagFilterDatas);
+            }
+            // 业务员工
+            if (tagSystemId.equals(TagSystemEnum.BUSINESS_TAG_SYSTEM.getId())) {
+                List<StaffInfoDO> staffInfoDOS = staffInfoMapper.selectByIds(userIds);
+                HashMap<String, StaffInfoDO> userMap = new HashMap<>();
+                for (StaffInfoDO staffInfoDO : staffInfoDOS) {
+                    userMap.put(staffInfoDO.getStaffId(), staffInfoDO);
+                }
+                for (Map<String, String> tagFilterData : tagFilterDatas) {
+                    // 根据用户id作为键 获取 用户map 里面的用户值
+                    this.resolveStaff(tagFilterData, userFields, userMap);
+                }
+                exportData.addAll(tagFilterDatas);
+            }
+            // 如果当前用户是标签管理员或业务人员
+//        } else if (permissions.contains(DATA_TAGADMIN) || permissions.contains(DATA_BUSINESS)) {
+//            // 将用户id 和es 里面的每一行id 进行关联查询  数据权限 除了超级管理员可以获取所有用户标识其他角色 只可获取 用户id和从es 里面拿的数据
+//            exportData = tagFilterDatas;
+//        } else {
+//            exportData = null;
+//        }
+        return exportData;
+    }
+
+
+     dataType = "String",
+     dataType = "String",
+     dataType = "Integer",
+     dataType = "Integer",
+     dataType = "Integer",
+     dataType = "Integer",
+     dataType = "Integer",
+     dataType = "String",
+     dataType = "String",
+     dataType = "Integer",
+
+
+ @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", dataType = "String", name = "field", value = "标签字段", required = true),
+            @ApiImplicitParam(paramType = "query", dataType = "String", name = "name", value = "标签名称", required = true),
+            @ApiImplicitParam(paramType = "query", dataType = "Integer", name = "categoryId", value = "这个标签所属的分级类别", required = true),
+            @ApiImplicitParam(paramType = "query", dataType = "Integer", name = "tagTypeId", value = "标签--类型", required = true),
+            @ApiImplicitParam(paramType = "query", dataType = "Integer", name = "valueType", value = "标签值", required = true),
+            @ApiImplicitParam(paramType = "query", dataType = "Integer", name = "status", value = "标签的初始状态", required = true),
+            @ApiImplicitParam(paramType = "query", dataType = "Integer", name = "authority", value = "标签的权限部门id", required = true),
+            @ApiImplicitParam(paramType = "query", dataType = "String", name = "rule", value = "标签的规则", required = true),
+            @ApiImplicitParam(paramType = "query", dataType = "String", name = "algorithm", value = "标签所使用的算法"),
+            @ApiImplicitParam(paramType = "query", dataType = "Integer", name = "entityId", value = "标签所属的实体id", required = true),
+    })
+
+
+
+    1.超级管理员  没有部门id
+
+    这样当超级管理员没有配置部门id 的时候 是拿不到这个用户的部门id 也就维持不了 这个标签和部门的关系
+
+    标签插入有权限 权限id 作为部门id
+
+
+    @Override
+    public Object addTag(TagVO tagVO) {
+        /**
+         *代码控制 标签名称name  标签字段field不可重复
+         *根据传入的标签名称tagName 由于这里的tagField 是从元数据表拉取es直接获取的
+         *标签字段 field用户没法编辑但是建不同的标签可以选同一个field 这时在新增和编辑的时候都会出现重复
+         *暂时 这里的需求是不同体系下的标签 是不能重复的
+         */
+        TagDO tagDO = BeanUtil.copy(tagVO, new TagDO());
+        // TODO: 这里需要元数据表 db_metadata里面 添加 标签值类型字段 用户通过系统选择标签值类型的时候 这里方便校验
+        // 这里对于标签部门权限的处理 会用一张部门标签表来关联这种多对多的关系
+        Integer categoryId = tagDO.getCategoryId();
+        Integer sysId = null;
+        //这里给这个标签添加所属的标签分级的id
+        if (categoryId != null) {
+            TagCategoryDO tagCategoryDO = tagCategoryMapper.selectByPrimaryKey(categoryId);
+            Integer level = tagCategoryDO.getLevel();
+            sysId = tagCategoryDO.getSysId();
+            tagDO.setLevel(level);
+            tagDO.setSysId(sysId);
+        }
+        Date currentTime = new Date();
+        String userName = UserUtil.getUserName();
+        tagDO.setCreateTime(currentTime);
+        tagDO.setCreateUser(userName);
+        tagDO.setUpdateTime(currentTime);
+        tagDO.setUpdateUser(userName);
+        // 如果使用默认的是不会返回 插入成功后返回的主键  这里是返回插入成功的状态值1
+        tagMapper.insertUseGeneratedKeys(tagDO);
+        /** 获取上一步插入标签成功的标签主键id 加上外部用户选择部门选择的下拉菜单deptId or deptIds 这里
+         * （如果目前用户只可可以选择自己所在的部门  考虑后期是否会有权限比较高用户 一次可以为这个标签 选择多个部门
+         * or标签审核 给别的部门赋予这个标签的部门 需要在部门标签表里面维护 被授权使用的标签id 和部门id 的关联关系）
+         */
+        //TODO：数据权限 添加部门标签关联表  id deptid tid sys_dept_tag
+        /**
+         * 数据权限的产生背景： 标签筛选里面 针对不同的用户 来自的部门不同  有些系统标签根据wiki
+         * @https://zlfzb.kungeek.com/confluence/pages/viewpage.action?pageId=92766225
+         * 上的画像标签体系里面的 具体系统标签 归属的部门 来设置这个标签权限的所属 也就是说 标签管理员通过 数据平台录入系统标签的时候
+         * 这里都需要维护 这个标签id 和 这个部门id 的关联关系 存到部门标签表里面
+         * 实现判定用户是否具有查看某个标签的逻辑：
+         * 根据用户通过cas 认证 在本系统内获取这个用户的邮箱账号 根据用户端邮箱账号获取这个账号在用户表里面的这个用户所在的部门
+         * 根据这个部门 获取标签部门表里面的这个部门拥有的标签集合 所展示的标签 就是这个用户可以使用 和看到的标签（用于标签组合条件筛选二期）
+         */
+        Integer deptId = userMapper.getDeptIdByUserName(userName);
+        // 这里的部门id 取的就是权限里面的 部门id
+        TagDeptDO tagDeptDO = new TagDeptDO(null, tagDO.getAuthority(), tagDO.getId(), currentTime, userName, currentTime, userName, ConstantEnum.NO, sysId);
+        tagDeptMapper.insertUseGeneratedKeys(tagDeptDO);
+        System.out.println(tagDO+"--------------------888888888888888");
+        return tagMapper.selectByPrimaryKey(tagDO);
+    }
+
+
+    权限相关的获取权限码  不要从掉方法查库 要直接到session
+
+    修改构造方法初始 改为builder
+
+
