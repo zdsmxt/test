@@ -1,0 +1,215 @@
+
+
+
+如何获取某一个存储对象集合里面的 主键id 集合
+如 你想 获取这个用户里面的 所有主键构成的id 集合
+获取到的对象集合.stream().map(item->item.getId()).collection.(collection.tolist())
+builder
+
+
+    @Select({"<script>",
+            "select id,name,field,sys_id as sysId from tag_sys where id in ",
+            "<foreach collection=\"tagIds\" item=\"tid\" index=\"index\" open=\"(\" separator=\",\" close=\")\">",
+            "#{tid, jdbcType=INTEGER}",
+            "</foreach>",
+            "<if test= \"tagName != null and tagName != ''\">" +
+                    "and name like CONCAT('%',#{tagName},'%')" +
+                    "</if> ",
+            "</script>"})
+    List<TagDO> getTagDos(@Param("tagIds") List<Integer> tagIds, @Param("tagName") String tagName);
+
+    default List<TagDO> queryTagList(Integer sysId, String tagName, Integer authority) {
+        Example example = new Example(TagDO.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("authority", authority);
+        criteria.andEqualTo("sysId", sysId);
+        if (StringUtils.isNotBlank(tagName)) {
+            criteria.andLike("name", tagName + "%");
+        }
+        example.orderBy("updateTime").desc();
+        return this.selectByExample(example);
+    }
+
+
+    @Override
+        public List<TagDO> getTagsCondition(TagConditionVO tagConditionVO) throws ElasticsearchException, IOException {
+            // 添加是否需要走数据权限的代码
+            if (null != tagConditionVO && tagConditionVO.getIsDataPermission()) {
+                DataPermissionTO dataPermission = tagFilterService.getCurrentUserDataPermission();
+                Set<String> permissions = dataPermission.getPermissions();
+                // 获取当前用户所在的部门id
+                Integer currentUserDeptId = dataPermission.getCurrentUserDeptId();
+                // 获取公共部门的id
+                Integer publicDeptId = deptService.getDeptIdDeptName(DeptServiceImpl.PUBLIC);
+                String tagName = tagConditionVO.getTagName();
+                List<TagDO> tagDOS = new ArrayList<>();
+                // 如果当前用户超级管理员
+                if (permissions.contains(TagFilterServiceImpl.DATA_ADMIN)) {
+                    // 这里超级管理员 可以选多个标签体系(一个标签体系下的标签 可以属于不同的部门)
+                    tagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, null);
+                    // 如果当前用户标签管理员或业务人员
+                } else if (permissions.contains(TagFilterServiceImpl.DATA_TAGADMIN) || permissions.contains(TagFilterServiceImpl.DATA_BUSINESS)) {
+                    // 分别获取本部门 和 公共部门的标签  这里可以获取的是这个体系下 这个用户部门权限的标签 和 公共部门的标签
+                    // 考虑到后面 有标签授权的情况 这里 把部门标签表里面的这个体系下 当前用户所在部门的标签id集合取出来
+                    TagDeptDO currentUserDeptTag = TagDeptDO.builder().
+                            deptId(dataPermission.getCurrentUserDeptId()).
+                            delFlag(ConstantEnum.NO).
+                            sysId(tagConditionVO.getSysId()).
+                            build();
+                    List<Integer> currentUserTagIds = tagDeptMapper.select(currentUserDeptTag).stream().map(item -> item.getId()).collect(Collectors.toList());
+                    List<TagDO> currentUserDeptTagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, currentUserTagIds);
+                    TagDeptDO assignTagSystemIdPublicTag = TagDeptDO.builder().
+                            deptId(dataPermission.getPublicDeptId()).
+                            delFlag(ConstantEnum.NO).
+                            sysId(tagConditionVO.getSysId()).
+                            build();
+                    List<Integer> publicDeptTagIds = tagDeptMapper.select(assignTagSystemIdPublicTag).stream().map(item -> item.getId()).collect(Collectors.toList());
+                    List<TagDO> publicDeptTagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, publicDeptTagIds);
+                    tagDOS.addAll(currentUserDeptTagDOS);
+                    tagDOS.addAll(publicDeptTagDOS);
+                } else {
+                    tagDOS = null;
+                }
+                return tagDOS;
+            }
+            List<TagDO> tags = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, null);
+            for (TagDO tag : tags) {
+                tag.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(tag.getCategoryId()));
+                Boolean isQueryES = tagConditionVO.getIsQueryES();
+                if (null != isQueryES && isQueryES) {
+                    tag.setCoveredPeopleNumber(this.getCoveredPeopleNumberByTag(tag));
+                } else {
+                    tag.setCoveredPeopleNumber(COVER_PEOPLE_ZERO);
+                }
+            }
+            return tags;
+        }
+
+
+             // 获取当前用户所在的部门id
+                    Integer currentUserDeptId = dataPermission.getCurrentUserDeptId();
+                    // 获取公共部门的id
+                    Integer publicDeptId = deptService.getDeptIdDeptName(DeptServiceImpl.PUBLIC);
+                    String tagName = tagConditionVO.getTagName();
+
+
+
+
+
+    default TagDO selectTagById(Integer id) {
+        Example example = new Example(TagDO.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("id", id);
+        return this.selectOneByExample(example);
+    }
+
+
+    /**
+     * @param
+     * @return
+     * @Description //TODO 单个标签的启用停用
+     * @Date 2020/11/25 18:18
+     */
+    @Update("update tag_sys set status =#{status,jdbcType=INTEGER} where id = #{id,jdbcType=INTEGER}")
+    Integer updateSingleTagStatus(@Param(value = "id") Integer id, @Param(value = "status") Integer status);
+
+    //        List<TagDO> tagDOS = tagMapper.getTagsByTagName(tagName);
+
+    //        List<TagDO> tags = tagMapper.getTagsByField(field);
+
+    //            List<TagDO> tags = tagMapper.getTagsByTagName(tagName);
+
+
+    @Select("select id,field,name from tag_sys where field =#{field,jdbcType =VARCHAR}")
+    List<TagDO> getTagsByField(@Param("field") String field);
+
+    @Select("select id ,field,name from tag_sys where name = #{tagName,jdbcType=VARCHAR}")
+    List<TagDO> getTagsByTagName(String tagName);
+
+
+    @Select("select id from tag_filter where filter_name = #{tagFilterName,jdbcType = VARCHAR} and del_flag = 0")
+    Integer getIdByName(@Param("tagFilterName") String tagFilterName);
+
+
+    @Select("select tag_id from tag_dept where sys_id = #{sysId,jdbcType=INTEGER} and dept_id = #{deptId,jdbcType=INTEGER}")
+    List<Integer> getTagIdListBysysIdDeptId(@Param(value = "sysId")Integer sysId,@Param(value = "deptId") Integer deptId);
+
+//            tag.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(tag.getCategoryId()));
+tag.setTagCategoryName(tagCategoryMapper.getTagCategoryNameById(tag.getCategoryId()));
+
+
+    @Select("select name from tag_category where id = #{id,jdbcType=INTEGER}")
+    String getTagCategoryNameById(@Param(value = "id") Integer id);
+
+
+    List<TagCategoryDO> tagCategorys = tagCategoryMapper.getTagCategoryBySysIdName(sysId,tagCategoryName);
+
+    //        List<TagCategoryDO> tagCategorys = tagCategoryMapper.getTagCategoryBySysIdName(sysId,tagCategoryName);
+
+
+    @Select("select id,name,sys_id as sysId from tag_category where sys_id = #{sysId,jdbcType=INTEGER} and name = #{name,jdbcType=VARCHAR}")
+    List<TagCategoryDO> getTagCategoryBySysIdName(@Param(value = "sysId") Integer sysId, @Param("name") String name);
+
+    //        List<DeptDO> allDept = deptMapper.getAllDept();
+
+    //        dataPermissionTO.setPublicDeptId(deptService.getDeptIdDeptName(DeptServiceImpl.PUBLIC));
+
+    //        Integer tagFilterId = tagFilterMapper.getIdByName(tagFilterDO.getFilterName());
+
+
+    Integer getDeptIdDeptName(String deptName);
+    @Override
+    public Integer getDeptIdDeptName(String deptName) {
+        return deptMapper.getDeptIdByName(deptName);
+    }
+
+     Integer unAllocatedId = deptMapper.getDeptIdByName(DeptServiceImpl.UNALLOCATED);
+                Integer unAllocatedId = deptMapper.selectOne(DeptDO.builder().name(DeptServiceImpl.UNALLOCATED).build()).getId();
+
+                Integer unAllocatedId = deptMapper.getDeptIdByName(DeptServiceImpl.UNALLOCATED);
+
+
+    @Select("select id ,name from sys_dept")
+    List<DeptDO> getAllDept();
+
+    @Select("select id from sys_dept where name =#{deptName,jdbcType=VARCHAR}")
+    Integer getDeptIdByName(@Param("deptName") String deptName);
+
+
+
+    /**
+     * @param
+     * @return
+     * @Description //TODO db_metadata 获取ES 里面的对应的索引存的表信息
+     * 由于在mysql 这张表存的 有表的字段行数据 所以db_metadata这里会有 table_name 和 table_comment的重复
+     * 因为前端只需一条 所以这里只取出一条数据
+     * @Date 2020/11/26 14:45
+     */
+    @Select("select table_comment from db_metadata where table_name = #{tableName,jdbcType=VARCHAR} limit 1")
+    String getTableCommentByTableName(@Param(value = "tableName") String tableName);
+
+         entityVO.setDwTableText(dbMetadataMapper.getTableCommentByTableName(entityVO.getDwTable()));
+            entityVO.setDwTableText(dbMetadataMapper.select(DbMetadataDO.builder().tableName(entityVO.getDwTable()).build())
+                    .get(ConstantEnum.NO).getTableComment());
+
+
+                    entityVO.setDwTableText(dbMetadataMapper.getTableCommentByTableName(entityVO.getDwTable()));
+
+
+    @Select("select id ,name,sys_id as sys_id from tag_entity where name = #{entityName,jdbcType = VARCHAR}")
+    List<EntityDO> getEntityByName(@Param("entityName") String entityName);
+
+    @Autowired
+    private DeptService deptService;
+
+
+用户管理界面 有个不易复现的bug
+
+
+Tag/query 模糊匹配  %%（由于为了防止索引失效的情况 所以不建议 把% 百分号 放在左边 违反了最左匹配原则）
+标签分类  直接关联的标签  需要递归关联
+
+
+
+
+

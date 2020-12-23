@@ -1,0 +1,16 @@
+
+
+多情况汇总
+
+接口该不该这样拆分
+       1.写标签筛选细则的接口
+       2.逻辑遗漏的问题
+
+select * from tag_sys where `status` = 1 and sys_id = 1 and authority = 1
+
+select * from tag_sys where `status` = 1 and sys_id = 1 and authority = 6
+
+由于每次创建标签 都要基于 数仓里面的数据刷到es 然后根据 三大体系 下的三类用户表作为es 的索引获取 这三大类  用户各自下的标签
+这里的标签字段 都需要从 es 里面取
+
+

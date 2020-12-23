@@ -1,0 +1,129 @@
+
+
+
+
+
+
+
+    public static void main(String[] args) {
+        System.out.println(hyphen2UtcStr("2020-08-01"));
+    }
+
+
+//    public static final String HYPHEN_SECOND_FORMATTER = "yyyy-MM-dd HH:mm:ss";
+    public static final String HYPHEN_SECOND_FORMATTER = "yyyy-MM-dd";
+//    public static final String UTC_FORMATTER = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    public static final String UTC_FORMATTER = "yyyy-MM-dd";
+
+
+
+
+     假如 这个用户调到别的部门 这个时候 会出现 原本在上个部门建的标签筛选项是无法移走的
+     举个例子 ：
+     沈程之前是在 增长部 建的标签选项 他的部长 王明玉 是可以看的 但是 沈程被调到市场部后之后
+     他还是可以看到之前自己在其他部门创建的标签
+
+
+   // 处理 某一个体系下 没有公开部门的标签时候 传的null 值会全表查询
+                if (publicDeptTagIds.size() > ConstantEnum.NO) {
+                    tagDOS.addAll(publicDeptTagDOS);
+
+       private Integer levelTagCount(Integer level, List<TagLevelCountDO> tagLevelCounts) {
+           return tagLevelCounts.stream()
+                   .filter(item -> item.getLevel().equals(level))
+                   .mapToInt(TagLevelCountDO::getTagCount)
+                   .sum();
+       }
+
+
+
+ @Override
+    public List getTagFilterData(TagFilterVO tagFilterVO, Integer maxSize) throws IOException {
+        List<List<TagFilterItemDO>> orderedGroupOrderedItemList = new ArrayList<>();
+        String[] headers = handleTagFilter(tagFilterVO, orderedGroupOrderedItemList);
+//        tagFilterVO.getTagFilterItems().forEach(item -> {
+//            if (item.getTagValueType().equals(TagValueTypeEnum.TAG_VALUE_TYPE_DATE.getId())) {
+//                item.getTagField();
+//            }
+//        });
+        List<String> dateTypeTagFields = tagFilterVO.getTagFilterItems().stream().filter(item -> item.getTagValueType().equals(TagValueTypeEnum.TAG_VALUE_TYPE_DATE.getId())).map(item -> item.getTagField()).collect(Collectors.toList());
+        List<HashMap> queryOutCome = esUtil.query(entityMapper.getTableNameBySysId(tagFilterVO.getTagFilter().getTagSystemId()), orderedGroupOrderedItemList,
+                HashMap.class, maxSize, 0, headers);
+        // 先硬编码 获取标签里面 tagValueType = 4 日期时间类型的标签 进行对应的返回截断
+        List<String> dateTypeTagFieleds = tagMapper.
+                select(TagDO.builder().tagValueType(TagValueTypeEnum.TAG_VALUE_TYPE_DATE.getId()).status(ConstantEnum.YES.shortValue()).build()).
+                stream().map(item -> item.getField()).collect(Collectors.toList());
+        for (HashMap map : queryOutCome) {
+            for (Object o : map.keySet()) {
+                if(dateTypeTagFields.contains(o)){
+                    map.put(o,map.get(o).toString().substring(0,11));
+                }
+            }
+        }
+        return queryOutCome;
+//        return esUtil.query(entityMapper.getTableNameBySysId(tagFilterVO.getTagFilter().getTagSystemId()), orderedGroupOrderedItemList,
+//                HashMap.class, maxSize, 0, headers);
+    }
+
+         List<String> dateTypeTagFields = tagMapper.
+                    select(TagDO.builder().tagValueType(TagValueTypeEnum.TAG_VALUE_TYPE_DATE.getId()).status(ConstantEnum.YES.shortValue()).build()).
+                    stream().map(item -> item.getField()).collect(Collectors.toList());
+
+                    //        tagFilterVO.getTagFilterItems().forEach(item -> {
+                    //            if (item.getTagValueType().equals(TagValueTypeEnum.TAG_VALUE_TYPE_DATE.getId())) {
+                    //                item.getTagField();
+                    //            }
+                    //        });
+
+
+                    //        return esUtil.query(entityMapper.getTableNameBySysId(tagFilterVO.getTagFilter().getTagSystemId()), orderedGroupOrderedItemList,
+                    //                HashMap.class, maxSize, 0, headers);
+
+
+
+                        public static void main(String[] args) {
+                            System.out.println(HYPHEN_SECOND_FORMATTER.substring(0, 11));
+                        }
+
+                                        System.out.println("<<<<<<<<<<<<<<---------" + from);
+                                        System.out.println("<<<<<<<<<<<<<<---------" + to);
+
+
+                                                        System.out.println("--------->>>>>>" + from);
+                                                        System.out.println("--------->>>>>>" + to);
+
+
+
+
+
+
+
+
+                                                            private Integer getPublicDeptId(){
+                                                        //        DeptDO deptDO = new DeptDO();
+                                                        //        deptDO.setName(DeptServiceImpl.PUBLIC);
+                                                        //        System.out.println(deptDO+"--------=====>>>>3333333");
+                                                        //        DeptDO deptDO1 = deptMapper.selectOne(deptDO);
+                                                        //        System.out.println(deptDO1+"--------=====>>>>11111111");
+                                                        //        return deptDO1.getId();
+                                                                return deptMapper.getIdByName(DeptServiceImpl.PUBLIC);
+                                                        //        return deptMapper.selectOne(DeptDO.builder().name(DeptServiceImpl.PUBLIC).build()).getId();
+                                                            }
+
+                                                             @Override
+                                                                public DataPermissionTO getCurrentUserDataPermission() {
+                                                                    // 从session 里获取当前用户
+                                                                    DataPermissionTO dataPermissionTO = new DataPermissionTO();
+                                                                    // 获取当前用户的用户名 username
+                                                                    dataPermissionTO.setUserName(UserUtil.getUserName());
+                                                                    System.out.println("---------->>>>"+dataPermissionTO);
+                                                            //        dataPermissionTO.setPublicDeptId(deptMapper.selectOne(DeptDO.builder().name(DeptServiceImpl.PUBLIC).build()).getId());
+                                                            //        Integer id =
+                                                                    Integer id = this.getPublicDeptId();
+                                                                    System.out.println("-------------->>>>>>>>>>>>>>>"+id);
+                                                                    dataPermissionTO.setPublicDeptId(deptMapper.getIdByName(DeptServiceImpl.PUBLIC));
+                                                                    dataPermissionTO.setCurrentUserDeptId(UserUtil.getDeptId());
+                                                                    // 获取当前session里 用户所拥有的权限码
+                                                                    dataPermissionTO.setPermissions(UserUtil.getUserPermissions());
+                                                                    return dataPermissionTO;
+                                                                }
