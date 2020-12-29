@@ -1,0 +1,664 @@
+
+
+
+tagFilter.query
+
+2020/12/11-10:10:24 [http-nio-9010-exec-2] INFO  com.data.web.backend.utils.AspectUtil [91]- 参数：2
+2020/12/11-10:10:24 [http-nio-9010-exec-2] INFO  com.data.web.backend.utils.AspectUtil [64]- ### 方法 Object com.data.web.backend.controller.TagFilterController.getCurrentUserVisibleTag(Integer,String)
+	请求时间: Fri Dec 11 10:10:24 CST 2020，完成时间： Fri Dec 11 10:10:24 CST 2020，处理用时：3ms
+	操作人 zds
+	参数：[2, null]
+
+2020/12/11-10:10:24 [http-nio-9010-exec-2] ERROR com.data.web.backend.utils.AspectUtil [78]- 出现异常:
+org.springframework.jdbc.BadSqlGrammarException:
+### Error querying database.  Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+### The error may exist in com/data/web/backend/mapper/TagMapper.java (best guess)
+### The error may involve com.data.web.backend.mapper.TagMapper.getTagDos-Inline
+### The error occurred while setting parameters
+### SQL: select id,name,field,sys_id as sysId from tag_sys where id in
+### Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+; bad SQL grammar []; nested exception is java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+	at org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator.doTranslate(SQLErrorCodeSQLExceptionTranslator.java:234)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:72)
+	at org.mybatis.spring.MyBatisExceptionTranslator.translateExceptionIfPossible(MyBatisExceptionTranslator.java:74)
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:440)
+	at com.sun.proxy.$Proxy77.selectList(Unknown Source)
+	at org.mybatis.spring.SqlSessionTemplate.selectList(SqlSessionTemplate.java:223)
+	at org.apache.ibatis.binding.MapperMethod.executeForMany(MapperMethod.java:147)
+	at org.apache.ibatis.binding.MapperMethod.execute(MapperMethod.java:80)
+	at org.apache.ibatis.binding.MapperProxy.invoke(MapperProxy.java:57)
+	at com.sun.proxy.$Proxy146.getTagDos(Unknown Source)
+	at com.data.web.backend.service.impl.TagFilterServiceImpl.getCurrentUserVisibleTag(TagFilterServiceImpl.java:118)
+	at com.data.web.backend.service.impl.TagFilterServiceImpl$$FastClassBySpringCGLIB$$6fb4cbed.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:684)
+	at com.data.web.backend.service.impl.TagFilterServiceImpl$$EnhancerBySpringCGLIB$$72763392.getCurrentUserVisibleTag(<generated>)
+	at com.data.web.backend.service.impl.TagFilterServiceImpl$$FastClassBySpringCGLIB$$6fb4cbed.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:684)
+	at com.data.web.backend.service.impl.TagFilterServiceImpl$$EnhancerBySpringCGLIB$$e37adb6e.getCurrentUserVisibleTag(<generated>)
+	at com.data.web.backend.controller.TagFilterController.getCurrentUserVisibleTag(TagFilterController.java:46)
+	at com.data.web.backend.controller.TagFilterController$$FastClassBySpringCGLIB$$7fe5a047.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:749)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint.proceed(MethodInvocationProceedingJoinPoint.java:88)
+	at com.data.web.backend.utils.AspectUtil.dealResult(AspectUtil.java:51)
+	at com.data.web.backend.aspect.ApprovalResultDealAspect.doAround(ApprovalResultDealAspect.java:33)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.aop.aspectj.AbstractAspectJAdvice.invokeAdviceMethodWithGivenArgs(AbstractAspectJAdvice.java:644)
+	at org.springframework.aop.aspectj.AbstractAspectJAdvice.invokeAdviceMethod(AbstractAspectJAdvice.java:633)
+	at org.springframework.aop.aspectj.AspectJAroundAdvice.invoke(AspectJAroundAdvice.java:70)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:175)
+	at org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthorizingMethodInterceptor$1.proceed(AopAllianceAnnotationsAuthorizingMethodInterceptor.java:82)
+	at org.apache.shiro.authz.aop.AuthorizingMethodInterceptor.invoke(AuthorizingMethodInterceptor.java:39)
+	at org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthorizingMethodInterceptor.invoke(AopAllianceAnnotationsAuthorizingMethodInterceptor.java:115)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:93)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:688)
+	at com.data.web.backend.controller.TagFilterController$$EnhancerBySpringCGLIB$$238238f4.getCurrentUserVisibleTag(<generated>)
+	at com.data.web.backend.controller.TagFilterController$$FastClassBySpringCGLIB$$7fe5a047.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:749)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthorizingMethodInterceptor$1.proceed(AopAllianceAnnotationsAuthorizingMethodInterceptor.java:82)
+	at org.apache.shiro.authz.aop.AuthorizingMethodInterceptor.invoke(AuthorizingMethodInterceptor.java:39)
+	at org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthorizingMethodInterceptor.invoke(AopAllianceAnnotationsAuthorizingMethodInterceptor.java:115)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:688)
+	at com.data.web.backend.controller.TagFilterController$$EnhancerBySpringCGLIB$$fa703fa9.getCurrentUserVisibleTag(<generated>)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:104)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:892)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1039)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:942)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1005)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:897)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:634)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:882)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:741)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.shiro.web.servlet.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:112)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.shiro.web.servlet.AdviceFilter.executeChain(AdviceFilter.java:108)
+	at org.apache.shiro.web.servlet.AdviceFilter.doFilterInternal(AdviceFilter.java:137)
+	at org.apache.shiro.web.servlet.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:125)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.jasig.cas.client.session.SingleSignOutFilter.doFilter(SingleSignOutFilter.java:76)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.shiro.web.servlet.ProxiedFilterChain.doFilter(ProxiedFilterChain.java:61)
+	at org.apache.shiro.web.servlet.AdviceFilter.executeChain(AdviceFilter.java:108)
+	at org.apache.shiro.web.servlet.AdviceFilter.doFilterInternal(AdviceFilter.java:137)
+	at org.apache.shiro.web.servlet.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:125)
+	at org.apache.shiro.web.servlet.ProxiedFilterChain.doFilter(ProxiedFilterChain.java:66)
+	at org.apache.shiro.web.servlet.AbstractShiroFilter.executeChain(AbstractShiroFilter.java:449)
+	at org.apache.shiro.web.servlet.AbstractShiroFilter$1.call(AbstractShiroFilter.java:365)
+	at org.apache.shiro.subject.support.SubjectCallable.doCall(SubjectCallable.java:90)
+	at org.apache.shiro.subject.support.SubjectCallable.call(SubjectCallable.java:83)
+	at org.apache.shiro.subject.support.DelegatingSubject.execute(DelegatingSubject.java:383)
+	at org.apache.shiro.web.servlet.AbstractShiroFilter.doFilterInternal(AbstractShiroFilter.java:362)
+	at org.apache.shiro.web.servlet.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:125)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:357)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:270)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.boot.actuate.web.trace.servlet.HttpTraceFilter.doFilterInternal(HttpTraceFilter.java:88)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:99)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:92)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.filterAndRecordMetrics(WebMvcMetricsFilter.java:114)
+	at org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:104)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:200)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:202)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:490)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:408)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:853)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1587)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:120)
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:97)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:955)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.execute(ClientPreparedStatement.java:372)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.execute(ProxyPreparedStatement.java:44)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.execute(HikariProxyPreparedStatement.java)
+	at org.apache.ibatis.executor.statement.PreparedStatementHandler.query(PreparedStatementHandler.java:64)
+	at org.apache.ibatis.executor.statement.RoutingStatementHandler.query(RoutingStatementHandler.java:79)
+	at org.apache.ibatis.executor.SimpleExecutor.doQuery(SimpleExecutor.java:63)
+	at org.apache.ibatis.executor.BaseExecutor.queryFromDatabase(BaseExecutor.java:324)
+	at org.apache.ibatis.executor.BaseExecutor.query(BaseExecutor.java:156)
+	at org.apache.ibatis.executor.CachingExecutor.query(CachingExecutor.java:109)
+	at com.github.pagehelper.PageInterceptor.intercept(PageInterceptor.java:108)
+	at org.apache.ibatis.plugin.Plugin.invoke(Plugin.java:61)
+	at com.sun.proxy.$Proxy222.query(Unknown Source)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:147)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:140)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:426)
+	... 139 common frames omitted
+2020/12/11-10:10:24 [http-nio-9010-exec-2] INFO  com.data.web.backend.utils.ExceptionUtil [30]- 出现异常：
+### Error querying database.  Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+### The error may exist in com/data/web/backend/mapper/TagMapper.java (best guess)
+### The error may involve com.data.web.backend.mapper.TagMapper.getTagDos-Inline
+### The error occurred while setting parameters
+### SQL: select id,name,field,sys_id as sysId from tag_sys where id in
+### Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+; bad SQL grammar []; nested exception is java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+org.springframework.jdbc.BadSqlGrammarException:
+### Error querying database.  Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+### The error may exist in com/data/web/backend/mapper/TagMapper.java (best guess)
+### The error may involve com.data.web.backend.mapper.TagMapper.getTagDos-Inline
+### The error occurred while setting parameters
+### SQL: select id,name,field,sys_id as sysId from tag_sys where id in
+### Cause: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+; bad SQL grammar []; nested exception is java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+	at org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator.doTranslate(SQLErrorCodeSQLExceptionTranslator.java:234)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:72)
+	at org.mybatis.spring.MyBatisExceptionTranslator.translateExceptionIfPossible(MyBatisExceptionTranslator.java:74)
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:440)
+	at com.sun.proxy.$Proxy77.selectList(Unknown Source)
+	at org.mybatis.spring.SqlSessionTemplate.selectList(SqlSessionTemplate.java:223)
+	at org.apache.ibatis.binding.MapperMethod.executeForMany(MapperMethod.java:147)
+	at org.apache.ibatis.binding.MapperMethod.execute(MapperMethod.java:80)
+	at org.apache.ibatis.binding.MapperProxy.invoke(MapperProxy.java:57)
+	at com.sun.proxy.$Proxy146.getTagDos(Unknown Source)
+	at com.data.web.backend.service.impl.TagFilterServiceImpl.getCurrentUserVisibleTag(TagFilterServiceImpl.java:118)
+	at com.data.web.backend.service.impl.TagFilterServiceImpl$$FastClassBySpringCGLIB$$6fb4cbed.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:684)
+	at com.data.web.backend.service.impl.TagFilterServiceImpl$$EnhancerBySpringCGLIB$$72763392.getCurrentUserVisibleTag(<generated>)
+	at com.data.web.backend.service.impl.TagFilterServiceImpl$$FastClassBySpringCGLIB$$6fb4cbed.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:684)
+	at com.data.web.backend.service.impl.TagFilterServiceImpl$$EnhancerBySpringCGLIB$$e37adb6e.getCurrentUserVisibleTag(<generated>)
+	at com.data.web.backend.controller.TagFilterController.getCurrentUserVisibleTag(TagFilterController.java:46)
+	at com.data.web.backend.controller.TagFilterController$$FastClassBySpringCGLIB$$7fe5a047.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:749)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint.proceed(MethodInvocationProceedingJoinPoint.java:88)
+	at com.data.web.backend.utils.AspectUtil.dealResult(AspectUtil.java:51)
+	at com.data.web.backend.aspect.ApprovalResultDealAspect.doAround(ApprovalResultDealAspect.java:33)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.aop.aspectj.AbstractAspectJAdvice.invokeAdviceMethodWithGivenArgs(AbstractAspectJAdvice.java:644)
+	at org.springframework.aop.aspectj.AbstractAspectJAdvice.invokeAdviceMethod(AbstractAspectJAdvice.java:633)
+	at org.springframework.aop.aspectj.AspectJAroundAdvice.invoke(AspectJAroundAdvice.java:70)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:175)
+	at org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthorizingMethodInterceptor$1.proceed(AopAllianceAnnotationsAuthorizingMethodInterceptor.java:82)
+	at org.apache.shiro.authz.aop.AuthorizingMethodInterceptor.invoke(AuthorizingMethodInterceptor.java:39)
+	at org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthorizingMethodInterceptor.invoke(AopAllianceAnnotationsAuthorizingMethodInterceptor.java:115)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:93)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:688)
+	at com.data.web.backend.controller.TagFilterController$$EnhancerBySpringCGLIB$$238238f4.getCurrentUserVisibleTag(<generated>)
+	at com.data.web.backend.controller.TagFilterController$$FastClassBySpringCGLIB$$7fe5a047.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:749)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthorizingMethodInterceptor$1.proceed(AopAllianceAnnotationsAuthorizingMethodInterceptor.java:82)
+	at org.apache.shiro.authz.aop.AuthorizingMethodInterceptor.invoke(AuthorizingMethodInterceptor.java:39)
+	at org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthorizingMethodInterceptor.invoke(AopAllianceAnnotationsAuthorizingMethodInterceptor.java:115)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:688)
+	at com.data.web.backend.controller.TagFilterController$$EnhancerBySpringCGLIB$$fa703fa9.getCurrentUserVisibleTag(<generated>)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:104)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:892)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1039)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:942)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1005)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:897)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:634)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:882)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:741)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.shiro.web.servlet.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:112)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.shiro.web.servlet.AdviceFilter.executeChain(AdviceFilter.java:108)
+	at org.apache.shiro.web.servlet.AdviceFilter.doFilterInternal(AdviceFilter.java:137)
+	at org.apache.shiro.web.servlet.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:125)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.jasig.cas.client.session.SingleSignOutFilter.doFilter(SingleSignOutFilter.java:76)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.shiro.web.servlet.ProxiedFilterChain.doFilter(ProxiedFilterChain.java:61)
+	at org.apache.shiro.web.servlet.AdviceFilter.executeChain(AdviceFilter.java:108)
+	at org.apache.shiro.web.servlet.AdviceFilter.doFilterInternal(AdviceFilter.java:137)
+	at org.apache.shiro.web.servlet.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:125)
+	at org.apache.shiro.web.servlet.ProxiedFilterChain.doFilter(ProxiedFilterChain.java:66)
+	at org.apache.shiro.web.servlet.AbstractShiroFilter.executeChain(AbstractShiroFilter.java:449)
+	at org.apache.shiro.web.servlet.AbstractShiroFilter$1.call(AbstractShiroFilter.java:365)
+	at org.apache.shiro.subject.support.SubjectCallable.doCall(SubjectCallable.java:90)
+	at org.apache.shiro.subject.support.SubjectCallable.call(SubjectCallable.java:83)
+	at org.apache.shiro.subject.support.DelegatingSubject.execute(DelegatingSubject.java:383)
+	at org.apache.shiro.web.servlet.AbstractShiroFilter.doFilterInternal(AbstractShiroFilter.java:362)
+	at org.apache.shiro.web.servlet.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:125)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:357)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:270)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.boot.actuate.web.trace.servlet.HttpTraceFilter.doFilterInternal(HttpTraceFilter.java:88)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:99)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:92)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.filterAndRecordMetrics(WebMvcMetricsFilter.java:114)
+	at org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:104)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:200)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:109)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:202)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:490)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:408)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:853)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1587)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:120)
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:97)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:955)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.execute(ClientPreparedStatement.java:372)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.execute(ProxyPreparedStatement.java:44)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.execute(HikariProxyPreparedStatement.java)
+	at org.apache.ibatis.executor.statement.PreparedStatementHandler.query(PreparedStatementHandler.java:64)
+	at org.apache.ibatis.executor.statement.RoutingStatementHandler.query(RoutingStatementHandler.java:79)
+	at org.apache.ibatis.executor.SimpleExecutor.doQuery(SimpleExecutor.java:63)
+	at org.apache.ibatis.executor.BaseExecutor.queryFromDatabase(BaseExecutor.java:324)
+	at org.apache.ibatis.executor.BaseExecutor.query(BaseExecutor.java:156)
+	at org.apache.ibatis.executor.CachingExecutor.query(CachingExecutor.java:109)
+	at com.github.pagehelper.PageInterceptor.intercept(PageInterceptor.java:108)
+	at org.apache.ibatis.plugin.Plugin.invoke(Plugin.java:61)
+	at com.sun.proxy.$Proxy222.query(Unknown Source)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:147)
+	at org.apache.ibatis.session.defaults.DefaultSqlSession.selectList(DefaultSqlSession.java:140)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.mybatis.spring.SqlSessionTemplate$SqlSessionInterceptor.invoke(SqlSessionTemplate.java:426)
+	... 139 common frames omitted
+
+     stream 的分组语法
+
+
+
+    @Test
+    public void testSeperateTagFilterGroup() {
+        List<TagFilterItemDO> tagFilterItemDOS = new ArrayList<>();
+        // 准备标签细则数据 集合
+        // 第一个组的第一个细则不带运算符 多个组里面 第一个组没有运算符
+        TagFilterItemDO vo1 = new TagFilterItemDO(null, 1, "age", "=", "20,30", 1, 2, 1, null, null, null, null, null, null, null, null, null);
+        TagFilterItemDO vo2 = new TagFilterItemDO(null, 2, "sex", "=", "1", 1, 1, 1, "and", null, null, null, null, null, null, null, null);
+        TagFilterItemDO vo3 = new TagFilterItemDO(null, 3, "city", "=", "北京", 1, 3, 1, "and", null, null, null, null, null, null, null, null);
+        TagFilterItemDO vo4 = new TagFilterItemDO(null, 1, "age", "=", "20,30,40", 1, 1, 2, null, "or", null, null, null, null, null, null, null);
+        TagFilterItemDO vo5 = new TagFilterItemDO(null, 2, "sex", "=", "1", 1, 3, 2, "and", null, null, null, null, null, null, null, null);
+        TagFilterItemDO vo6 = new TagFilterItemDO(null, 3, "city", "=", "广州", 1, 2, 2, "and", null, null, null, null, null, null, null, null);
+        tagFilterItemDOS.add(vo1);
+        tagFilterItemDOS.add(vo2);
+        tagFilterItemDOS.add(vo3);
+        tagFilterItemDOS.add(vo4);
+        tagFilterItemDOS.add(vo5);
+        tagFilterItemDOS.add(vo6);
+
+//        List<TagFilterItemDO> collect = tagFilterItemDOS.stream().distinct().collect(Collectors.toList());
+//
+//        for (TagFilterItemDO tagFilterItemDO : collect) {
+//            System.out.println(tagFilterItemDO);
+//        }
+
+
+//        Map<String, List<Person>> collect = list.stream().collect(Collectors.groupingBy(person -> person.getName()));
+        // 分理处每一个组细则
+        Map<Integer, List<TagFilterItemDO>> groupMap = tagFilterItemDOS.stream().collect(Collectors.groupingBy(item -> item.getGroupOrder()));
+        // 遍历出每一个组细则 的顺序排好序
+        List<Integer> sortedGroupOrders = groupMap.keySet().stream().sorted().collect(Collectors.toList());
+        //遍历groupMap 排序里面的各个list 里面的item
+//        List<List<TagFilterItemDO>> collect = groupMap.values().stream().parallel().collect(Collectors.toList());
+//        List<Person> collect = list.stream().sorted(Comparator.comparing(Person::getSalary).reversed()).collect(Collectors.toList());
+        List<List<TagFilterItemDO>> groupList = groupMap.values().stream().sorted(item->item.stream().sorted(filterItem->filterItem.getGroupInnerOrder())).parallel().collect(Collectors.toList());
+        // 放置有序组的集合
+        List<List<TagFilterItemDO>> groupItemList = null;
+        for (Integer groupOrder : sortedGroupOrders) {
+            groupItemList.add(groupMap.get(groupOrder));
+        }
+        // 排序每一个集合里面的item
+        List<List<TagFilterItemDO>> orderedGroupOrderedItemList = null;
+        for (List<TagFilterItemDO> filterItemDOS : groupItemList) {
+
+            orderedGroupOrderedItemList.add(filterItemDOS.stream().sorted(Comparator.comparing(TagFilterItemDO::getGroupInnerOrder).reversed()).collect(Collectors.toList()));
+//            filterItemDOS.stream().sorted(item->item.getGroupInnerOrder()).collect(Collectors.toList());
+        }
+//        groupItemList.stream().sorted(Comparator.comparing(Person::getSalary).reversed())
+
+
+
+
+
+        for (TagFilterItemDO tagFilterItemDO : tagFilterItemDOS) {
+            ArrayList<TagFilterItemDO> groupItems = new ArrayList<>();
+            for (TagFilterItemDO filterItemDO : tagFilterItemDOS) {
+                if (tagFilterItemDO.getGroupOrder().equals(filterItemDO.getGroupOrder())) {
+                    groupItems.add(filterItemDO);
+                }
+
+            }
+        }
+
+
+
+    }
+
+
+
+    @Override
+    public List getTagFilterData(TagFilterVO tagFilterVO) throws IOException {
+        List<TagFilterItemDO> tagFilterItems = tagFilterVO.getTagFilterItems();
+        // 分理处每一个组细则
+        Map<Integer, List<TagFilterItemDO>> groupMap = tagFilterItems.stream().collect(Collectors.groupingBy(item -> item.getGroupOrder()));
+        // 遍历出每一个组细则 的顺序排好序
+        List<Integer> sortedGroupOrders = groupMap.keySet().stream().sorted().collect(Collectors.toList());
+        // 放置有序组的集合
+        List<List<TagFilterItemDO>> groupItemList = null;
+        for (Integer groupOrder : sortedGroupOrders) {
+            groupItemList.add(groupMap.get(groupOrder));
+        }
+        // 排序每一个集合里面的item
+        List<List<TagFilterItemDO>> orderedGroupOrderedItemList = null;
+        for (List<TagFilterItemDO> filterItemDOS : groupItemList) {
+            //遍历groupMap 排序里面的各个list 里面的item
+            orderedGroupOrderedItemList.add(filterItemDOS.stream().sorted(Comparator.comparing(TagFilterItemDO::getGroupInnerOrder).reversed()).collect(Collectors.toList()));
+        }
+
+
+
+
+
+
+
+
+
+
+        HashMap<Integer, List<TagFilterItemDO>> groupMap = new HashMap<>();
+        List<List<TagFilterItemDO>> groupList = new ArrayList<>();
+        // 分离出每一组 外层获取一个标签细则
+        for (TagFilterItemDO tagFilterItem : tagFilterItems) {
+            ArrayList<TagFilterItemDO> tagFilterItemDOS = new ArrayList<>();
+            for (TagFilterItemDO filterItem : tagFilterItems) {
+                if (tagFilterItem.getGroupOrder().equals(filterItem.getGroupOrder())) {
+                    tagFilterItemDOS.add(filterItem);
+                }
+            }
+            groupList.add(tagFilterItemDOS);
+        }
+        String tagField = tagFilterItems.get(0).getTagField();
+        String index = dbMetadataMapper.getTableNameByTagField(tagField);
+//        List<HashMap> query = esUtil.query(index, groupList, HashMap.class, 50, 1);
+        return esUtil.query(index, groupList, HashMap.class, 50, 1);
+    }
+
+
+
+
+    drop table cust_info;
+    drop table db_metadata;
+    drop field_test;
+    drop sys_dept;
+    drop sys_permission;
+    drop sys_role;
+    drop sys_role_perm;
+    drop sys_tag_dept;
+    drop sys_user_role;
+    drop tag_category;
+    drop tag_entity;
+    drop tag_sys;
+
+
+
+
+    @Override
+    public List<TagFilterDO> getTagFilterList(TagFilterVO tagFilterVO) {
+//        // 这里需要根据 当前登录的用户的不同角色有的关于数据的权限码 来获取 当前用户可看的数据
+//        // 获取当前用户的用户名 username
+//        String userName = UserUtil.getUserName();
+//        // 根据用户名 获取这个用户的 部门deptId 和 用户id uid
+//        User currentUser = userMapper.getUserByName(userName);
+//        // 获取当前用户的id 和 deptId
+//        Integer deptId = currentUser.getDept();
+//        // 获取当前用户所拥有的权限码
+//        User user = userService.initSessionUser(userName);
+//        Set<String> permissions = user.getPermissions();
+
+        DataPermissionTO dataPermission = this.getCurrentUserDataPermission();
+        Set<String> permissions = dataPermission.getPermmissions();
+        List<TagFilterDO> tagFilterDOs;
+        // 如果当前用户超级管理员
+        if (permissions.contains(DATA_ADMIN)) {
+            tagFilterDOs = tagFilterMapper.getTagFitersCondition(null, null);
+            // 如果当前用户标签管理员
+        } else if (permissions.contains(DATA_TAGADMIN)) {
+            tagFilterDOs = tagFilterMapper.getTagFitersCondition(null, dataPermission.getCurrentUserDeptId());
+            // 如果当前用户是业务人员
+        } else if (permissions.contains(DATA_BUSINESS)) {
+            tagFilterDOs = tagFilterMapper.getTagFitersCondition(dataPermission.getUserName(), null);
+        } else {
+            tagFilterDOs = null;
+        }
+        return tagFilterDOs;
+    }
+
+
+
+
+
+    //        // 这里需要根据 当前登录的用户的不同角色有的关于数据的权限码 来获取 当前用户可看的数据
+    //        // 获取当前用户的用户名 username
+    //        String userName = UserUtil.getUserName();
+    //        // 根据用户名 获取这个用户的 部门deptId 和 用户id uid
+    //        User currentUser = userMapper.getUserByName(userName);
+    //        // 获取当前用户的id 和 deptId
+    //        Integer deptId = currentUser.getDept();
+    //        // 获取当前用户所拥有的权限码
+    //        User user = userService.initSessionUser(userName);
+    //        Set<String> permissions = user.getPermissions();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+加 状态位  关于标签查询的接口
+
+isDataPermission 是否是走数据权限
+
+将当t_user的userID修改为自增
+alter table t_user modify userID int auto_increment;
+
+alter table tag_dept modify iD int auto_increment;
+
+
+工具的问题
+navicat
+
+当你选择 主键自增 选项1 勾选的话 没有生效
+但是语句该默认自增 就可以实现
+
+
+       Integer tagFilterId ;
+        for (TagFilterItemDO tagFilterItem : tagFilterItems) {
+            if (null != tagFilterItem.getId()) {
+                tagFilterId = tagFilterItem.getFilterId();
+                break;
+            }
+        }
+
+
+
+        [慧算账App?Android版, 慧算账助手小程序, 慧算账App?iOS版, 慧算账App?Android版, 慧算账助手小程序, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?iOS版, 慧算账App?iOS版, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?iOS版, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?Android版, 慧算账助手小程序, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?iOS版, 慧算账App?Android版, 慧算账App?iOS版, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?Android版, 慧算账助手小程序, 慧算账App?Android版, 慧算账App?iOS版, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?iOS版, 慧算账助手小程序, 慧算账助手小程序, 慧算账App?iOS版, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?iOS版, 慧算账App?iOS版, 慧算账App?iOS版, 慧算账App?iOS版, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?Android版, 慧算账App?iOS版, 慧算账App?iOS版, 慧算账助手小程序, 慧算账App?Android版, 慧算账App?Android版]
+
+
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+        执行力
+
+
+            /**
+             * 运算符
+             */
+            String NE = "=";
+            String NEQ = "!=";
+            String CONTAINS = "包含";
+            String NOT_CONTAINS = "不包含";
+            String IS_NULL = "为空";
+            String NOT_NULL = "不为空";
+            String GT = ">";
+            String GTE = ">=";
+            String LT = "<";
+            String LTE = "<=";
+            String BETWEEN = "between";
+
+            String AND = "且";
+            String OR = "或";
+
+
+
+
+
+
+
+
+
+
+
+
+
+      20201210daylog
+            一 工作进度：
+            1.二期项目还剩导出数据的接口
+            2.数据权限 我需要自己 本地切换角色仔细测试
+
+            二 存在的疑问：
+            1.我发现自己 有些看似简单的问题 理解不是很到位 或者曾经 遇到过问题 发现加了一些代码就正常运行了
+            并没有把加的那些代码的含义理解的到位
+            如:今天讨论的序列化问题与框架自带序列化 避免了实体类实现Serializable
+               某个类的两个对象 比较需要在类上 重写equals 方法
