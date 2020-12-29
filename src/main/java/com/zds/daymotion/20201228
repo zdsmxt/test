@@ -1,0 +1,264 @@
+
+
+尽可能早的把活干好干完
+
+1.问萧哥 之前的邮件模块 是如何实现的 参考一下
+
+2. 看别人如何对集合判空
+    if (CollectionUtils.isEmpty(ids)) {
+                return exportData;
+            }
+
+
+3.多问问 自己 一些 看似简单的东西 自己能不能 快速 熟练的搭建出来 成品
+
+  比如搭建一个linux 环境 可以下软件 网络连通 java 运行环境的配置
+
+
+
+为什么触发不到调用 查询标签枚举的结果  找到事情的本质原因 而不是迷迷糊糊 可能是电脑不如服务器的配置
+
+return esUtil.getSampleTextValueByPhrase(index, tagField, 0, pageSize, keyword).stream().distinct().collect(Collectors.toList());
+
+develop  线上最新分支
+
+        // 分离出标签细则 标签值数据类型为日期的类型 给时间类型的数据拼00:00:00 或者 23:59:59
+        tagFilterVO.getTagFilterItems().stream().filter(item->{
+            if(item.getTagValueType().equals())
+        });
+
+
+
+
+
+
+//                if (this.judgeIsDate(filterItem)) {
+//                    String filterValue = filterItem.getFilterValue() + DAY_BEGIN;
+//                    itemFilterQueryBuilder = QueryBuilders.termsQuery(tagField, filterValue);
+//                    break;
+//                }
+
+
+
+
+
+
+
+
+
+
+
+//                if (this.judgeIsDate(filterItem)) {
+//                    String filterValue = filterItem.getFilterValue() + DAY_END;
+//                    itemFilterQueryBuilder = QueryBuilders.rangeQuery(filterItem.getTagField()).gt(filterValue);
+//                    break;
+//                }
+
+
+
+
+//                if (this.judgeIsDate(filterItem)) {
+//                    String filterValue = filterItem.getFilterValue() + DAY_BEGIN;
+//                    itemFilterQueryBuilder = QueryBuilders.rangeQuery(filterItem.getTagField()).gte(filterValue);
+//                    break;
+//                }
+
+
+//                if (this.judgeIsDate(filterItem)) {
+//                    String filterValue = filterItem.getFilterValue() + DAY_BEGIN;
+//                    itemFilterQueryBuilder = QueryBuilders.rangeQuery(filterItem.getTagField()).lt(filterValue);
+//                    break;
+//                }
+
+
+
+//                if (this.judgeIsDate(filterItem)) {
+//                    String filterValue = filterItem.getFilterValue() + DAY_END;
+//                    itemFilterQueryBuilder = QueryBuilders.rangeQuery(filterItem.getTagField()).lte(filterValue);
+//                    break;
+//                }
+
+
+
+
+                    // 只给日期类型的标签值 入参时 拼上时分秒
+//                    from = DateUtil.hyphen2UtcStr(from + DAY_BEGIN);
+//                    to = DateUtil.hyphen2UtcStr(to + DAY_END);
+//
+
+
+
+
+    /**
+     * 一天开始的第一秒 用于给前端传的年月日的数据拼上 时分秒
+     */
+    private static final String DAY_BEGIN = " 00:00:00";
+
+    /**
+     * 一天结束的最后一秒 用于给前端传的年月日的数据拼上 时分秒
+     */
+    private static final String DAY_END = " 23:59:59";
+
+
+
+
+
+    /**
+     * 多个条件值的分隔符
+     */
+    private static final String FILTER_VALUE_SPLIT_SYMBOL = ",";
+
+
+
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+    智力输出
+
+
+ private String[] handleTagFilter(TagFilterVO tagFilterVO, List<List<TagFilterItemDO>> orderedGroupOrderedItemList) {
+        // 分离出标签细则 标签值数据类型为日期的类型 给时间类型的数据拼00:00:00 或者 23:59:59
+        // 查看标签值 是否是时间类型
+        tagFilterVO.getTagFilterItems().stream().filter(item -> esUtil.judgeIsDate(item)).forEach(item -> {
+            // 获取时间的区间值 操作符号为区间
+            if (OperatorEnum.BETWEEN.equals(item.getOperator())) {
+                List<String> values = Arrays.asList(item.getFilterValue().split(EsUtil.FILTER_VALUE_SPLIT_SYMBOL));
+                AssertUtil.assertTrue(values.size() == 2, String.format("范围查询条件个数不对，需2个参数，实际个数:%s", values.size()));
+                String from = values.get(0) + DAY_BEGIN;
+                String to = values.get(1) + DAY_END;
+                String filterValue = from + EsUtil.FILTER_VALUE_SPLIT_SYMBOL + to;
+                item.setFilterValue(filterValue);
+            }
+            //操作符号为等于或者不等于或者大于等于或者小于
+            if (OperatorEnum.NEQ.equals(item.getOperator())
+                    || OperatorEnum.NE.equals(item.getOperator())
+                    || OperatorEnum.GTE.equals(item.getOperator())
+                    || OperatorEnum.LT.equals(item.getOperator())) {
+                item.setFilterValue(item.getFilterValue() + DAY_BEGIN);
+            }
+            //操作符号大于或者小于等于
+            if (OperatorEnum.GT.equals(item.getOperator()) || OperatorEnum.LTE.equals(item.getOperator())) {
+                item.setFilterValue(item.getFilterValue() + DAY_END);
+            }
+        });
+        // 排序每一个内层集合里面的item
+        List<TagFilterItemDO> tagFilterItems = tagFilterVO.getTagFilterItems();
+        // 分理处每一个组细则
+        Map<Integer, List<TagFilterItemDO>> groupMap = tagFilterItems.stream().collect(Collectors.groupingBy(TagFilterItemDO::getGroupOrder));
+        // 遍历出每一个组细则 的顺序排好序
+        List<Integer> sortedGroupOrders = groupMap.keySet().stream().sorted().collect(Collectors.toList());
+        // 放置有序组的集合
+        List<List<TagFilterItemDO>> groupItemList = new ArrayList<>(sortedGroupOrders.size());
+        for (Integer groupOrder : sortedGroupOrders) {
+            groupItemList.add(groupMap.get(groupOrder));
+        }
+        // 排序每一个内层集合里面的item
+        for (List<TagFilterItemDO> filterItemDOS : groupItemList) {
+            //遍历groupMap 排序里面的各个list 里面的item
+            orderedGroupOrderedItemList.add(filterItemDOS.stream().sorted(Comparator.comparing(TagFilterItemDO::getGroupInnerOrder)).collect(Collectors.toList()));
+        }
+        String[] headers;
+        if (CollectionUtils.isEmpty(tagFilterVO.getHeaders())) {
+            headers = tagFilterVO.getTagFilterItems()
+                    .stream()
+                    .map(TagFilterItemDO::getTagField)
+                    .distinct()
+                    .collect(Collectors.toList())
+                    .toArray(new String[]{});
+        } else {
+            headers = tagFilterVO.getHeaders().toArray(new String[]{});
+        }
+        return headers;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//            if (item.getTagValueType().equals(TagValueTypeEnum.TAG_VALUE_TYPE_DATE.getId())) {
+
+
+}
+
+
+先写一个设计文档：
+        数据权限的设计文档：
+        邮件告警的设计文档：
+
+
+
+
+
+
+
+
+
+
+如何设计一个邮箱报警模块
+
+  1.邮件报警的触发机制 （数仓里面的 针对指定的系统的某张表 某个字段的 某个数据  跟实际的预期值 存在 较大查询 需判断如何处理）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

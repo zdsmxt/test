@@ -1,0 +1,41 @@
+
+
+
+
+#!/bin/bash -x
+export LC_ALL="zh_CN.UTF8"
+export LANG="zh_CN.UTF8"
+export PATH=$PATH:/data/jdk1.8.0_151/bin
+
+nohup java -Xdebug -Xrunjdwp:transport=dt_socket,
+server=y,suspend=n,address=18095 -jar data-web-1.0-SNAPSHOT.jar -Xmx512m &
+echo 'execute success'
+
+
+
+经验->>>>如何避免拷贝别人的配置 明明看起来一样 但是还是会执行报错的情况分析
+ 不知道是不是拷的有特殊字符 我看到的资料显示 nginx对空格的规范比较严谨
+
+邮件模块和触发记录的开发
+邮件模块开发需求，
+1、邮件模板的开发如下：
+收件人：业务联系人
+发件人：当前发送地址
+抄送人：技术、产品运营联系人
+邮件主题：xx字段预警，将会影响xx系统xx指标
+邮件内容
+您好
+阿里云源表xx字段规则监测，发现xx字段（中/英）数值＜0（正常≥0），会影响到xx系统>xx>xx>xx的指标结果展示，供决策参考。
+
+2:、邮件触发记录
+包含发送时间、收件人、邮件主题、发送状态，便于发送记录的查询
+
+
+邮件发送：
+1.触发邮件报警的触发条件 自动发送
+
+2.如何不把自己的发件人的邮箱密码耦合到代码中
+password尽量使用授权码，尽管有的邮箱用密码也可以,遇到问题有时候与这个有关
+
+3.发送的邮件记录 要存库
+
