@@ -1,0 +1,114 @@
+
+
+
+优先级
+
+先用户画像的需求涉及的地方写代码
+
+    1、标签筛选模块 筛选项排序，数字、占比、日期yyyymm类标签值在筛选项中要排序，从大到小倒序排序。
+
+
+
+     获取的
+
+     自己多测试几遍 避免测试发现提的bug单过多
+
+
+
+
+SELECT
+		CASE sys_id
+		WHEN 1 THEN
+			'用户标签体系'
+		WHEN 2 THEN
+			'企业标签体系'
+		WHEN 3 THEN
+			'业务标签体系'
+		ELSE
+			'无'
+		END AS 标签体系,
+   (select name from tag_category where id = category_id) as 所属分类,
+   name as 标签名称,
+    field as 标签字段,
+    case tag_type_id
+    WHEN 1 THEN
+			'事实标签'
+		WHEN 2 THEN
+			'统计标签'
+		WHEN 3 THEN
+			'算法模型'
+	  ELSE
+			'无'
+		END AS 标签类型,
+    case tag_value_type
+    WHEN 1 THEN
+			'连续型数值'
+		WHEN 2 THEN
+			'枚举值'
+		WHEN 3 THEN
+			'字符型'
+    WHEN 4 THEN
+			'日期时间'
+		ELSE
+			'无'
+		END AS 标签值类型,
+
+    rule as 标签规则,
+    `algorithm` as 算法介绍,
+    case update_cycle_id
+    WHEN 1 THEN
+			'每天'
+		WHEN 2 THEN
+			'每周'
+		WHEN 3 THEN
+			'每月'
+    WHEN 4 THEN
+			'每月3/6/9/12/15/18/19/24/29号'
+		ELSE
+			'无'
+		END AS 更新周期,
+    case status
+    WHEN 0 THEN
+			'停用'
+		WHEN 1 THEN
+			'启用'
+	  ELSE
+			'无'
+		END AS 标签状态,
+   case authority
+    WHEN 1 THEN
+			'公开'
+		WHEN 2 THEN
+			'培训'
+		WHEN 3 THEN
+			'增长'
+    WHEN 4 THEN
+			'销售'
+    WHEN 5 THEN
+			'金融风控'
+    WHEN 6 THEN
+			'市场'
+    WHEN 7 THEN
+			'会计'
+	  ELSE
+			'无'
+    END AS 标签权限,
+    note as 备注
+		FROM
+			tag_sys;
+
+select * from tag_sys;
+select * from sys_dept;
+
+
+
+
+
+
+
+
+
+
+
+
+
