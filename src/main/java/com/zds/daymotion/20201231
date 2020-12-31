@@ -17,93 +17,504 @@
 
 
 SELECT
-		CASE sys_id
-		WHEN 1 THEN
-			'用户标签体系'
-		WHEN 2 THEN
-			'企业标签体系'
-		WHEN 3 THEN
-			'业务标签体系'
-		ELSE
-			'无'
-		END AS 标签体系,
-   (select name from tag_category where id = category_id) as 所属分类,
-   name as 标签名称,
-    field as 标签字段,
-    case tag_type_id
-    WHEN 1 THEN
-			'事实标签'
-		WHEN 2 THEN
-			'统计标签'
-		WHEN 3 THEN
-			'算法模型'
-	  ELSE
-			'无'
-		END AS 标签类型,
-    case tag_value_type
-    WHEN 1 THEN
-			'连续型数值'
-		WHEN 2 THEN
-			'枚举值'
-		WHEN 3 THEN
-			'字符型'
-    WHEN 4 THEN
-			'日期时间'
-		ELSE
-			'无'
-		END AS 标签值类型,
+	CASE sys_id
+WHEN 1 THEN
+	'用户标签体系'
+WHEN 2 THEN
+	'企业标签体系'
+WHEN 3 THEN
+	'业务标签体系'
+ELSE
+	'无'
+END AS 标签体系,
+ (
+	SELECT
+		NAME
+	FROM
+		tag_category
+	WHERE
+		id = category_id
+) AS 所属分类,
+ NAME AS 标签名称,
+ field AS 标签字段,
+ CASE tag_type_id
+WHEN 1 THEN
+	'事实标签'
+WHEN 2 THEN
+	'统计标签'
+WHEN 3 THEN
+	'算法模型'
+ELSE
+	'无'
+END AS 标签类型,
+ CASE tag_value_type
+WHEN 1 THEN
+	'连续型数值'
+WHEN 2 THEN
+	'枚举值'
+WHEN 3 THEN
+	'字符型'
+WHEN 4 THEN
+	'日期时间'
+ELSE
+	'无'
+END AS 标签值类型,
+ rule AS 标签规则,
+ `algorithm` AS 算法介绍,
+ CASE update_cycle_id
+WHEN 1 THEN
+	'每天'
+WHEN 2 THEN
+	'每周'
+WHEN 3 THEN
+	'每月'
+WHEN 4 THEN
+	'每月3/6/9/12/15/18/19/24/29号'
+ELSE
+	'无'
+END AS 更新周期,
+ CASE STATUS
+WHEN 0 THEN
+	'停用'
+WHEN 1 THEN
+	'启用'
+ELSE
+	'无'
+END AS 标签状态,
+ CASE authority
+WHEN 1 THEN
+	'公开'
+WHEN 2 THEN
+	'培训'
+WHEN 3 THEN
+	'增长'
+WHEN 4 THEN
+	'销售'
+WHEN 5 THEN
+	'金融风控'
+WHEN 6 THEN
+	'市场'
+WHEN 7 THEN
+	'会计'
+ELSE
+	'无'
+END AS 标签权限,
+ note AS 备注
+FROM
+	tag_sys;
 
-    rule as 标签规则,
-    `algorithm` as 算法介绍,
-    case update_cycle_id
-    WHEN 1 THEN
-			'每天'
-		WHEN 2 THEN
-			'每周'
-		WHEN 3 THEN
-			'每月'
-    WHEN 4 THEN
-			'每月3/6/9/12/15/18/19/24/29号'
-		ELSE
-			'无'
-		END AS 更新周期,
-    case status
-    WHEN 0 THEN
-			'停用'
-		WHEN 1 THEN
-			'启用'
-	  ELSE
-			'无'
-		END AS 标签状态,
-   case authority
-    WHEN 1 THEN
-			'公开'
-		WHEN 2 THEN
-			'培训'
-		WHEN 3 THEN
-			'增长'
-    WHEN 4 THEN
-			'销售'
-    WHEN 5 THEN
-			'金融风控'
-    WHEN 6 THEN
-			'市场'
-    WHEN 7 THEN
-			'会计'
-	  ELSE
-			'无'
-    END AS 标签权限,
-    note as 备注
-		FROM
-			tag_sys;
+SELECT
+	*
+FROM
+	tag_sys;
 
-select * from tag_sys;
-select * from sys_dept;
+SELECT
+	*
+FROM
+	sys_dept;
 
 
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : localdatabase
+Source Server Version : 50732
+Source Host           : localhost:3306
+Source Database       : data_web1
+
+Target Server Type    : MYSQL
+Target Server Version : 50732
+File Encoding         : 65001
+
+Date: 2020-12-31 14:22:22
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for tag
+-- ----------------------------
+DROP TABLE IF EXISTS `tag`;
+CREATE TABLE `tag` (
+  `标签体系` varchar(255) DEFAULT NULL,
+  `所属分类` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `field` varchar(255) DEFAULT NULL,
+  `标签类型` varchar(255) DEFAULT NULL,
+  `标签值类型` varchar(255) DEFAULT NULL,
+  `rule` varchar(255) DEFAULT NULL,
+  `algorithm` varchar(255) DEFAULT NULL,
+  `更新周期` varchar(255) DEFAULT NULL,
+  `标签状态` varchar(255) DEFAULT NULL,
+  `标签权限` varchar(255) DEFAULT NULL,
+  `note` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
+字符型排序
+
+时间
+
+
+
+================在岗时间
+================入职时间
+================姓名
+================职位
+================工号
+================离职日期
+================工作城市
+================工作省份
+================所属分部
+================所属大区
+================所属机构
+================机构类别
+================10s≤有效通话数＜30s
+================ABC意向客户总数
+================A类意向客户数
+================B类意向客户数
+================C类意向客户数
+================外呼总数
+================外呼接通总数
+================有效通话数≥120s
+================有效通话数≥180s
+================有效通话数≥30s
+================有效通话数≥60s
+================翻动总数
+================A类意向客户出单数
+================一般纳税客户数
+================促单池中出单数
+================出单代账客户数
+================出单代账服务总金额
+================出单客户数
+================出单总金额
+================出单非代账客户数
+================出单非代账服务总金额
+================切户出单数
+================小规模纳税客户数
+================新户出单数
+================首单开单时间周期
+================退款总金额
+================退款次数
+================上级主管姓名
+================上级主管工号
+================姓名
+================工号
+================手机号
+================邮箱
+================员工id
+
+
+
+
+headers: ["duty_time", "entry_date", "staff_name", "staff_post", "staff_no", "leave_date", "city", "province",…]
+0: "duty_time"
+1: "entry_date"
+2: "staff_name"
+3: "staff_post"
+4: "staff_no"
+5: "leave_date"
+6: "city"
+7: "province"
+8: "belong_branch"
+9: "belong_region"
+10: "belong_agency"
+11: "agency_type"
+12: "call_10_30"
+13: "intent_num"
+14: "a_intent_num"
+15: "b_intent_num"
+16: "c_intent_num"
+17: "call_total"
+18: "call_valid_count"
+19: "call_120"
+20: "call_180"
+21: "call_30"
+22: "call_60"
+23: "fd_num"
+24: "cust_a_intent_num"
+25: "cust_general_taxpayer_num"
+26: "cust_promote_num"
+27: "cust_dz_num"
+28: "cust_dz_amount"
+29: "cust_num"
+30: "cust_amount"
+31: "cust_fdz_num"
+32: "cust_fdz_amount"
+33: "cust_change_num"
+34: "cust_small_taxpayer_num"
+35: "cust_new_num"
+36: "first_sign_period"
+37: "refund_amount"
+38: "refund_num"
+39: "supervisor_name"
+40: "supervisor_no"
+41: "staff_name"
+42: "staff_no"
+43: "mobile_phone"
+44: "email"
+45: "id"
+
+
+
+
+
+private List<String> convertOutputHeaders(List<String> headers, Integer tagSysId) {
+        List<String> outputHeaders = new ArrayList<>();
+        headers.forEach(item -> {
+            String headerItem = (String) cacheDataDao.getMap(TagSystemEnum.tagSystemMap.get(tagSysId).getTagNameCacheKey()).get(item);
+            if (StringUtils.isBlank(headerItem)) {
+                headerItem = (String) cacheDataDao.getMap(TagSystemEnum.tagSystemMap.get(tagSysId).getIdenCacheKey()).get(item);
+            }
+            outputHeaders.add(StringUtils.isBlank(headerItem) ? item : headerItem);
+        });
+        int headFieldCount = outputHeaders.size();
+        ArrayList<String> headList = new ArrayList<>(headFieldCount);
+        for (int i = headFieldCount-1; i >=0; i--) {
+             headList.add(outputHeaders.get(i));
+        }
+        headList.stream().forEach(item->{
+            System.out.println("--->>>>"+item);
+        });
+//        return outputHeaders.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+//        return outputHeaders;
+        return headList;
+    }
+
+
+2020/12/31-15:45:50 [http-nio-9010-exec-4] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [230]- Enabling session validation scheduler...
+2020/12/31-15:45:50 [http-nio-9010-exec-2] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [230]- Enabling session validation scheduler...
+2020/12/31-15:45:50 [http-nio-9010-exec-1] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [230]- Enabling session validation scheduler...
+2020/12/31-15:45:50 [http-nio-9010-exec-3] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [230]- Enabling session validation scheduler...
+2020/12/31-15:45:50 [http-nio-9010-exec-1] INFO  com.data.web.backend.utils.AspectUtil [91]- 参数：{}
+2020/12/31-15:45:50 [http-nio-9010-exec-1] INFO  com.data.web.backend.utils.AspectUtil [64]- ### 方法 Object com.data.web.backend.controller.UserController.getUserDetail()
+	请求时间: Thu Dec 31 15:45:50 CST 2020，完成时间： Thu Dec 31 15:45:50 CST 2020，处理用时：9ms
+	操作人 zhudongsheng@kungeek.com
+	参数：[]
+
+2020/12/31-15:45:50 [http-nio-9010-exec-4] INFO  com.data.web.backend.utils.AspectUtil [91]- 参数：null
+2020/12/31-15:45:50 [http-nio-9010-exec-3] INFO  com.data.web.backend.utils.AspectUtil [91]- 参数：21
+2020/12/31-15:45:50 [http-nio-9010-exec-2] INFO  com.data.web.backend.utils.AspectUtil [91]- 参数：TagConditionVO(status=1, authority=null, updateCycleId=null, sysId=3, entityId=null, tagTypeId=null, unPagination=true, isQueryES=false, tagName=null, categoryId=null, isDataPermission=true)
+2020/12/31-15:45:50 [http-nio-9010-exec-3] INFO  com.data.web.backend.utils.AspectUtil [64]- ### 方法 Object com.data.web.backend.controller.TagFilterController.getSingleTagFilterDetail(Integer)
+	请求时间: Thu Dec 31 15:45:50 CST 2020，完成时间： Thu Dec 31 15:45:50 CST 2020，处理用时：22ms
+	操作人 zhudongsheng@kungeek.com
+	参数：[21]
+
+2020/12/31-15:45:50 [http-nio-9010-exec-4] INFO  com.data.web.backend.utils.AspectUtil [64]- ### 方法 Object com.data.web.backend.controller.TagCategoryController.getTagCategoryList(Integer)
+	请求时间: Thu Dec 31 15:45:50 CST 2020，完成时间： Thu Dec 31 15:45:50 CST 2020，处理用时：27ms
+	操作人 zhudongsheng@kungeek.com
+	参数：[null]
+
+2020/12/31-15:45:50 [http-nio-9010-exec-2] INFO  com.data.web.backend.utils.AspectUtil [64]- ### 方法 Object com.data.web.backend.controller.TagController.getTagsCondition(TagConditionVO)
+	请求时间: Thu Dec 31 15:45:50 CST 2020，完成时间： Thu Dec 31 15:45:50 CST 2020，处理用时：23ms
+	操作人 zhudongsheng@kungeek.com
+	参数：[TagConditionVO(status=1, authority=null, updateCycleId=null, sysId=3, entityId=null, tagTypeId=null, unPagination=true, isQueryES=false, tagName=null, categoryId=null, isDataPermission=true)]
+
+2020/12/31-15:45:50 [http-nio-9010-exec-5] INFO  com.data.web.backend.utils.AspectUtil [91]- 参数：TagEnumValueVO(tagId=254, keyword=, pageSize=20, sysId=null)
+2020/12/31-15:45:50 [http-nio-9010-exec-5] INFO  com.data.web.backend.utils.EsUtil [124]- =========创建Elasticsearch连接开始========
+2020/12/31-15:45:50 [http-nio-9010-exec-5] INFO  com.data.web.backend.utils.EsUtil [129]- ===========连接121.41.131.237开始========
+2020/12/31-15:45:50 [http-nio-9010-exec-5] INFO  com.data.web.backend.utils.EsUtil [143]- ============连接121.41.131.237,成功==========
+2020/12/31-15:45:51 [http-nio-9010-exec-5] INFO  com.data.web.backend.utils.AspectUtil [64]- ### 方法 Object com.data.web.backend.controller.TagFilterController.getAssignTagEnumValue(TagEnumValueVO)
+	请求时间: Thu Dec 31 15:45:50 CST 2020，完成时间： Thu Dec 31 15:45:51 CST 2020，处理用时：278ms
+	操作人 zhudongsheng@kungeek.com
+	参数：[TagEnumValueVO(tagId=254, keyword=, pageSize=20, sysId=null)]
+
+--->>>>员工id
+--->>>>邮箱
+--->>>>手机号
+--->>>>工号
+--->>>>姓名
+--->>>>上级主管工号
+--->>>>上级主管姓名
+--->>>>退款次数
+--->>>>退款总金额
+--->>>>首单开单时间周期
+--->>>>新户出单数
+--->>>>小规模纳税客户数
+--->>>>切户出单数
+--->>>>出单非代账服务总金额
+--->>>>出单非代账客户数
+--->>>>出单总金额
+--->>>>出单客户数
+--->>>>出单代账服务总金额
+--->>>>出单代账客户数
+--->>>>促单池中出单数
+--->>>>一般纳税客户数
+--->>>>A类意向客户出单数
+--->>>>翻动总数
+--->>>>有效通话数≥60s
+--->>>>有效通话数≥30s
+--->>>>有效通话数≥180s
+--->>>>有效通话数≥120s
+--->>>>外呼接通总数
+--->>>>外呼总数
+--->>>>C类意向客户数
+--->>>>B类意向客户数
+--->>>>A类意向客户数
+--->>>>ABC意向客户总数
+--->>>>10s≤有效通话数＜30s
+--->>>>机构类别
+--->>>>所属机构
+--->>>>所属大区
+--->>>>所属分部
+--->>>>工作省份
+--->>>>工作城市
+--->>>>离职日期
+--->>>>工号
+--->>>>职位
+--->>>>姓名
+--->>>>入职时间
+--->>>>在岗时间
+================员工id
+================邮箱
+================手机号
+================工号
+================姓名
+================上级主管工号
+================上级主管姓名
+================退款次数
+================退款总金额
+================首单开单时间周期
+================新户出单数
+================小规模纳税客户数
+================切户出单数
+================出单非代账服务总金额
+================出单非代账客户数
+================出单总金额
+================出单客户数
+================出单代账服务总金额
+================出单代账客户数
+================促单池中出单数
+================一般纳税客户数
+================A类意向客户出单数
+================翻动总数
+================有效通话数≥60s
+================有效通话数≥30s
+================有效通话数≥180s
+================有效通话数≥120s
+================外呼接通总数
+================外呼总数
+================C类意向客户数
+================B类意向客户数
+================A类意向客户数
+================ABC意向客户总数
+================10s≤有效通话数＜30s
+================机构类别
+================所属机构
+================所属大区
+================所属分部
+================工作省份
+================工作城市
+================离职日期
+================工号
+================职位
+================姓名
+================入职时间
+================在岗时间
+
+
+
+headers: ["duty_time", "entry_date", "staff_name", "staff_post", "staff_no", "leave_date", "city", "province",…]
+0: "duty_time"
+1: "entry_date"
+2: "staff_name"
+3: "staff_post"
+4: "staff_no"
+5: "leave_date"
+6: "city"
+7: "province"
+8: "belong_branch"
+9: "belong_region"
+10: "belong_agency"
+11: "agency_type"
+12: "call_10_30"
+13: "intent_num"
+14: "a_intent_num"
+15: "b_intent_num"
+16: "c_intent_num"
+17: "call_total"
+18: "call_valid_count"
+19: "call_120"
+20: "call_180"
+21: "call_30"
+22: "call_60"
+23: "fd_num"
+24: "cust_a_intent_num"
+25: "cust_general_taxpayer_num"
+26: "cust_promote_num"
+27: "cust_dz_num"
+28: "cust_dz_amount"
+29: "cust_num"
+30: "cust_amount"
+31: "cust_fdz_num"
+32: "cust_fdz_amount"
+33: "cust_change_num"
+34: "cust_small_taxpayer_num"
+35: "cust_new_num"
+36: "first_sign_period"
+37: "refund_amount"
+38: "refund_num"
+39: "supervisor_name"
+40: "supervisor_no"
+41: "staff_name"
+42: "staff_no"
+43: "mobile_phone"
+44: "email"
+45: "id"
+
+        outputHeaders.stream().forEach(item->{
+            System.out.println("================"+item);
+        });
+
+
+            private List<String> convertOutputHeaders(List<String> headers, Integer tagSysId) {
+                List<String> outputHeaders = new ArrayList<>();
+                headers.forEach(item -> {
+                    String headerItem = (String) cacheDataDao.getMap(TagSystemEnum.tagSystemMap.get(tagSysId).getTagNameCacheKey()).get(item);
+                    if (StringUtils.isBlank(headerItem)) {
+                        headerItem = (String) cacheDataDao.getMap(TagSystemEnum.tagSystemMap.get(tagSysId).getIdenCacheKey()).get(item);
+                    }
+                    outputHeaders.add(StringUtils.isBlank(headerItem) ? item : headerItem);
+                });
+                int headFieldCount = outputHeaders.size();
+                ArrayList<String> headList = new ArrayList<>(headFieldCount);
+                for (int i = headFieldCount-1; i >=0; i--) {
+                     headList.add(outputHeaders.get(i));
+                }
+                return headList;
+            }
+                    int headFieldCount = outputHeaders.size();
+                    ArrayList<String> headList = new ArrayList<>(headFieldCount);
+                    for (int i = headFieldCount-1; i >=0; i--) {
+                         headList.add(outputHeaders.get(i));
+                    }
+
+public void download(@RequestBody TagFilterVO tagFilterVO, HttpServletResponse response) throws IOException {
+        List<String> headers = tagFilterVO.getHeaders();
+        int headFieldCount = headers.size();
+        ArrayList<String> headList = new ArrayList<>(headFieldCount);
+        // 反转传过来的 表头字段顺序
+        for (int i = headFieldCount-1; i >=0; i--) {
+            headList.add(headers.get(i));
+        }
+//        Collections.reverse(headers);
+        List<String> outputHeaders = convertOutputHeaders(headList, tagFilterVO.getTagFilter().getTagSystemId());
+        XSSFWorkbook workbook = ExcelUtil.writeExcel(outputHeaders.toArray(new String[]{}), headList.toArray(new String[]{}),
+                tagFilterService.exportUserGroup(tagFilterVO, headList));
+        String fileName = "tag" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        workbook.write(response.getOutputStream());
+        response.flushBuffer();
+    }
+
+
+//        int headFieldCount = headers.size();
+//        ArrayList<String> headList = new ArrayList<>(headFieldCount);
+//        // 反转传过来的 表头字段顺序
+//        for (int i = headFieldCount-1; i >=0; i--) {
+//            headList.add(headers.get(i));
+//        }
 
 
 
@@ -111,4 +522,29 @@ select * from sys_dept;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public void download(@RequestBody TagFilterVO tagFilterVO, HttpServletResponse response) throws IOException {
+        List<String> headers = tagFilterVO.getHeaders();
+        Collections.reverse(headers);
+        List<String> outputHeaders = convertOutputHeaders(headers, tagFilterVO.getTagFilter().getTagSystemId());
+        XSSFWorkbook workbook = ExcelUtil.writeExcel(outputHeaders.toArray(new String[]{}), headers.toArray(new String[]{}),
+                tagFilterService.exportUserGroup(tagFilterVO, headers));
+        String fileName = "tag" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        workbook.write(response.getOutputStream());
+        response.flushBuffer();
+    }
 
