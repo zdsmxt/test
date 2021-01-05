@@ -3,10 +3,16 @@
 
 优先级
 
-先用户画像的需求涉及的地方写代码
+先做用户画像的需求涉及的地方写代码
+    1.<后端实现 数值的逆序排序完成 字符的排序如果是数值的字符串比如开头是6123 5436逆序>
+      标签筛选模块 筛选项排序，数字、占比、日期yyyymm类标签值在筛选项中要排序，从大到小倒序排序。
+    2.<前端实现> 单次导出不能超出30个标签 这个需要前端 传表头的时候 统计标签字段值是否超出30个
+      <如果后端实现 实现难度 由于后端 对应三类用户 而且 各类用户在后端都算作 一个用户 由于每一类用户的字段标识个数不一样
+      所以这里需要 如果做 需要找到最大个数的那类用户 然后根据获取的前端传入的表头字段的个数List<String> 来减去max(user.size)>
 
-    1、标签筛选模块 筛选项排序，数字、占比、日期yyyymm类标签值在筛选项中要排序，从大到小倒序排序。
-
+    3.<已完成>在已选标签中新增查询标签，标签列按选中顺序往后追加新的列字段。
+    4.重点关注企业标签 这里面的 合作机构所在城市 如果筛选运算符是=的时候 虽然是 之前系统已存在的城市 但是 并没有数据 但是 换成包含就可以有数据
+    是由于数据端存在es里面的数据 使用的方法不对 是否分词
 
 
      获取的
@@ -517,25 +523,6 @@ public void download(@RequestBody TagFilterVO tagFilterVO, HttpServletResponse r
 //        }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public void download(@RequestBody TagFilterVO tagFilterVO, HttpServletResponse response) throws IOException {
         List<String> headers = tagFilterVO.getHeaders();
         Collections.reverse(headers);
@@ -548,3 +535,32 @@ public void download(@RequestBody TagFilterVO tagFilterVO, HttpServletResponse r
         response.flushBuffer();
     }
 
+
+
+    @Override
+    public List<EntityVO> getAllEntity(EntityVO entityVO) {
+        // 这里需要处理 每一实体所拥有的标签数量 从标签表统计获得
+        List<EntityDO> entityDos = entityMapper.queryEntityList(entityVO);
+        List<EntityVO> entityVos = BeanUtil.copyList(entityDos, EntityVO.class);
+        // 这里根据实体的id 查询标签表里面 标签所属的实体id 是这个的实体所有标签统计数量
+        // 可能产生的问题 如果 实体比较多 会给数据库带来的查询压力
+        for (EntityVO vo : entityVos) {
+            vo.setTagNumber(tagMapper.countEntityTags(vo.getId()));
+            vo.setDwTableText(dbMetadataMapper.select(DbMetadataDO.builder().tableName(vo.getDwTable()).build())
+                    .get(ConstantEnum.NO).getTableComment());
+        }
+        return entityVos;
+    }
+
+          return entityVos.stream().forEach(item -> {
+                item.setTagNumber(tagMapper.countEntityTags(item.getId()));
+                item.setDwTableText(dbMetadataMapper.select(DbMetadataDO.builder().tableName(item.getDwTable()).build())
+                        .get(ConstantEnum.NO).getTableComment());
+            });
+
+                    TagDeptDO tagDeptDO = new TagDeptDO(null, tagDO.getAuthority(), tagDO.getId(), currentTime, userName, currentTime, userName, ConstantEnum.NO, sysId);
+            //        tagDeptMapper.insertUseGeneratedKeys(tagDeptDO);
+
+            神策
+            易观方舟
+            databack
