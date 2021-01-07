@@ -1,0 +1,83 @@
+
+百分比
+全年净利率
+
+枚举数值
+最近12个月有收入的月份数
+
+日期时间 yyyy-mm-dd
+成立日期
+
+日期时间 yyyy-MM-dd HH:mm:ss
+合作机构成立日期
+
+日期时间 yyyy-MM-
+建账日期
+
+枚举值
+所属行业
+
+        for (HashMap map : queryOutCome) {
+            for (Object o : map.keySet()) {
+                TagDO tagDO = tagMapper.selectByPrimaryKey(tagIdsFieldsMap.get(o));
+                System.out.println("-----》" + tagDO);
+                if(tagDO!=null){
+                    Boolean isDateToMonth = DateFormatEnum.DATE_TO_MONTH.equals(tagDO.getDateFormat());
+                    if (dateTypeTagFields.contains(o) && isDateToMonth) {
+                        // 如果获取的时间类型标签到月 这里需要截取到月份
+                        System.out.println("到月份的标签" + tagMapper.selectByPrimaryKey(tagIdsFieldsMap.get(o)));
+                        System.out.println("=================到月份");
+                        map.put(o, map.get(o).toString().substring(0, DATE_TO_MONTH));
+                    }
+                    if (dateTypeTagFields.contains(o) && !isDateToMonth) {
+                        // 如果是标签值是时间类型 去掉时分秒
+                        System.out.println("=================到天");
+                        map.put(o, map.get(o).toString().substring(0, DATE_TO_DAY));
+                    }
+                }
+
+                // 如果是标签值类型是百分比 直接对取的值拼%
+                if (percentageTypeTagFields.contains(o)) {
+                    System.out.println("百分比的数据" + map.get(o));
+                    map.put(o, map.get(o).toString() + PERCENT);
+                }
+
+            }
+        }
+
+
+                    if (dateTypeTagFields.contains(o) && isDateToMonth) {
+                        // 如果获取的时间类型标签到月 这里需要截取到月份
+                        System.out.println("到月份的标签" + tagMapper.selectByPrimaryKey(tagIdsFieldsMap.get(o)));
+                        System.out.println("=================到月份");
+                        map.put(o, map.get(o).toString().substring(0, DATE_TO_MONTH));
+                    }
+                    if (dateTypeTagFields.contains(o) && !isDateToMonth) {
+                        // 如果是标签值是时间类型 去掉时分秒
+                        System.out.println("=================到天");
+                        map.put(o, map.get(o).toString().substring(0, DATE_TO_DAY));
+                    }
+
+
+                    if (isDateToDay || isDateToSecond) {
+
+                                        }
+
+
+
+
+
+
+
+晋哥的需求
+      画像平台的权限系统是否可以 跨系统使用
+      萧哥的回应 对应的系统模块是可以服用的 比如权限表 用户表
+
+所有数据平台一键登录
+
+
+业务变复杂的演变
+      比如有一个标签筛选是
+
+
+

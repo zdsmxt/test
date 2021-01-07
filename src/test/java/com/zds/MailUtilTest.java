@@ -44,9 +44,9 @@ public class MailUtilTest {
     @Before
     public void before() {
         // 配置，一次即可
-        MailUtil.config(SMTP_QQ(false), "zhudongsheng@kungeek.com", "Zds626zds");
+        MailUtil.config(SMTP_QQ(false), "zhudongsheng@kungeek.com", "*********");
         // 如果是企业邮箱则使用下面配置
-        MailUtil.config(SMTP_ENT_QQ(false), "zhudongsheng@kungeek.com", "Zds626zds");
+        MailUtil.config(SMTP_ENT_QQ(false), "zhudongsheng@kungeek.com", "*********");
     }
 
 
