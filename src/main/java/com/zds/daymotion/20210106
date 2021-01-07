@@ -1,0 +1,11 @@
+
+
+
+UPDATE tag_sys
+SET tag_value_type = 2
+WHERE
+	field IN (
+		'industry',
+		'latest_change_name',
+		'agency_city'
+	);
