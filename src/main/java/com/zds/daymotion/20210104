@@ -1,0 +1,174 @@
+
+
+
+
+
+
+    private static final String TO_EMAIL = "2812364443@qq.com";
+    private static final String CC = "zhangyubo@kungeek.com";
+
+    public static void main(String[] args) throws PebbleException, IOException, SendMailException, MessagingException {
+        // 配置，一次即可
+        MailUtil.config(SMTP_QQ(false), "zhudongsheng@kungeek.com", "Zds626zds");
+        // 如果是企业邮箱则使用下面配置
+        MailUtil.config(SMTP_ENT_QQ(false), "zhudongsheng@kungeek.com", "Zds626zds");
+        PebbleEngine engine = new PebbleEngine.Builder().build();
+        PebbleTemplate compiledTemplate = engine.getTemplate("blood2.html");
+        Map<String, Object> context = new HashMap<String, Object>();
+        //来自血缘表的数据
+        context.put("field", "zc_zb_");
+        context.put("exceptionValue", "＜0");
+        context.put("normalValue", "≥0");
+        context.put("system", "慧到账金融业务");
+        context.put("systemMenu", "审批管理>数据查询>企业基本信息>");
+        // 关于人的集合
+        context.put("productOperation", "产品运营");
+        context.put("pName", "郑雅韵");
+        context.put("pTelephone", "15201611798");
+        context.put("pMail", "zhengyayun@kungeek.com");
+        context.put("technicalPersonnel", "技术人员");
+        context.put("tName", "侯亚乾");
+        context.put("tTelephone", "17602110876");
+        context.put("tMail", "houyaqian@kungeek.com");
+
+        Writer writer = new StringWriter();
+        compiledTemplate.evaluate(writer, context);
+        String output = writer.toString();
+        System.out.println(output);
+        // 邮件的主题如何定义 item
+        // 发件人 from
+        // 收件人 to
+        MailUtil.subject("告警邮件")
+                .from("数据中台")
+                .to(TO_EMAIL)
+                .html(output)
+                .send();
+        Assert.assertTrue(true);
+    }
+
+    Field[] fields = LineageInfluenceDO.class.getDeclaredFields();
+
+
+
+
+
+
+
+
+
+@Override
+    public Object onAlarmSendMail() throws SendMailException, MessagingException, PebbleException, IOException {
+        // 入参信号：
+        // 1.可能是慧到账里面的某模块的某个字段有异常值
+        // 2.可能是某个增量任务 跑失败了
+        MailUtil.config(SMTP_QQ(false), "zhudongsheng@kungeek.com", "Zds626zds");
+        MailUtil.config(SMTP_ENT_QQ(false), "zhudongsheng@kungeek.com", "Zds626zds");
+        PebbleEngine engine = new PebbleEngine.Builder().build();
+        // 不同邮件模板的里面的不同参数如何设置 邮件模板配置表mail_template_config
+        // 与对应告警信息的映射关系 告警信号配置表 alarm_signal_config
+
+
+        // 选择哪一个邮件模板如何配置
+        PebbleTemplate compiledTemplate = engine.getTemplate("blood2.html");
+        Map<String, Object> context = new HashMap<String, Object>();
+        LineageInfluenceDO lineageInfluenceDO = lineageInfluenceMapper.selectOne(LineageInfluenceDO.builder().sourceTableName("tsp_kh_khxx").odsColumnName("zc_zb_").build());
+        //来自血缘表的数据
+
+        // 源表字段名
+        context.put("sourceColumnName", lineageInfluenceDO.getSourceColumnName());
+        context.put("field", "zc_zb_");
+        // 异常值打印
+        context.put("exceptionValue", "＜0");
+        // 取值范围
+        context.put("valueRange", lineageInfluenceDO.getValueRange());
+        context.put("normalValue", "≥0");
+        // 源业务系统名称
+        context.put("sourceSystemName", lineageInfluenceDO.getSourceSystemName());
+        context.put("system", "慧到账金融业务");
+        String systemMenu = lineageInfluenceDO.getSourceFirstLevel() + ">" +
+                lineageInfluenceDO.getSourceSecondLevel() + ">" +
+                lineageInfluenceDO.getSourceThirdLevel() + ">" +
+                lineageInfluenceDO.getSourceFourthLevel() + ">" +
+                lineageInfluenceDO.getSourceFifthLevel();
+        context.put("systemMenu", systemMenu);
+        context.put("systemMenu", "审批管理>数据查询>企业基本信息>");
+        // 关于人的集合
+//        context.put("productOperation", "产品运营");
+        // 产品运营负责人
+        context.put("pmOwner", lineageInfluenceDO.getPmOwner());
+//        context.put("pName", "郑雅韵");
+//        context.put("pTelephone", "15201611798");
+        //产品运营负责人邮箱
+        context.put("pmMail", lineageInfluenceDO.getPmEmail());
+//        context.put("pMail", "zhengyayun@kungeek.com");
+//        context.put("technicalPersonnel", "技术人员");
+//        context.put("tName", "侯亚乾");
+        // 开发人员
+        context.put("developer", lineageInfluenceDO.getDeveloper());
+        context.put("developerEmail", lineageInfluenceDO.getDeveloperEmail());
+//        context.put("tTelephone", "17602110876");
+//        context.put("tMail", "houyaqian@kungeek.com");
+        //产品设计owner
+        context.put("designer", lineageInfluenceDO.getDesigner());
+        context.put("designerEmail", lineageInfluenceDO.getDesignerEmail());
+        //源业务系统该功能的产品owner
+        context.put("sourcePm",lineageInfluenceDO.getSourcePm());
+        //源业务系统该功能的前端开发工程师(front-end)
+        context.put("sourceFe",lineageInfluenceDO.getSourceFe());
+        //源业务系统该功能的后端开发工程师(back-end)
+        context.put("sourceBe",lineageInfluenceDO.getSourceBe());
+        Writer writer = new StringWriter();
+        compiledTemplate.evaluate(writer, context);
+        String output = writer.toString();
+        System.out.println(output);
+        // 邮件的主题如何定义 item
+        // 发件人 from
+        // 收件人 to
+        MailUtil.subject("告警邮件")
+                .from("数据中台")
+                .to(TO_EMAIL)
+                .html(output)
+                .send();
+        Assert.assertTrue(true);
+
+        return null;
+    }
+
+    日期格式
+    dateFormat
+    取值样例
+    note 从备注里面取
+
+    tag_value_example
+
+
+    1: 新增标签属性:  取值样例, 日期格式等两个, 请确定字段名称
+        日期格式
+        dateFormat
+        标签值样例
+        tagValueSample
+    2: 标签值类型字典表新增: 百分比, 枚举数值, 等两项, 请确定 key值
+        5 百分比,
+        6 枚举数值
+    3: 新增日期时间类型字典(见需求文档) 请确定key值
+        1 yyyy-mm、
+        2 yyyy-mm-dd、
+        3 yyyy-mm-dd hh:mm:ss
+
+
+
+
+
+
+
+
+
+
+        原有的百分号 转为数值型
+
+        枚举数值单独排序
+
+//                return esUtil.getSampleTextValueByPhrase(index, tagField, 0, pageSize, keyword).stream().distinct().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+
+
+//                return esUtil.getAllEnumValue(index, tagField).stream().sorted(Comparator.reverseOrder());

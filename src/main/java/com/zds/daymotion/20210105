@@ -1,0 +1,508 @@
+v1.0版本优化功能需求
+
+一、标签筛选模块
+
+1、筛选项排序，数字、占比、日期yyyymm类标签值在筛选项中要排序，从大到小倒序排序。(***按照升序排序) 不用做 将原来获取的数据集合.stream.sorted()的
+
+2、枚举值类型的标签值数据要支持关键词搜索 （乾哥的es分词实现的 类似模糊匹配的 ）
+
+3、已选标签，筛选条件项默认为选中显示状态；可选列增加限制最多可选30个标签项，
+当选择项超过30个时，提示"最多可选30项"，同时不进行ES标签查询，当选择项小于等于30个时，进行查询和列数据展示。
+
+4、导出标签，导出标签上限为30个标签，当超出30个时，系统提示“最多可导出30个标签”，且不能再点击选择标签。(前端基于选择的标签个数进行计算if(tagNumber>30){sout(最多可导出30个标签)})
+
+5、已选标签优化：3）在已选标签中新增查询标签，标签列按选中顺序往后追加新的列字段。(已完成)
+
+7、建议企业相关标识信息放在最前列，标签列依次往后排（已完成 现在是基于传入的标签 进行逆序查询es 获取的查询结果）
+
+8、字符型标签搜索关键字不生效（这个是es 的分词决定 和由于重复的值大于等于20 导致）
+
+三、标签数据格式规范化
+
+1、企业所在省份，数据中包含城市，如搜索重庆关键字，匹配重庆、重庆市两个选项，要将省份中包含重复直辖市这类异常数据做清洗；（沈程来清洗数据）
+2、新增标签值类型“百分比“ （现在前端是传入具体的百分号前面的数值  原来存在es 里面的数据 也要改一下数据类型 由原来的字符型'20%' 改为数值类型）
+3、新增标签值类型“枚举数值” 以下4个标签的标签值类型更新为“枚举数值”，筛选项显示正序排序，从小到大。
+
+
+
+
+
+
+自测案例如何准备
+
+
+
+
+
+
+
+
+报错：由于获取数据 本地电脑 性能一般导致连接超时 反映在客服端的是 其他错误
+
+
+
+
+
+
+
+es 健康检查的关闭
+
+String[] headers;
+        if (CollectionUtils.isEmpty(tagFilterVO.getHeaders())) {
+            headers = tagFilterVO.getTagFilterItems()
+                    .stream()
+                    .map(TagFilterItemDO::getTagField)
+                    .distinct()
+                    .collect(Collectors.toList())
+                    .toArray(new String[]{});
+        } else {
+            headers = tagFilterVO.getHeaders().toArray(new String[]{});
+        }
+# 修改 以下标签字段 的标签值类型 为百分比类型
+
+update tag_sys set tag_value_type = 5 where field in(year_net_profit_rate,year_gross_profit_rate,
+now_q_net_profit_rate,now_q_gross_profit_rate,reduction_year_gross_profit_rate,lately_y_affinity,
+lately_3m_affinity,lately_6m_affinity,now_m_add_income_rate,now_vanish_rate,sy_now_add_pay_rate,
+sy_now_vanish_pay_rate,sy_lately_12m_affinity,sy_lately_3m_affinity,sy_lately_6m_affinity,
+now_m_income_tb_term_incr,lately_3m_income_tb,lately_3m_income_hb,now_m_income_tb_incr,
+now_m_income_hb_incr,lately_1y_income_continuous_rate_q,lately_1y_income_continuous_rate_m,
+lately_6m_income_continuous_rate,now_m_staff_count_hb,now_m_salary_yf_hb,now_m_pay_hb,
+jzby_hk_tb_incr,lately_3m_hk_tb,lately_3m_hk_hb,now_m_hk_tb_incr,now_m_hk_hb_incr,
+lately_y_hk_continuous_rate_q,lately_y_hk_continuous_rate_m,lately_6m_hk_continuous_rate);
+
+# 修改 以下标签字段 的标签值类型 为百分比类型
+UPDATE tag_sys
+SET tag_value_type = 5
+WHERE
+	field IN (
+		year_net_profit_rate,
+		year_gross_profit_rate,
+		now_q_net_profit_rate,
+		now_q_gross_profit_rate,
+		reduction_year_gross_profit_rate,
+		lately_y_affinity,
+		lately_3m_affinity,
+		lately_6m_affinity,
+		now_m_add_income_rate,
+		now_vanish_rate,
+		sy_now_add_pay_rate,
+		sy_now_vanish_pay_rate,
+		sy_lately_12m_affinity,
+		sy_lately_3m_affinity,
+		sy_lately_6m_affinity,
+		now_m_income_tb_term_incr,
+		lately_3m_income_tb,
+		lately_3m_income_hb,
+		now_m_income_tb_incr,
+		now_m_income_hb_incr,
+		lately_1y_income_continuous_rate_q,
+		lately_1y_income_continuous_rate_m,
+		lately_6m_income_continuous_rate,
+		now_m_staff_count_hb,
+		now_m_salary_yf_hb,
+		now_m_pay_hb,
+		jzby_hk_tb_incr,
+		lately_3m_hk_tb,
+		lately_3m_hk_hb,
+		now_m_hk_tb_incr,
+		now_m_hk_hb_incr,
+		lately_y_hk_continuous_rate_q,
+		lately_y_hk_continuous_rate_m,
+		lately_6m_hk_continuous_rate
+	);
+
+	update tag_sys set tag_value_type =3 where field = 'year_net_profit_rate';
+
+    select * from tag_sys where field IN (
+    		'year_net_profit_rate',
+    		'year_gross_profit_rate',
+    		'now_q_net_profit_rate',
+    		'now_q_gross_profit_rate',
+    		'reduction_year_gross_profit_rate',
+    		'lately_y_affinity',
+    		'lately_3m_affinity',
+    		'lately_6m_affinity',
+    		'now_m_add_income_rate',
+    		'now_vanish_rate',
+    		'sy_now_add_pay_rate',
+    		'sy_now_vanish_pay_rate',
+    		'sy_lately_12m_affinity',
+    		'sy_lately_3m_affinity',
+    		'sy_lately_6m_affinity',
+    		'now_m_income_tb_term_incr',
+    		'lately_3m_income_tb',
+    		'lately_3m_income_hb',
+    		'now_m_income_tb_incr',
+    		'now_m_income_hb_incr',
+    		'lately_1y_income_continuous_rate_q',
+    		'lately_1y_income_continuous_rate_m',
+    		'lately_6m_income_continuous_rate',
+    		'now_m_staff_count_hb',
+    		'now_m_salary_yf_hb',
+    		'now_m_pay_hb',
+    		'jzby_hk_tb_incr',
+    		'lately_3m_hk_tb',
+    		'lately_3m_hk_hb',
+    		'now_m_hk_tb_incr',
+    		'now_m_hk_hb_incr',
+    		'lately_y_hk_continuous_rate_q',
+    		'lately_y_hk_continuous_rate_m',
+    		'lately_6m_hk_continuous_rate'
+    	);
+
+
+# 修改 以下标签字段 的标签值类型 为百分比类型
+UPDATE tag_sys
+SET tag_value_type = 5
+WHERE
+	field IN (
+		'year_net_profit_rate',
+		'year_gross_profit_rate',
+		'now_q_net_profit_rate',
+		'now_q_gross_profit_rate',
+		'reduction_year_gross_profit_rate',
+		'lately_y_affinity',
+		'lately_3m_affinity',
+		'lately_6m_affinity',
+		'now_m_add_income_rate',
+		'now_vanish_rate',
+		'sy_now_add_pay_rate',
+		'sy_now_vanish_pay_rate',
+		'sy_lately_12m_affinity',
+		'sy_lately_3m_affinity',
+		'sy_lately_6m_affinity',
+		'now_m_income_tb_term_incr',
+		'lately_3m_income_tb',
+		'lately_3m_income_hb',
+		'now_m_income_tb_incr',
+		'now_m_income_hb_incr',
+		'lately_1y_income_continuous_rate_q',
+		'lately_1y_income_continuous_rate_m',
+		'lately_6m_income_continuous_rate',
+		'now_m_staff_count_hb',
+		'now_m_salary_yf_hb',
+		'now_m_pay_hb',
+		'jzby_hk_tb_incr',
+		'lately_3m_hk_tb',
+		'lately_3m_hk_hb',
+		'now_m_hk_tb_incr',
+		'now_m_hk_hb_incr',
+		'lately_y_hk_continuous_rate_q',
+		'lately_y_hk_continuous_rate_m',
+		'lately_6m_hk_continuous_rate'
+	);
+
+# 修改 以下标签字段 的标签值类型 为枚举数值类型
+UPDATE tag_sys
+SET tag_value_type = 6
+WHERE
+	field IN (
+		'lately_1y_have_income_count',
+		'lately_6m_have_income_count',
+		'app_preference_time',
+		'fwh_preference_time'
+	);
+
+# 对为时间类型的标签 根据需求设置时间格式
+UPDATE tag_sys
+SET date_format = 2
+WHERE
+	field IN (
+		'established_date',
+		'check_date',
+		'term_start',
+		'term_end',
+		'latest_abnormal_time',
+		'entry_date',
+		'leave_date'
+	);
+
+UPDATE tag_sys
+SET date_format = 3
+WHERE
+	field IN (
+		'agency_join_date',
+		'app_first_time',
+		'minigram_first_time',
+		'fwh_first_time'
+	);
+
+# 修改之前的到月份的四个标签改为原来到的时间数据类型和设置时间格式为yyyy-mm
+UPDATE tag_sys
+SET date_format = 1,
+ tag_value_type = 3
+WHERE
+	field IN (
+		'jzrq',
+		'fwqx_z',
+		'rencent_kj_qj',
+		'tj_month'
+	);
+
+ // 获取当前这些标签所属的体系id 获取这个体系所属的用户实体 (确定 in 那张用户表) 企业主用户
+            Integer tagSystemId = tagFilterVO.getTagFilter().getTagSystemId();
+            if (tagSystemId.equals(TagSystemEnum.USER_TAG_SYSTEM.getId())) {
+                Map<String, EuInfoDO> userMap = euInfoMapper.selectByIds(ids)
+                        .stream()
+                        // 这里是吧这个用户端id作为键 值为用户实体对象
+                        .collect(Collectors.toMap(EuInfoDO::getEuId, item -> item));
+                tagFilterDatas.forEach(item -> resolveEu(item, userFields, userMap));
+                exportData.addAll(tagFilterDatas);
+            }
+
+ List<Map> tagFilterDatas = esUtil.scrollQuery(index, orderedGroupOrderedItemList, Map.class, 1000, headers, maxSize);
+        List<Map> exportData = new ArrayList<>();
+        // 获取es 里面返回的所有用户id
+  ****      List<String> ids = tagFilterDatas.stream().map(item -> item.get("id").toString()).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(ids)) {
+            return exportData;
+        }
+
+
+    default List<CustInfoDO> selectByIds(List<String> ids) {
+        if (ids.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        Example example = new Example(CustInfoDO.class);
+        example.and().andIn("qyzUserId", ids);
+        return this.selectByExample(example);
+    }
+        Map<String, CustInfoDO> custMap = custInfoMapper.selectByIds(ids)
+                                .stream()
+                                .collect(Collectors.toMap(CustInfoDO::getCustId, item -> item));
+                                集合转map
+
+
+    Object delSingleTagFilterItem(Integer tagFilterItemId);
+
+    @Override
+    public Object delSingleTagFilterItem(Integer tagFilterItemId) {
+        TagFilterItemDO tagFilterItemDO = new TagFilterItemDO();
+        tagFilterItemDO.setId(tagFilterItemId);
+        tagFilterItemDO.setDelFlag(ConstantEnum.YES);
+        return tagFilterItemMapper.updateByPrimaryKeySelective(tagFilterItemDO);
+    }
+
+=================================================================================================================
+    TAG_VALUE_TYPE_CONTINUOUS_VALUE(1, "连续型数值"),
+    TAG_VALUE_TYPE_ENUM(2, "枚举值"),
+    TAG_VALUE_TYPE_CHAR(3, "字符型"),
+    TAG_VALUE_TYPE_DATE(4, "日期时间"),
+    TAG_VALUE_TYPE_PERCENTAGE(5, "百分比"),
+    TAG_VALUE_TYPE_enum_value(6, "枚举数值");
+=================================================================================================================
+
+原本的时间处理 标签时间类型 格式 都按yyyymmdd
+     前端传的到天 后端拼时分秒 +hhmmss
+
+
+     现在原本的四个按字符处理的标签 现在也改为时间但是格式 是到月yyyymm
+
+     结合时间类型和时间格式 来确定传给的时间是否拼
+
+
+
+
+原本的百分比处理 标签字符类型 格式 存在es的数据35% 带有百分号的字符串
+     前端传的包含百分号 后端直接按tagValueType = 3 字符处理(需要数据开发人员修改为枚举数值 而且需要具体标签下的值 为数 没有百分号)
+
+
+
+
+
+
+flume hive
+UPDATE tag_sys
+SET tag_value_type = 2
+WHERE
+	field IN ('industry', 'latest_change_name', 'agency_city');
+
+SELECT
+	*
+FROM
+	tag_sys
+WHERE
+	field IN (
+		'industry',
+		'latest_change_name',
+		'agency_city'
+	);
+
+update
+	tag_sys
+set tag_value_type = 4
+WHERE
+	field IN (
+		'jzrq',
+		'fwqx_z',
+		'rencent_kj_qj',
+		'tj_month'
+	);
+
+
+如何在本地查看es 数据
+
+System.out.println("标签字段"+tagField+"===>industry");
+
+                if (isBetween(item)) {
+                    item.setFilterValue(resolveBetweenDate(item,dateFormat));
+                }
+  // 获取时间的区间值 操作符号为区间
+            if (isBetween(item)) {
+                item.setFilterValue(resolveBetweenDate(item,dateFormat));
+            }
+
+
+
+
+
+
+private String[] handleTagFilter(TagFilterVO tagFilterVO, List<List<TagFilterItemDO>> orderedGroupOrderedItemList) {
+        // 分离出标签细则 标签值数据类型为日期的类型 给时间类型的数据拼00:00:00 或者 23:59:59
+        // 查看标签值 是否是时间类型
+        tagFilterVO.getTagFilterItems().stream().filter(item -> esUtil.judgeIsDate(item)).forEach(item -> {
+            Integer dateFormat = tagMapper.selectByPrimaryKey(item.getTagId()).getDateFormat();
+            // 如果前端传入的日期是到月份的 这里需要拼上时分秒
+            if (dateFormat.equals(DateFormatEnum.DATE_TO_DAY.getId())) {
+                // 获取时间的区间值 操作符号为区间
+                if (isBetween(item)) {
+                    item.setFilterValue(resolveBetweenDate(item,dateFormat));
+                }
+                //操作符号为等于或者不等于或者大于等于或者小于
+                if (operatorSet.contains(item.getOperator())) {
+                    item.setFilterValue(item.getFilterValue() + DAY_BEGIN);
+                }
+                //操作符号大于或者小于等于
+                if (OperatorEnum.GT.equals(item.getOperator()) || OperatorEnum.LTE.equals(item.getOperator())) {
+                    item.setFilterValue(item.getFilterValue() + DAY_END);
+                }
+                //如果前端传入的日期是到月份的 这里需要拼上天时分秒
+            } else if (dateFormat.equals(DateFormatEnum.DATE_TO_MONTH.getId())) {
+               // 获取时间的区间值 操作符号为区间
+                if (isBetween(item)) {
+                    item.setFilterValue(resolveBetweenDate(item,dateFormat));
+                }
+                if (operatorSet.contains(item.getOperator())) {
+                    item.setFilterValue(item.getFilterValue() + DDHHMMSS);
+                }
+                if (OperatorEnum.GT.equals(item.getOperator()) || OperatorEnum.LTE.equals(item.getOperator())) {
+                    item.setFilterValue(item.getFilterValue() + DDHHMMSS);
+                }
+            }
+        });
+        // 排序每一个内层集合里面的item
+        List<TagFilterItemDO> tagFilterItems = tagFilterVO.getTagFilterItems();
+        // 分理处每一个组细则
+        Map<Integer, List<TagFilterItemDO>> groupMap = tagFilterItems.stream().collect(Collectors.groupingBy(TagFilterItemDO::getGroupOrder));
+        // 遍历出每一个组细则 的顺序排好序
+        List<Integer> sortedGroupOrders = groupMap.keySet().stream().sorted().collect(Collectors.toList());
+        // 放置有序组的集合
+        List<List<TagFilterItemDO>> groupItemList = new ArrayList<>(sortedGroupOrders.size());
+        for (Integer groupOrder : sortedGroupOrders) {
+            groupItemList.add(groupMap.get(groupOrder));
+        }
+        // 排序每一个内层集合里面的item
+        for (List<TagFilterItemDO> filterItemDOS : groupItemList) {
+            //遍历groupMap 排序里面的各个list 里面的item
+            orderedGroupOrderedItemList.add(filterItemDOS.stream().sorted(Comparator.comparing(TagFilterItemDO::getGroupInnerOrder)).collect(Collectors.toList()));
+        }
+        String[] headers;
+        if (CollectionUtils.isEmpty(tagFilterVO.getHeaders())) {
+            headers = tagFilterVO.getTagFilterItems()
+                    .stream()
+                    .map(TagFilterItemDO::getTagField)
+                    .distinct()
+                    .collect(Collectors.toList())
+                    .toArray(new String[]{});
+        } else {
+            headers = tagFilterVO.getHeaders().toArray(new String[]{});
+        }
+        return headers;
+    }
+
+
+  /**
+     * 操作符号大于或者小于等于
+     *
+     * @param item
+     * @return
+     */
+    private boolean isGtLte(TagFilterItemDO item) {
+        return OperatorEnum.GT.equals(item.getOperator()) || OperatorEnum.LTE.equals(item.getOperator());
+    }
+
+    private String resolveBetweenDate(TagFilterItemDO item, Integer dateFormat) {
+        List<String> values = Arrays.asList(item.getFilterValue().split(EsUtil.FILTER_VALUE_SPLIT_SYMBOL));
+        AssertUtil.assertTrue(values.size() == 2, String.format("范围查询条件个数不对，需2个参数，实际个数:%s", values.size()));
+        String from = null;
+        String to = null;
+        if (dateFormat.equals(DateFormatEnum.DATE_TO_MONTH.getId())) {
+            from = values.get(0) + DDHHMMSS;
+            to = values.get(1) + DDHHMMSS;
+        }
+        if (dateFormat.equals(DateFormatEnum.DATE_TO_DAY.getId())) {
+            from = values.get(0) + DAY_BEGIN;
+            to = values.get(1) + DAY_END;
+        }
+        System.out.println(from + EsUtil.FILTER_VALUE_SPLIT_SYMBOL + to+"=====888====");
+        return from + EsUtil.FILTER_VALUE_SPLIT_SYMBOL + to;
+    }
+
+private String[] handleTagFilter(TagFilterVO tagFilterVO, List<List<TagFilterItemDO>> orderedGroupOrderedItemList) {
+        // 分离出标签细则 标签值数据类型为日期的类型 给时间类型的数据拼00:00:00 或者 23:59:59
+        // 查看标签值 是否是时间类型
+        tagFilterVO.getTagFilterItems().stream().filter(item -> esUtil.judgeIsDate(item)).forEach(item -> {
+            Integer dateFormat = tagMapper.selectByPrimaryKey(item.getTagId()).getDateFormat();
+            // 如果前端传入的日期是到月份的 这里需要拼上时分秒
+            // 获取时间的区间值 操作符号为区间
+            if (OperatorEnum.BETWEEN.equals(item.getOperator())) {
+                item.setFilterValue(resolveBetweenDate(item, dateFormat));
+            }
+            if (dateFormat.equals(DateFormatEnum.DATE_TO_DAY.getId())) {
+                //操作符号为等于或者不等于或者大于等于或者小于
+                if (operatorSet.contains(item.getOperator())) {
+                    item.setFilterValue(item.getFilterValue() + DAY_BEGIN);
+                }
+                //操作符号大于或者小于等于
+                if (isGtLte(item)) {
+                    item.setFilterValue(item.getFilterValue() + DAY_END);
+                }
+                //如果前端传入的日期是到月份的 这里需要拼上天时分秒
+            } else if (dateFormat.equals(DateFormatEnum.DATE_TO_MONTH.getId())) {
+                if (operatorSet.contains(item.getOperator())) {
+                    item.setFilterValue(item.getFilterValue() + DDHHMMSS);
+                }
+                if (isGtLte(item)) {
+                    item.setFilterValue(item.getFilterValue() + DDHHMMSS);
+                }
+            }
+        });
+        // 排序每一个内层集合里面的item
+        List<TagFilterItemDO> tagFilterItems = tagFilterVO.getTagFilterItems();
+        // 分理处每一个组细则
+        Map<Integer, List<TagFilterItemDO>> groupMap = tagFilterItems.stream().collect(Collectors.groupingBy(TagFilterItemDO::getGroupOrder));
+        // 遍历出每一个组细则 的顺序排好序
+        List<Integer> sortedGroupOrders = groupMap.keySet().stream().sorted().collect(Collectors.toList());
+        // 放置有序组的集合
+        List<List<TagFilterItemDO>> groupItemList = new ArrayList<>(sortedGroupOrders.size());
+        for (Integer groupOrder : sortedGroupOrders) {
+            groupItemList.add(groupMap.get(groupOrder));
+        }
+        // 排序每一个内层集合里面的item
+        for (List<TagFilterItemDO> filterItemDOS : groupItemList) {
+            //遍历groupMap 排序里面的各个list 里面的item
+            orderedGroupOrderedItemList.add(filterItemDOS.stream().sorted(Comparator.comparing(TagFilterItemDO::getGroupInnerOrder)).collect(Collectors.toList()));
+        }
+        String[] headers;
+        if (CollectionUtils.isEmpty(tagFilterVO.getHeaders())) {
+            headers = tagFilterVO.getTagFilterItems()
+                    .stream()
+                    .map(TagFilterItemDO::getTagField)
+                    .distinct()
+                    .collect(Collectors.toList())
+                    .toArray(new String[]{});
+        } else {
+            headers = tagFilterVO.getHeaders().toArray(new String[]{});
+        }
+        return headers;
+    }

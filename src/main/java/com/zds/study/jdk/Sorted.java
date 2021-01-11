@@ -32,10 +32,28 @@ public class Sorted {
         mlist.add("202009");
         mlist.add("202003");
         mlist.add("202004");
-        mlist.stream().sorted().forEach(item->{
+//        mlist.stream().sorted().forEach(item->{
+//            System.out.println(item);
+//        });
+
+
+        ArrayList<Integer> arrayList = new ArrayList<>();
+        arrayList.add(0);
+        arrayList.add(1);
+        arrayList.add(10);
+        arrayList.add(11);
+        arrayList.add(12);
+        arrayList.add(2);
+        arrayList.add(3);
+        arrayList.add(4);
+        arrayList.add(5);
+        arrayList.add(6);
+        arrayList.add(7);
+        arrayList.add(8);
+        arrayList.add(9);
+        arrayList.stream().sorted().forEach(item->{
             System.out.println(item);
         });
-
     }
 
 }

@@ -1,0 +1,127 @@
+
+
+select * from tag_sys where tag_value_type = 3
+
+
+5	reg_no	企业注册号
+
+16	regist_capi	注册资本
+
+18	org_no	组织机构代码
+
+20	credit_no	统一社会信用代码
+
+48	recent_fc_no	最近一次财税顾问联系人工号
+
+50	recent_sell_no	最近一次销售联系人工号
+
+255	supervisor_no	上级主管工号
+
+258	staff_no	工号
+
+8 个单个字符或者数字组成的字符串
+
+
+
+标签筛选枚举值的 涉及字符类型tagValueType = 3 的标签  es 里面的模糊匹配
+1.有的可以匹配 是汉字或者英文单词的字符串组
+  但是也有匹配不全的情况 如“登记机关”筛选内容不全。举例，输入“京” 匹配不全
+2.有的不可以匹配  是多个字母 或者数字组成的字符串组 分词器 没法对单个字母或数字分词
+
+
+ "registrar": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        },
+        "analyzer": "ik_smart"
+      }
+
+
+    System.out.println("开始时间：" + from + "截止时间：" + to);
+
+    hsz_crm 线上环境
+    hsz_crm_dev 测试环境
+
+
+GET eu_active_info/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"range": {
+          "app_first_time": {
+            "gte": "2020-12-01 00:00:00",
+            "lte": "2021-12-01 23:59:59"
+          }
+        }}
+      ]
+    }
+  }
+}
+
+
+
+GET eu_active_info/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {
+          "app_first_time": "2021-01-07 00:00:00"
+        }}
+      ]
+    }
+  }
+}
+
+app_first_time
+GET cust_tag/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {
+          "established_date": "2017-10-27 00:00:00"
+        }}
+      ]
+    }
+  }
+}
+
+GET eu_active_info/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"range": {
+          "app_first_time": {
+            "gte": "2020-06-10 00:00:00",
+            "lte": "2020-06-10 23:59:59"
+          }
+        }}
+      ]
+    }
+  }
+}
+
+
+//        add(OperatorEnum.NE);
+
+
+
+数据问题的总结
+
+1. 建账距今时长为什么小于0 （业务原因）未来要迁帐的 这里先把代账合同提前签了 所以日期是未来的
+2. 账期长度为什么小于0 （业务原因）
+3. 关于标签值 为 时间数据格式的总结
+   目前ES 里面灌的数据按照格式来展开 总的是都到秒
+   （1）如果是到月的格式
+   （2）如果是到天的格式
+   （3）如果是到秒的格式
+
+4.关于传入的时间三种格式的if else 分支的优化
+
+
