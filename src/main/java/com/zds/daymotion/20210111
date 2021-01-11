@@ -60,4 +60,11 @@ git 使用细节记录
 但是prd 出现了 这样的问题
 根据报错信息是类对象转换异常cast into 于是我把这个出问题的对象
 
+       String fifthLevel = lineageInfluenceDO.getSourceFifthLevel();
+        String systemMenu = lineageInfluenceDO.getSourceFirstLevel() + ">" +
+                secondLevel != null ? secondLevel : "" + ">" +
+//                lineageInfluenceDO.getSourceThirdLevel() + ">" +
+//                lineageInfluenceDO.getSourceFourthLevel() + ">" +
+//                lineageInfluenceDO.getSourceFifthLevel();
+        context.put("systemMenu", systemMenu);
 
