@@ -35,6 +35,29 @@
   }
 
 
+git 使用细节记录
+   git branch 查看本地分支
+   D:\daylog>git branch
+     202101
+   * master
+     new1test
+     test1
+     test2
+   在 master上
+   切换分支
+   git checkout test2
+   查看本地分支
+   git branch
+    * 202101
+      master
+      new1test
+      test1
+      test2
 
+奇奇怪的现象
+
+发布到uat 环境没有报 对象 转为comparator
+但是prd 出现了 这样的问题
+根据报错信息是类对象转换异常cast into 于是我把这个出问题的对象
 
 
