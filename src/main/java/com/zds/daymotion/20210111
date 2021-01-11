@@ -7,6 +7,33 @@
 
   如何定位字段对应的数据是否满足 业务的要求
 
+  package com.data.web.backend.domains.vo;
+
+  import lombok.AllArgsConstructor;
+  import lombok.Builder;
+  import lombok.Data;
+  import lombok.NoArgsConstructor;
+
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Builder
+  public class TagSpreadRatioVO implements Comparable{
+
+      private String name;
+
+      private String ratio;
+
+      private Long count;
+
+      private Integer tagType;
+
+      @Override
+      public int compareTo(Object o) {
+          return 0;
+      }
+  }
+
 
 
 
