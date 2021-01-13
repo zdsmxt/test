@@ -1,0 +1,98 @@
+Java 集合类中的 Set.contains() 方法判断 Set 集合是否包含指定的对象。
+该方法返回值为 boolean 类型，如果 Set 集合包含指定的对象，则返回 true，否则返回 false。
+
+再次梳理逻辑
+
+    hxd血缘关系涉及的字段 来自的具体字段 具体负责人 （业务和技术）
+
+
+ private String[] handleTagFilter(TagFilterVO tagFilterVO, List<List<TagFilterItemDO>> orderedGroupOrderedItemList) {
+        // 分离出标签细则 标签值数据类型为日期的类型 给时间类型的数据拼00:00:00 或者 23:59:59
+        // 查看标签值 是否是时间类型
+        tagFilterVO.getTagFilterItems().stream().filter(item -> esUtil.judgeIsDate(item)).forEach(item -> {
+            // 获取时间的区间值 操作符号为区间
+            if (OperatorEnum.BETWEEN.equals(item.getOperator())) {
+                List<String> values = Arrays.asList(item.getFilterValue().split(EsUtil.FILTER_VALUE_SPLIT_SYMBOL));
+                AssertUtil.assertTrue(values.size() == 2, String.format("范围查询条件个数不对，需2个参数，实际个数:%s", values.size()));
+                String from = values.get(0) + DAY_BEGIN;
+                String to = values.get(1) + DAY_END;
+                String filterValue = from + EsUtil.FILTER_VALUE_SPLIT_SYMBOL + to;
+                item.setFilterValue(filterValue);
+            }
+            //操作符号为等于或者不等于或者大于等于或者小于
+            Set<String> operatorSet = new HashSet<>();
+            operatorSet.add(OperatorEnum.NEQ);
+            operatorSet.add(OperatorEnum.NE);
+            operatorSet.add(OperatorEnum.GTE);
+            operatorSet.add(OperatorEnum.LT);
+            if (OperatorEnum.NEQ.equals(item.getOperator())
+                    || OperatorEnum.NE.equals(item.getOperator())
+                    || OperatorEnum.GTE.equals(item.getOperator())
+                    || OperatorEnum.LT.equals(item.getOperator())) {
+                item.setFilterValue(item.getFilterValue() + DAY_BEGIN);
+            }
+            //操作符号大于或者小于等于
+            if (OperatorEnum.GT.equals(item.getOperator()) || OperatorEnum.LTE.equals(item.getOperator())) {
+                item.setFilterValue(item.getFilterValue() + DAY_END);
+            }
+        });
+        // 排序每一个内层集合里面的item
+        List<TagFilterItemDO> tagFilterItems = tagFilterVO.getTagFilterItems();
+        // 分理处每一个组细则
+        Map<Integer, List<TagFilterItemDO>> groupMap = tagFilterItems.stream().collect(Collectors.groupingBy(TagFilterItemDO::getGroupOrder));
+        // 遍历出每一个组细则 的顺序排好序
+        List<Integer> sortedGroupOrders = groupMap.keySet().stream().sorted().collect(Collectors.toList());
+        // 放置有序组的集合
+        List<List<TagFilterItemDO>> groupItemList = new ArrayList<>(sortedGroupOrders.size());
+        for (Integer groupOrder : sortedGroupOrders) {
+            groupItemList.add(groupMap.get(groupOrder));
+        }
+        // 排序每一个内层集合里面的item
+        for (List<TagFilterItemDO> filterItemDOS : groupItemList) {
+            //遍历groupMap 排序里面的各个list 里面的item
+            orderedGroupOrderedItemList.add(filterItemDOS.stream().sorted(Comparator.comparing(TagFilterItemDO::getGroupInnerOrder)).collect(Collectors.toList()));
+        }
+        String[] headers;
+        if (CollectionUtils.isEmpty(tagFilterVO.getHeaders())) {
+            headers = tagFilterVO.getTagFilterItems()
+                    .stream()
+                    .map(TagFilterItemDO::getTagField)
+                    .distinct()
+                    .collect(Collectors.toList())
+                    .toArray(new String[]{});
+        } else {
+            headers = tagFilterVO.getHeaders().toArray(new String[]{});
+        }
+        return headers;
+    }
+
+
+    /**
+     * 操作符集合 = ≠ ≥ <
+     */
+    private static final Set<String> operatorSet = new HashSet<String>(){{
+        operatorSet.add(OperatorEnum.NEQ);
+        operatorSet.add(OperatorEnum.NE);
+        operatorSet.add(OperatorEnum.GTE);
+        operatorSet.add(OperatorEnum.LT);
+    }};
+
+
+
+    /**
+     * 操作符集合 = ≠ ≥ <
+     */
+    private static final Set<String> operatorSet = new HashSet<String>(){{
+        add(OperatorEnum.NEQ);
+        add(OperatorEnum.NE);
+        add(OperatorEnum.GTE);
+        add(OperatorEnum.LT);
+    }};
+
+
+
+
+
+
+
+

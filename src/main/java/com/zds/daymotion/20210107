@@ -1,0 +1,115 @@
+
+百分比
+全年净利率
+
+枚举数值
+最近12个月有收入的月份数
+
+日期时间 yyyy-mm-dd
+成立日期
+
+日期时间 yyyy-MM-dd HH:mm:ss
+合作机构成立日期
+
+日期时间 yyyy-MM-
+建账日期
+
+枚举值
+所属行业
+
+        for (HashMap map : queryOutCome) {
+            for (Object o : map.keySet()) {
+                TagDO tagDO = tagMapper.selectByPrimaryKey(tagIdsFieldsMap.get(o));
+                System.out.println("-----》" + tagDO);
+                if(tagDO!=null){
+                    Boolean isDateToMonth = DateFormatEnum.DATE_TO_MONTH.equals(tagDO.getDateFormat());
+                    if (dateTypeTagFields.contains(o) && isDateToMonth) {
+                        // 如果获取的时间类型标签到月 这里需要截取到月份
+                        System.out.println("到月份的标签" + tagMapper.selectByPrimaryKey(tagIdsFieldsMap.get(o)));
+                        System.out.println("=================到月份");
+                        map.put(o, map.get(o).toString().substring(0, DATE_TO_MONTH));
+                    }
+                    if (dateTypeTagFields.contains(o) && !isDateToMonth) {
+                        // 如果是标签值是时间类型 去掉时分秒
+                        System.out.println("=================到天");
+                        map.put(o, map.get(o).toString().substring(0, DATE_TO_DAY));
+                    }
+                }
+
+                // 如果是标签值类型是百分比 直接对取的值拼%
+                if (percentageTypeTagFields.contains(o)) {
+                    System.out.println("百分比的数据" + map.get(o));
+                    map.put(o, map.get(o).toString() + PERCENT);
+                }
+
+            }
+        }
+
+
+                    if (dateTypeTagFields.contains(o) && isDateToMonth) {
+                        // 如果获取的时间类型标签到月 这里需要截取到月份
+                        System.out.println("到月份的标签" + tagMapper.selectByPrimaryKey(tagIdsFieldsMap.get(o)));
+                        System.out.println("=================到月份");
+                        map.put(o, map.get(o).toString().substring(0, DATE_TO_MONTH));
+                    }
+                    if (dateTypeTagFields.contains(o) && !isDateToMonth) {
+                        // 如果是标签值是时间类型 去掉时分秒
+                        System.out.println("=================到天");
+                        map.put(o, map.get(o).toString().substring(0, DATE_TO_DAY));
+                    }
+
+
+                    if (isDateToDay || isDateToSecond) {
+
+                                        }
+
+
+
+
+
+
+
+晋哥的需求
+      画像平台的权限系统是否可以 跨系统使用
+      萧哥的回应 对应的系统模块是可以服用的 比如权限表 用户表
+
+所有数据平台一键登录
+
+
+总结今天的耽误时间的事情
+   1.由于不明白清楚 枚举数值 这个新加的类型 导致重新提pr
+   2.关于时间格式的处理 由于是拿到对应时间格式枚举的id 与 数据库存数值的id 进行equals 计算
+   3.关于es 的学习  类似navicat 连接mysql 的客服端  可以用
+
+
+
+业务变复杂的演变
+      比如有一个标签筛选是
+
+
+
+五、枚举值显示不全
+   企业类型 分词 keyword （分词匹配有问题）
+
+六、鼠标移动到枚举值的时候，有的有预览，有的没有 (有结果 没有结果 是否匹配到)
+
+七、“注册资本”标签单位不统一，是否考虑改为连续型数值 （需要数据人员规整数据）先忽略
+
+八、标签树模块查询无效，无反应与响应  （有响应  红色标注）
+
+九、建账距今时长为什么小于0 （业务原因）
+
+十、账期长度为什么小于0 （业务原因）
+
+十二、组织机构代码筛选无效 （分词匹配有问题）
+
+十三、“登记机关”筛选内容不全。举例，输入“京” （分词匹配有问题）
+
+十四、“统一社会信用代码”筛选无效 （分词匹配有问题）
+
+keyword
+
+两边如工号 标签值类型是字符 实际存的是数值 没法匹配
+
+枚举的
+
