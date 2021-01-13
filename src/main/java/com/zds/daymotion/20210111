@@ -68,3 +68,16 @@ git 使用细节记录
 //                lineageInfluenceDO.getSourceFifthLevel();
         context.put("systemMenu", systemMenu);
 
+
+加日志
+
+pv uv 到后端是否可感知
+
+采集的日志 录入的hive
+
+接口做一个切面 存到数据库
+
+多少次 点查询 点击的人是谁
+
+
+
