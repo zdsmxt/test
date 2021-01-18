@@ -1,0 +1,672 @@
+
+
+    Set<Integer> getCategoryIds(Integer tagCategoryId);
+
+
+    @Override
+    public Set<Integer> getCategoryIds(Integer tagCategoryId) {
+        TagCategoryDO tagCategoryDOTree = getTagCategoryDOTree(tagCategoryId);
+        return tagCategoryIds;
+    }
+
+    获取的所有子分类id有81
+    获取的所有子分类id有82
+    获取的所有子分类id有83
+    获取的所有子分类id有84
+    获取的所有子分类id有85
+    获取的所有子分类id有86
+    获取的所有子分类id有87
+    获取的所有子分类id有88
+    获取的所有子分类id有89
+    获取的所有子分类id有90
+    获取的所有子分类id有91
+    获取的所有子分类id有92
+    获取的所有子分类id有156
+    获取的所有子分类id有93
+    获取的所有子分类id有94
+    获取的所有子分类id有95
+    获取的所有子分类id有96
+    获取的所有子分类id有97
+    获取的所有子分类id有98
+    获取的所有子分类id有99
+    获取的所有子分类id有100
+    获取的所有子分类id有101
+    获取的所有子分类id有102
+    获取的所有子分类id有103
+    获取的所有子分类id有104
+    获取的所有子分类id有105
+    获取的所有子分类id有106
+    获取的所有子分类id有107
+    获取的所有子分类id有108
+    获取的所有子分类id有109
+    获取的所有子分类id有110
+    获取的所有子分类id有111
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   {
+   	"total": 0,
+   	"code": "00000",
+   	"data": {
+   		"id": 81,
+   		"code": null,
+   		"name": "企业经营信息",
+   		"parentId": null,
+   		"level": 1,
+   		"note": null,
+   		"createTime": null,
+   		"createUser": null,
+   		"updateTime": null,
+   		"updateUser": null,
+   		"sysId": null,
+   		"children": [{
+   			"id": 82,
+   			"code": null,
+   			"name": "往来单位情况",
+   			"parentId": null,
+   			"level": 2,
+   			"note": null,
+   			"createTime": null,
+   			"createUser": null,
+   			"updateTime": null,
+   			"updateUser": null,
+   			"sysId": null,
+   			"children": [{
+   				"id": 90,
+   				"code": null,
+   				"name": "下游往来方情况",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}, {
+   				"id": 91,
+   				"code": null,
+   				"name": "上游往来方情况",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}, {
+   				"id": 92,
+   				"code": null,
+   				"name": "上下游往来方交叉情况",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}]
+   		}, {
+   			"id": 83,
+   			"code": null,
+   			"name": "营收情况",
+   			"parentId": null,
+   			"level": 2,
+   			"note": null,
+   			"createTime": null,
+   			"createUser": null,
+   			"updateTime": null,
+   			"updateUser": null,
+   			"sysId": null,
+   			"children": [{
+   				"id": 93,
+   				"code": null,
+   				"name": "收入规模",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}, {
+   				"id": 94,
+   				"code": null,
+   				"name": "收入成长性",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}, {
+   				"id": 95,
+   				"code": null,
+   				"name": "收入连续性",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}]
+   		}, {
+   			"id": 84,
+   			"code": null,
+   			"name": "利润情况",
+   			"parentId": null,
+   			"level": 2,
+   			"note": null,
+   			"createTime": null,
+   			"createUser": null,
+   			"updateTime": null,
+   			"updateUser": null,
+   			"sysId": null,
+   			"children": []
+   		}, {
+   			"id": 85,
+   			"code": null,
+   			"name": "支出情况",
+   			"parentId": null,
+   			"level": 2,
+   			"note": null,
+   			"createTime": null,
+   			"createUser": null,
+   			"updateTime": null,
+   			"updateUser": null,
+   			"sysId": null,
+   			"children": [{
+   				"id": 96,
+   				"code": null,
+   				"name": "成本费用情况",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": [{
+   					"id": 99,
+   					"code": null,
+   					"name": "销售费用",
+   					"parentId": null,
+   					"level": 4,
+   					"note": null,
+   					"createTime": null,
+   					"createUser": null,
+   					"updateTime": null,
+   					"updateUser": null,
+   					"sysId": null,
+   					"children": []
+   				}, {
+   					"id": 100,
+   					"code": null,
+   					"name": "管理费用",
+   					"parentId": null,
+   					"level": 4,
+   					"note": null,
+   					"createTime": null,
+   					"createUser": null,
+   					"updateTime": null,
+   					"updateUser": null,
+   					"sysId": null,
+   					"children": []
+   				}, {
+   					"id": 101,
+   					"code": null,
+   					"name": "财务费用",
+   					"parentId": null,
+   					"level": 4,
+   					"note": null,
+   					"createTime": null,
+   					"createUser": null,
+   					"updateTime": null,
+   					"updateUser": null,
+   					"sysId": null,
+   					"children": []
+   				}]
+   			}, {
+   				"id": 97,
+   				"code": null,
+   				"name": "纳税情况",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}, {
+   				"id": 98,
+   				"code": null,
+   				"name": "工资情况",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}]
+   		}, {
+   			"id": 86,
+   			"code": null,
+   			"name": "票据情况",
+   			"parentId": null,
+   			"level": 2,
+   			"note": null,
+   			"createTime": null,
+   			"createUser": null,
+   			"updateTime": null,
+   			"updateUser": null,
+   			"sysId": null,
+   			"children": []
+   		}, {
+   			"id": 87,
+   			"code": null,
+   			"name": "资金流水情况",
+   			"parentId": null,
+   			"level": 2,
+   			"note": null,
+   			"createTime": null,
+   			"createUser": null,
+   			"updateTime": null,
+   			"updateUser": null,
+   			"sysId": null,
+   			"children": [{
+   				"id": 102,
+   				"code": null,
+   				"name": "银行流水",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": [{
+   					"id": 107,
+   					"code": null,
+   					"name": "公户流水信息",
+   					"parentId": null,
+   					"level": 4,
+   					"note": null,
+   					"createTime": null,
+   					"createUser": null,
+   					"updateTime": null,
+   					"updateUser": null,
+   					"sysId": null,
+   					"children": []
+   				}, {
+   					"id": 108,
+   					"code": null,
+   					"name": "私户往来信息",
+   					"parentId": null,
+   					"level": 4,
+   					"note": null,
+   					"createTime": null,
+   					"createUser": null,
+   					"updateTime": null,
+   					"updateUser": null,
+   					"sysId": null,
+   					"children": []
+   				}]
+   			}, {
+   				"id": 103,
+   				"code": null,
+   				"name": "回款规模",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}, {
+   				"id": 104,
+   				"code": null,
+   				"name": "回款成长性",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}, {
+   				"id": 105,
+   				"code": null,
+   				"name": "回款连续性",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}, {
+   				"id": 106,
+   				"code": null,
+   				"name": "现金流水",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}]
+   		}, {
+   			"id": 88,
+   			"code": null,
+   			"name": "资产负债情况",
+   			"parentId": null,
+   			"level": 2,
+   			"note": null,
+   			"createTime": null,
+   			"createUser": null,
+   			"updateTime": null,
+   			"updateUser": null,
+   			"sysId": null,
+   			"children": [{
+   				"id": 109,
+   				"code": null,
+   				"name": "资产情况",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}, {
+   				"id": 110,
+   				"code": null,
+   				"name": "负债情况",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}, {
+   				"id": 111,
+   				"code": null,
+   				"name": "所有者权益",
+   				"parentId": null,
+   				"level": 3,
+   				"note": null,
+   				"createTime": null,
+   				"createUser": null,
+   				"updateTime": null,
+   				"updateUser": null,
+   				"sysId": null,
+   				"children": []
+   			}]
+   		}, {
+   			"id": 89,
+   			"code": null,
+   			"name": "企业财务信息",
+   			"parentId": null,
+   			"level": 2,
+   			"note": null,
+   			"createTime": null,
+   			"createUser": null,
+   			"updateTime": null,
+   			"updateUser": null,
+   			"sysId": null,
+   			"children": []
+   		}, {
+   			"id": 156,
+   			"code": null,
+   			"name": "结账月份",
+   			"parentId": null,
+   			"level": 2,
+   			"note": null,
+   			"createTime": null,
+   			"createUser": null,
+   			"updateTime": null,
+   			"updateUser": null,
+   			"sysId": null,
+   			"children": []
+   		}]
+   	},
+   	"message": "success"
+   }
+
+
+
+
+
+
+    @Override
+       public List<TagDO> getCategoryAllTag(Integer tagCategoryId) {
+           TagCategoryDO tagCategoryDOTree = getTagCategoryDOTree(tagCategoryId);
+           tagCategoryIds.stream().forEach(item->{
+               System.out.println("获取的所有子分类id有"+item);
+           });
+           List tags = tagMapper.getTags(new ArrayList(tagCategoryIds));
+           return tags;
+       }
+
+       /**
+        * 读写锁，控制读写互斥
+        */
+       private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+       public TagCategoryDO getTagCategoryDOTree(int cid) {
+           readWriteLock.readLock().lock();
+           try {
+               return this.recursiveTree(cid);
+           } finally {
+               readWriteLock.readLock().unlock();
+           }
+       }
+
+       private Set<Integer> tagCategoryIds = new HashSet();
+
+       /**
+        * 从map缓存的数据中，递归生成树
+        *
+        * @param cid 指定的根节点id
+        * @return 树
+        */
+       private TagCategoryDO recursiveTree(int cid) {
+           List<TagCategoryDO> allCategory = tagCategoryMapper.selectAll();
+           tagCategoryIds.add(cid);
+           // 从所有标签分类中获取 指定键的对象
+           TagCategoryDO node = tagCategoryMapper.selectOne(TagCategoryDO.builder().id(cid).build());
+           TagCategoryDO tagCategoryTree = TagCategoryDO.builder()
+                   .id(node.getId())
+                   .name(node.getName())
+                   .level(node.getLevel())
+                   .children(new ArrayList<>())
+                   .build();
+           List<TagCategoryDO> childTreeNodes = new ArrayList<>();
+           for (TagCategoryDO item: allCategory) {
+               if (item.getParentId().equals(cid)) {
+                   // 获取传入的这个id 作为parentId 的子分类
+                   childTreeNodes.add(item);
+               }
+           }
+           //遍历所有子分类
+           for (TagCategoryDO child : childTreeNodes) {
+               //递归 给子分类设置子标签分类
+               TagCategoryDO n = recursiveTree(child.getId());
+               System.out.println("====<<<<<"+n);
+               tagCategoryIds.add(n.getId());
+               tagCategoryTree.getChildren().add(n);
+           }
+           return tagCategoryTree;
+       }
+    List<TagDO> getCategoryAllTag(Integer tagCategoryId);
+
+
+    default List<TagDO> getTags(List<Integer> tagCategoryIds) {
+        if (tagCategoryIds.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        Example example = new Example(TagDO.class);
+        Example.Criteria criteria = example.createCriteria();
+            criteria.andIn("categoryId", tagCategoryIds);
+        return this.selectByExample(example);
+    }
+
+
+    /**
+     * 当前标签分类的子分类集合
+     */
+    List<TagCategoryDO> children;
+
+        tagCategoryIds.stream().forEach(item->{
+            System.out.println("获取的所有子分类id有"+item);
+        });
+    1.一个企业会对应多个销售
+    2.如果是不同标签体系 没有体系之间没有关联关系 数据展示 是锯齿状的
+
+
+    日志 mounted
+    3.页面 根据前端传入的  按钮事件 和 页面信息 记录 按钮点击数 和 页面访问数              菜单不要了
+
+    4.切面打标记 （对那个接口 进行 过滤 切）
+
+    5.operatorContentEnum
+
+    6.账号前缀匹配
+
+
+
+ @Override
+    public Object onAlarmSendMail(AlarmInfoTO alarmInfoTO) throws SendMailException, MessagingException, PebbleException, IOException {
+        // 入参信号：
+        // 1.可能是慧到账里面的某模块的某个字段有异常值
+        // 2.可能是某个增量任务 跑失败了
+        MailUtil.config(SMTP_QQ(false), "zhudongsheng@kungeek.com", "*******");
+        MailUtil.config(SMTP_ENT_QQ(false), "zhudongsheng@kungeek.com", "*******");
+        PebbleEngine engine = new PebbleEngine.Builder().build();
+        // 不同邮件模板的里面的不同参数如何设置 邮件模板配置表mail_template_config
+        // 与对应告警信息的映射关系 告警信号配置表 alarm_signal_config
+        MailConfigDO mailConfigDO = mailConfigMapper.selectOne(MailConfigDO.builder().code(alarmInfoTO.getCode()).build());
+        // 选择哪一个邮件模板如何配置
+        PebbleTemplate compiledTemplate = engine.getTemplate(mailConfigDO.getTemplateName());
+        Map<String, Object> context = new HashMap<>();
+        LineageInfluenceDO lineageInfluenceDO = lineageInfluenceMapper.selectOne(LineageInfluenceDO.builder().id(alarmInfoTO.getFieldId()).build());
+        //来自血缘表的数据
+        // 源表字段名
+        context.put("sourceColumnName", lineageInfluenceDO.getSourceColumnName());
+        // 异常值打印
+        context.put("exceptionValue", "＜0");
+        // 取值范围
+        context.put("valueRange", lineageInfluenceDO.getValueRange());
+        // 源业务系统名称
+        context.put("sourceSystemName", lineageInfluenceDO.getSourceSystemName());
+        String secondLevel = lineageInfluenceDO.getSourceSecondLevel();
+        String thirdLevel = lineageInfluenceDO.getSourceThirdLevel();
+        String fourthLevel = lineageInfluenceDO.getSourceFourthLevel();
+        String fifthLevel = lineageInfluenceDO.getSourceFifthLevel();
+        String systemMenu = lineageInfluenceDO.getSourceFirstLevel() + ">" +
+                secondLevel != null ? secondLevel + ">" : "";
+        systemMenu += thirdLevel != null ? thirdLevel + ">" : "";
+        systemMenu += fourthLevel != null ? fourthLevel + ">" : "";
+        systemMenu += fifthLevel != null ? fifthLevel : "";
+        context.put("systemMenu", systemMenu);
+        // 关于人的集合
+        // 产品运营负责人
+        context.put("pmOwner", lineageInfluenceDO.getPmOwner());
+        //产品运营负责人邮箱
+        context.put("pmEmail", lineageInfluenceDO.getPmEmail());
+        // 开发人员
+        context.put("developer", lineageInfluenceDO.getDeveloper());
+        context.put("developerEmail", lineageInfluenceDO.getDeveloperEmail());
+        //产品设计owner
+        context.put("designer", lineageInfluenceDO.getDesigner());
+        context.put("designerEmail", lineageInfluenceDO.getDesignerEmail());
+        //源业务系统该功能的产品owner
+        context.put("sourcePm", lineageInfluenceDO.getSourcePm());
+        //源业务系统该功能的前端开发工程师(front-end)
+        context.put("sourceFe", lineageInfluenceDO.getSourceFe());
+        //源业务系统该功能的后端开发工程师(back-end)
+        context.put("sourceBe", lineageInfluenceDO.getSourceBe());
+        Writer writer = new StringWriter();
+        compiledTemplate.evaluate(writer, context);
+        String output = writer.toString();
+        System.out.println(output);
+        // 邮件的主题如何定义 topic
+//        String topic = "告警邮件";
+        String topic = mailConfigDO.getAlarmItem();
+        // 发件人 from
+//        String mailSource = "数据中台";
+        String mailSource = mailConfigDO.getSender();
+        // 邮件的接收人
+        String recipient = mailConfigDO.getRecipient();
+        // 邮件的抄送人
+        String cc = mailConfigDO.getCc();
+        MailUtil.subject(topic)
+                .from(mailSource)
+//                .to(TO_EMAIL)        // 收件人 to
+                .to(recipient)        // 收件人 to
+//                .cc(CC)
+                .html(output)
+                .send();
+        Assert.assertTrue(true);
+        // 保存邮件发送记录表
+        mailRecordMapper.insert(MailRecordDO.builder().topic(topic).sender(mailSource).cc(CC).recipient(TO_EMAIL).createTime(new Date()).status(ConstantEnum.YES.byteValue()).content(output).build());
+        return null;
+    }
+
+
+
+
+    private static final String TO_EMAIL = "2812364443@qq.com";
+    //    private static final String CC = "zhangyubo@kungeek.com";
+    private static final String CC = "liuhoulei@kungeek.com";
+
+
+
+

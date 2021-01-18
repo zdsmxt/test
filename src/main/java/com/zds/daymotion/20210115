@@ -1,0 +1,143 @@
+
+标签条件查询
+
+需要考虑数据权限 是否查询es 获取具体的覆盖人数
+
+根据传入的标签分类的id 获取这个标签分类 及其子分类下的所有标签
+
+List<String> ccList = Arrays.asList(cc.split(","));
+
+
+INSERT INTO `lineage_influence` (`id`, `source_system_name`, `source_first_level`, `source_second_level`, `source_third_level`, `source_fourth_level`, `source_fifth_level`, `source_pm`, `source_fe`, `source_be`, `source_role_owner`, `source_db_name`, `source_db_type`, `integrate_job_create_time`, `integrate_job_name`, `integrate_job_env`, `integrate_job_cycle`, `integrate_job_mode`, `warehouse_level`, `integrate_frequency`, `integrate_job_owner`, `data_apply_target`, `data_perm_approve`, `data_owner`, `source_table_name`, `source_table_comment`, `source_column_name`, `source_column_type`, `ods_table_name`, `ods_table_comment`, `ods_column_name`, `ods_column_comment`, `ods_column_type`, `value_range`, `is_primary_key`, `is_foreign_key`, `is_partition`, `job_execution_time`, `etl_node_name`, `dm_table_name`, `dm_column_name`, `dm_column_comment`, `fixed_time`, `execute_time`, `target_system`, `target_abbreviate`, `target_first_level`, `target_second_level`, `target_third_level`, `target_fourth_level`, `target_data`, `designer`, `designer_email`, `user_owner`, `user_email`, `developer`, `developer_email`, `pm_owner`, `pm_email`) VALUES ('1', '慧小贷', '审批管理', '数据查询', '企业基本信息', NULL, NULL, '侯亚乾', '侯亚乾', '侯亚乾', '侯亚乾', 'tsp_kh_khxx', '1', '22:01:00', '额度数据导出', '1', '1', '1', '1', '1', '张玉博', NULL, NULL, NULL, 'tsp_kh_khxx', '客户信息表', 'zc_zb_', 'decimal(15,2)', 'ods_ftsp_kh_khxx_ctd', '客户信息表', 'zc_zb_', '注册资本', 'double', '≥0', '0', '0', '1', '2:00:00', '额度数据导出', '最终额度表', 'hxd_data_quota_final', '最终额度表', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '侯亚乾', 'houyaqian@kungeek.com', NULL, 'houyaqian@kungeek.com', '侯亚乾', 'houyaqian@kungeek.com', '郑雅韵', 'zhengyayun@kungeek.com');
+
+
+
+
+
+
+每隔5秒执行一次：0/5 * * * * ?
+每隔1分钟执行一次：0 */1 * * * ?
+每天23点执行一次：0 0 23 * * ?
+每天凌晨1点执行一次：0 0 1 * * ?
+每月1号凌晨1点执行一次：0 0 1 1 * ?
+每月最后一天23点执行一次：0 0 23 L * ?
+每周星期天凌晨1点实行一次：0 0 1 ? * L
+在26分、29分、33分执行一次：0 26,29,33 * * * ?
+每天的0点、13点、18点、21点都执行一次：0 0 0,13,18,21 * * ?
+                   秒 分 小时 日 月 星期 年
+
+
+   qualityEntityList.stream().forEach(item->{
+            System.out.println("质量实体信息表的数据-》》"+item);
+        });
+
+ System.out.println("响应的数据为：===》》》》"+response);
+
+
+INSERT INTO `dw-uat`.`lineage_influence` (`id`, `source_system_name`, `source_first_level`, `source_second_level`, `source_third_level`, `source_fourth_level`, `source_fifth_level`, `source_pm`, `source_fe`, `source_be`, `source_role_owner`, `integrate_job_create_time`, `integrate_job_name`, `integrate_job_env`, `integrate_job_cycle`, `integrate_job_mode`, `warehouse_level`, `integrate_frequency`, `integrate_job_owner`, `data_apply_target`, `data_perm_approve`, `data_owner`, `ods_table_name`, `ods_table_comment`, `ods_column_name`, `ods_column_comment`, `ods_column_type`, `value_range`, `is_primary_key`, `is_foreign_key`, `is_partition`, `job_execution_time`, `etl_node_name`, `dm_table_name`, `dm_column_name`, `dm_column_comment`, `fixed_time`, `execute_time`, `target_system`, `target_abbreviate`, `target_first_level`, `target_second_level`, `target_third_level`, `target_fourth_level`, `target_data`, `designer`, `designer_email`, `user_owner`, `user_email`, `developer`, `developer_email`, `pm_owner`, `pm_email`, `create_time`, `update_time`, `ods_column_guid`, `dm_column_guid`) VALUES ('52031', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'dwd_crm_basic_ticket_wide_ct', NULL, 'deal_time', '处理时间', 'string', NULL, NULL, NULL, NULL, NULL, NULL, 'dws_crm_eu_leave_info_ct', 'first_ticket_time', '首次工单解决时间', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2021-01-12 00:53:02', NULL, 'odps.hsz_crm.dwd_crm_basic_ticket_wide_ct.deal_time', 'odps.hsz_crm.dws_crm_eu_leave_info_ct.first_ticket_time');
+
+odps.hsz_huixiaodai.ods_ftsp_cb_gzmx_ctd.gsqzd_
+
+
+
+
+
+
+
+
+
+
+List<String> values;
+values = Arrays.asList(filterItem.getFilterValue().split(FILTER_VALUE_SPLIT_SYMBOL));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//odps.hsz_huixiaodai.hxd_data_pz_source.df_je_
+
+
+odps.hsz_huixiaodai.hxd_data_pz_source.df_je_
+
+
+odps.hsz_huixiaodai.ods_ftsp_cb_gzmx_ctd.gsqzd_
+
+
+        System.out.println("事件的唯一标识" + alarmInfoTO.getAlarmEventUniqueTag());
+
+        System.out.println("血缘的数据" + lineageInfluenceDO);
+
+        System.out.println("----" + recipient);
+
+
+
+
+            /**
+             * @param
+             * @return
+             * @Description //TODO 抄送多人
+             * @Date 2021/1/15 16:21
+             */
+            public static void multiCc(List<String> ccList) throws SendMailException {
+
+                ccList.stream().forEach(item -> {
+                    try {
+                        addRecipient(item, Message.RecipientType.CC);
+                    } catch (MessagingException e) {
+                        try {
+                            throw new SendMailException(e);
+                        } catch (SendMailException sendMailException) {
+                            sendMailException.printStackTrace();
+                        }
+                    }
+                });
+
+            }
+
+
+
+                public MailUtil multiCc(List<String> ccList) throws SendMailException {
+                    ccList.stream().forEach(item -> {
+                        try {
+                            cc(item);
+                        } catch (SendMailException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    return this;
+                }
+
+
+
+   liuhoulei@kungeek.com,zhangyubo@kungeek.com
+
+   //    @Scheduled(cron = "0 0/60 * * * ?")
+       //每隔5秒执行一次：0/5 * * * * ?
+       @Scheduled(cron = "0/10 * * * * ?")
+
+
+       liuhoulei@kungeek.com,zhangyubo@kungeek.com
