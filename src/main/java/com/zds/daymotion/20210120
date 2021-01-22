@@ -1,0 +1,290 @@
+
+门文钰
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ @Override
+    public List<TagDO> getTagsCondition(TagConditionVO tagConditionVO) throws ElasticsearchException, IOException {
+        // 添加是否需要走数据权限的代码
+        if (tagConditionVO != null && tagConditionVO.getIsDataPermission()) {
+            DataPermissionTO dataPermission = tagFilterService.getCurrentUserDataPermission();
+            Set<String> permissions = dataPermission.getPermissions();
+            List<TagDO> tagDOS = new ArrayList<>();
+            // 如果当前用户超级管理员
+            if (permissions.contains(TagFilterServiceImpl.DATA_ADMIN)) {
+                // 这里超级管理员 可以选多个标签体系(一个标签体系下的标签 可以属于不同的部门)
+                tagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, null);
+                // 如果当前用户标签管理员或业务人员
+            } else if (permissions.contains(TagFilterServiceImpl.DATA_TAGADMIN) || permissions.contains(TagFilterServiceImpl.DATA_BUSINESS)) {
+                // 分别获取本部门 和 公共部门的标签  这里可以获取的是这个体系下 这个用户部门权限的标签 和 公共部门的标签
+                // 考虑到后面 有标签授权的情况 这里 把部门标签表里面的这个体系下 当前用户所在部门的标签id集合取出来
+                TagDeptDO currentUserDeptTag = TagDeptDO.builder().
+                        deptId(dataPermission.getCurrentUserDeptId()).
+                        delFlag(ConstantEnum.NO).
+                        sysId(tagConditionVO.getSysId()).
+                        build();
+                List<Integer> currentUserTagIds = tagDeptMapper.select(currentUserDeptTag).stream().map(item -> item.getTagId()).collect(Collectors.toList());
+                List<TagDO> currentUserDeptTagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, currentUserTagIds);
+                TagDeptDO assignTagSystemIdPublicTag = TagDeptDO.builder().
+                        deptId(dataPermission.getPublicDeptId()).
+                        delFlag(ConstantEnum.NO).
+                        sysId(tagConditionVO.getSysId()).
+                        build();
+                List<Integer> publicDeptTagIds = tagDeptMapper.select(assignTagSystemIdPublicTag).stream().map(item -> item.getTagId()).collect(Collectors.toList());
+                List<TagDO> publicDeptTagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, publicDeptTagIds);
+                if (currentUserTagIds.size() > ConstantEnum.NO) {
+                    tagDOS.addAll(currentUserDeptTagDOS);
+                }
+                if (publicDeptTagIds.size() > ConstantEnum.NO) {
+                    tagDOS.addAll(publicDeptTagDOS);
+                }
+            } else {
+                log.info("由于标签对访客的数据权限限制，当前登录的用户:{}看不到任何标签数据", UserUtil.getUserName());
+                tagDOS = null;
+            }
+            return tagDOS;
+        }
+        //递归获取传入的这个 标签分类 及这个分类下的标签
+        Integer categoryId = tagConditionVO.getCategoryId();
+        List<Integer> tagIds = Collections.EMPTY_LIST;
+        System.out.println("输入的的标签分类id为:" + tagConditionVO.getCategoryId());
+        List<TagCategoryDO> tagCategoryDOS = tagCategoryMapper.selectAll();
+        System.out.println("====666666====" + tagCategoryDOS.size());
+        if (categoryId != null) {
+            // 这个方法没有执行递归
+            TagCategoryDO tagCategoryDOTree = this.getTagCategoryDOTree(categoryId, tagCategoryDOS);
+//            System.out.println("分类标签树为：----->>>" + tagCategoryDOTree);
+            // 根据这棵树过滤出分类id
+            // 获取你想要的的这个标签分类的id
+            tagCategoryIds.forEach(item -> {
+//                System.out.println("---0000000---" + item);
+            });
+            // 递归 获取传入的标签分类id的子分类id 及这些分类的标签
+            tagIds = tagMapper.getTags(new ArrayList<>(tagCategoryIds)).stream().map(item -> item.getId()).collect(Collectors.toList());
+        }
+        System.out.println("根据分类id：" + tagConditionVO.getCategoryId() + "获取的标签数量为" + tagIds.size());
+        System.out.println("输入的的标签分类id为:" + tagConditionVO.getCategoryId() + "下的标签id 集合为：" + tagIds);
+        tagConditionVO.setCategoryId(null);
+//        if (tagConditionVO.getUnPagination() == null) {
+//            PageUtil.setPagePro2(tagConditionVO);
+//        }
+        List<TagDO> tags = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, tagIds);
+        for (TagDO tag : tags) {
+            tag.setTagCategoryName(tagCategoryMapper.selectByPrimaryKey(tag.getCategoryId()).getName());
+            Boolean isQueryES = tagConditionVO.getIsQueryES();
+            if (null != isQueryES && isQueryES) {
+                tag.setCoveredPeopleNumber(this.getCoveredPeopleNumberByTag(tag));
+            } else {
+                tag.setCoveredPeopleNumber(COVER_PEOPLE_ZERO);
+            }
+        }
+        if (tagConditionVO.getUnPagination() == null) {
+            PageUtil.setPagePro2(tagConditionVO);
+        }
+        tags.stream().forEach(item -> {
+            System.out.println("获取的标签为》》》："+item);
+        });
+        // 清空上一次查询的所有标签分类的id集合
+        tagCategoryIds.clear();
+        System.out.println("输出的标签数量为" + tags.size());
+        return tags;
+    }
+
+
+
+
+
+/**
+     * 读写锁，控制读写互斥
+     */
+    private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+    public TagCategoryDO getTagCategoryDOTree(int cid, List<TagCategoryDO> allCategory) {
+        readWriteLock.readLock().lock();
+        try {
+            return this.recursiveTree(cid, allCategory);
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    private Set<Integer> tagCategoryIds = new HashSet();
+
+    /**
+     * 从map缓存的数据中，递归生成树
+     *
+     * @param cid 指定的根节点id
+     * @return 树
+     */
+    private TagCategoryDO recursiveTree(int cid, List<TagCategoryDO> allCategory) {
+//        List<TagCategoryDO> allCategory = tagCategoryMapper.selectAll();
+        tagCategoryIds.add(cid);
+//        System.out.println("=====999====="+cid);
+        // 从所有标签分类中获取 指定键的对象
+        TagCategoryDO node = tagCategoryMapper.selectOne(TagCategoryDO.builder().id(cid).build());
+        TagCategoryDO tagCategoryTree = TagCategoryDO.builder()
+                .id(node.getId())
+                .name(node.getName())
+                .level(node.getLevel())
+                .children(new ArrayList<>())
+                .build();
+        List<TagCategoryDO> childTreeNodes = new ArrayList<>();
+        for (TagCategoryDO item : allCategory) {
+            if (item.getParentId().equals(cid)) {
+                // 获取传入的这个id 作为parentId 的子分类
+                childTreeNodes.add(item);
+                tagCategoryIds.add(item.getId());
+            }
+        }
+        //遍历所有子分类
+        for (TagCategoryDO child : childTreeNodes) {
+            //递归 给子分类设置子标签分类
+            TagCategoryDO n = recursiveTree(child.getId(), allCategory);
+//            System.out.println("====8888===="+n);
+            tagCategoryIds.add(n.getId());
+//            tagCategoryIds.add(child.getId());
+            tagCategoryTree.getChildren().add(n);
+        }
+        return tagCategoryTree;
+    }
+
+
+  @Override
+    public List<TagDO> getTagsCondition(TagConditionVO tagConditionVO) throws ElasticsearchException, IOException {
+        // 添加是否需要走数据权限的代码
+        if (tagConditionVO != null && tagConditionVO.getIsDataPermission()) {
+            DataPermissionTO dataPermission = tagFilterService.getCurrentUserDataPermission();
+            Set<String> permissions = dataPermission.getPermissions();
+            List<TagDO> tagDOS = new ArrayList<>();
+            // 如果当前用户超级管理员
+            if (permissions.contains(TagFilterServiceImpl.DATA_ADMIN)) {
+                // 这里超级管理员 可以选多个标签体系(一个标签体系下的标签 可以属于不同的部门)
+                tagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, null);
+                // 如果当前用户标签管理员或业务人员
+            } else if (permissions.contains(TagFilterServiceImpl.DATA_TAGADMIN) || permissions.contains(TagFilterServiceImpl.DATA_BUSINESS)) {
+                // 分别获取本部门 和 公共部门的标签  这里可以获取的是这个体系下 这个用户部门权限的标签 和 公共部门的标签
+                // 考虑到后面 有标签授权的情况 这里 把部门标签表里面的这个体系下 当前用户所在部门的标签id集合取出来
+                TagDeptDO currentUserDeptTag = TagDeptDO.builder().
+                        deptId(dataPermission.getCurrentUserDeptId()).
+                        delFlag(ConstantEnum.NO).
+                        sysId(tagConditionVO.getSysId()).
+                        build();
+                List<Integer> currentUserTagIds = tagDeptMapper.select(currentUserDeptTag).stream().map(item -> item.getTagId()).collect(Collectors.toList());
+                List<TagDO> currentUserDeptTagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, currentUserTagIds);
+                TagDeptDO assignTagSystemIdPublicTag = TagDeptDO.builder().
+                        deptId(dataPermission.getPublicDeptId()).
+                        delFlag(ConstantEnum.NO).
+                        sysId(tagConditionVO.getSysId()).
+                        build();
+                List<Integer> publicDeptTagIds = tagDeptMapper.select(assignTagSystemIdPublicTag).stream().map(item -> item.getTagId()).collect(Collectors.toList());
+                List<TagDO> publicDeptTagDOS = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, publicDeptTagIds);
+                if (currentUserTagIds.size() > ConstantEnum.NO) {
+                    tagDOS.addAll(currentUserDeptTagDOS);
+                }
+                if (publicDeptTagIds.size() > ConstantEnum.NO) {
+                    tagDOS.addAll(publicDeptTagDOS);
+                }
+            } else {
+                log.info("由于标签对访客的数据权限限制，当前登录的用户:{}看不到任何标签数据", UserUtil.getUserName());
+                tagDOS = null;
+            }
+            return tagDOS;
+        }
+        //递归获取传入的这个 标签分类 及这个分类下的标签
+        Integer categoryId = tagConditionVO.getCategoryId();
+        List<Integer> tagIds = Collections.EMPTY_LIST;
+        System.out.println("输入的的标签分类id为:" + tagConditionVO.getCategoryId());
+        List<TagCategoryDO> tagCategoryDOS = tagCategoryMapper.selectAll();
+        System.out.println("====666666====" + tagCategoryDOS.size());
+        if (categoryId != null) {
+            // 这个方法没有执行递归
+            TagCategoryDO tagCategoryDOTree = this.getTagCategoryDOTree(categoryId, tagCategoryDOS);
+//            System.out.println("分类标签树为：----->>>" + tagCategoryDOTree);
+            // 根据这棵树过滤出分类id
+            // 获取你想要的的这个标签分类的id
+            tagCategoryIds.forEach(item -> {
+//                System.out.println("---0000000---" + item);
+            });
+            // 递归 获取传入的标签分类id的子分类id 及这些分类的标签
+            tagIds = tagMapper.getTags(new ArrayList<>(tagCategoryIds)).stream().map(item -> item.getId()).collect(Collectors.toList());
+        }
+        System.out.println("根据分类id：" + tagConditionVO.getCategoryId() + "获取的标签数量为" + tagIds.size());
+        System.out.println("输入的的标签分类id为:" + tagConditionVO.getCategoryId() + "下的标签id 集合为：" + tagIds);
+        tagConditionVO.setCategoryId(null);
+        if (tagConditionVO.getUnPagination() == null) {
+            PageUtil.setPagePro2(tagConditionVO);
+        }
+        List<TagDO> tags = tagMapper.getTagsByTagCategoryIdCondition(tagConditionVO, tagIds);
+        for (TagDO tag : tags) {
+            tag.setTagCategoryName(tagCategoryMapper.selectByPrimaryKey(tag.getCategoryId()).getName());
+            Boolean isQueryES = tagConditionVO.getIsQueryES();
+            if (null != isQueryES && isQueryES) {
+                tag.setCoveredPeopleNumber(this.getCoveredPeopleNumberByTag(tag));
+            } else {
+                tag.setCoveredPeopleNumber(COVER_PEOPLE_ZERO);
+            }
+        }
+//        if (tagConditionVO.getUnPagination() == null) {
+//            PageUtil.setPagePro2(tagConditionVO);
+//        }
+        tags.stream().forEach(item -> {
+            System.out.println("获取的标签为》》》："+item);
+        });
+        // 清空上一次查询的所有标签分类的id集合
+        tagCategoryIds.clear();
+//        tagIds.clear();
+        System.out.println("输出的标签数量为" + tags.size());
+        return tags;
+    }
+
+
+
+
+
+
+    @Test
+    public void TestGetAllTags() throws Exception {
+        TagCategoryConditionVO tagCategoryConditionVO = new TagCategoryConditionVO();
+//        List<TagDO> categoryIds = tagService.getCategoryAllTag(TagCategoryConditionVO.builder().id(81).build());
+//        List<TagDO> categoryIds = tagService.getCategoryAllTag(68);
+        System.out.println(categoryIds.size() + "===");
+        categoryIds.stream().forEach(item -> {
+            System.out.println(item);
+        });
+    }
+
+
+
+
+
+日志开发
+1. 由于采用的是公用的单点登录 就导致拿不到用户的登录行为 只能根据用户详情的调用来判断这个用户的登录情况
+2. 上传接口 前端传入 日志的创建时间 logTime 操作人actionUser 日志动作类型actionType
+
+
+select * from sys_time where year(log_time)=2021 and month(log_time)=1 and day(log_time) = 20
+
+
+活跃用户有什么特点吗 如何判定为活跃用户
+
+
+
+
+
+
+
+
+
+

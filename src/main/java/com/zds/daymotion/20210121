@@ -1,0 +1,208 @@
+
+
+
+
+系统日志下的 活跃分析
+
+
+左侧的选择日期区间段   和  右侧的 月周天的关系
+单天活跃用户数
+
+select count(id) from sys_log where year("log_time") = '2020' and month("log_time") and day("log_time") =
+
+
+
+关于右下角分页的数据获取
+
+
+
+SELECT * from sys_time where log_time >='2020-10-06 00:00:00' and log_time <='2020-10-06 23:59:59'
+
+SELECT * from sys_time where log_time >='2020-10-06' and log_time <='2020-10-06'
+
+SELECT * from sys_time where log_time >='2020-10-06'
+
+-- ----------------------------
+-- Table structure for sys_time
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_time`;
+CREATE TABLE `sys_time` (
+  `id` int(11) NOT NULL,
+  `log_time` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- ----------------------------
+-- Records of sys_time
+-- ----------------------------
+INSERT INTO `sys_time` VALUES ('1', '2021-01-20 17:03:37');
+INSERT INTO `sys_time` VALUES ('2', '2020-12-17 17:03:46');
+INSERT INTO `sys_time` VALUES ('3', '2020-12-08 17:04:00');
+INSERT INTO `sys_time` VALUES ('4', '2020-10-06 17:04:11');
+INSERT INTO `sys_time` VALUES ('5', '2020-10-23 17:04:23');
+INSERT INTO `sys_time` VALUES ('6', '2020-08-20 17:05:17');
+INSERT INTO `sys_time` VALUES ('7', '2020-11-11 17:05:31');
+INSERT INTO `sys_time` VALUES ('8', '2020-10-15 17:05:45');
+INSERT INTO `sys_time` VALUES ('9', '2020-10-06 10:36:29');
+INSERT INTO `sys_time` VALUES ('10', '2020-10-06 10:45:51');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+疑问：
+  关于事件埋点 里面的事件理解 用户在应用上的某一个操作留下的数据
+  触发的接口（点击按钮 点击页面）
+  事件的英文名 与中文名的映射
+  事件的内容 对应事件的一系列属性和值
+
+
+
+
+
+SELECT log_time as d,count(*)
+FROM sys_log
+where event = 'LoginResult'
+GROUP BY log_time
+ORDER BY d asc;
+
+
+(SELECT log_time as d,count(*) as uv
+FROM sys_log
+where event = 'LoginResult'
+GROUP BY log_time
+ORDER BY d asc)UNION all
+(SELECT log_time as d,count(*) as pv
+FROM sys_log
+where event = 'SearchClick'
+GROUP BY log_time
+ORDER BY d asc)
+
+
+
+
+
+SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as uv
+FROM sys_log
+where event = 'LoginResult'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+ORDER BY d asc;
+
+
+SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as uv
+FROM sys_log
+where event = 'SearchClick'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+ORDER BY d asc;
+
+
+
+select t1.d,t1.uv,t2.pv
+from(
+(SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as uv
+FROM sys_log
+where event = 'LoginResult'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+) as t1
+left join (
+SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as pv
+FROM sys_log
+where event = 'SearchClick'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+) as t2
+on t1.d = t2.d
+)ORDER BY t1.d asc;
+
+
+
+登录的事件 肯定要多于标签筛选的点击事件的
+
+select t1.d,t1.uv,t2.pv
+from(
+(SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as uv
+FROM sys_log
+where event = 'LoginResult'
+and log_time >='2020-09-01 00:00:00' and log_time<='2021-02-01 23:59:59'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+) as t1
+left join (
+SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as pv
+FROM sys_log
+where event = 'SearchClick'
+and log_time >='2020-09-01 00:00:00' and log_time<='2021-02-01 23:59:59'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+) as t2
+on t1.d = t2.d
+)ORDER BY t1.d asc;
+
+
+
+
+
+
+
+select t1.d,t1.uv,t2.pv
+from(
+(SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as uv
+FROM sys_log
+where event = 'LoginResult'
+and log_time >='2020-09-01 00:00:00' and log_time<='2021-02-01 23:59:59'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+) as t1
+left join (
+SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as pv
+FROM sys_log
+where event = 'SearchClick'
+and log_time >='2020-09-01 00:00:00' and log_time<='2021-02-01 23:59:59'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+) as t2
+on t1.d = t2.d
+)ORDER BY t1.d desc;
+
+
+
+
+
+
+
+
+
+select t1.m,t1.uv,t2.pv
+from(
+(SELECT DATE_FORMAT(log_time,'%Y-%m') as m,count(*) as uv
+FROM sys_log
+where event = 'LoginResult'
+and log_time >='2020-09-01 00:00:00' and log_time<='2021-02-01 23:59:59'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m')
+) as t1
+left join (
+SELECT DATE_FORMAT(log_time,'%Y-%m') as m,count(*) as pv
+FROM sys_log
+where event = 'SearchClick'
+and log_time >='2020-09-01 00:00:00' and log_time<='2021-02-01 23:59:59'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m')
+) as t2
+on t1.m = t2.m
+)ORDER BY t1.m desc;
+
+
+
+
+
+
+反思：
+1.昨天到家晚上11点 烧热水 12:55  洗完澡 一点半 耍手机 等头发干 结果两点半睡
+  现在犯困 10:47 2021/1/21
