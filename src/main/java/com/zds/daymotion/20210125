@@ -1,0 +1,197 @@
+***************急需修改的问题   跨标签体系查询
+
+1.联调完日志系统和系统标签优化的测试
+2.对接乾哥的跨标签体系
+3.1）新增角色 可以导出 新加一个权限码  tagFilter:export
+  2）之前的标签详情分布 tag:detail 需要标签管理员来分配 角色权限
+
+4.不要有侥幸心态
+       跨标签报的标签体系为空
+       uv 用户访问量需要去除数据人员的账号访问统计（
+       目前的应对之策 1.在代码里面 把这些账号全去掉 （不好弄）2.在语句里面直接过滤掉这些用户
+       select * from sys_log where action_user not in ("数据人员1","数据人员2","数据人员3","数据人员4","数据人员5","数据人员6")）
+
+
+
+
+
+like 用法的积累
+
+百分号产生的结果区别
+
+select * from sys_log where content like = "%左%"
+select * from sys_log where content like = "左%"
+select * from sys_log where content like = "%左"
+
+
+
+
+
+
+关于获取血缘树的代码
+
+   可以看到 这里 用了线程池
+   为什么这么用 ？？？？？？？？？？？？
+   血缘的先插lineageInfluenceThread
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+select t1.m,t1.uv,t2.pv
+from(
+(SELECT DATE_FORMAT(log_time,'%Y-%m') as m,count(DISTINCT action_user) as uv
+FROM sys_log
+where event = 'LoginResult'
+and log_time >='2020-01-01' and log_time<='2021-02-01'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m')
+) as t1
+left join (
+SELECT DATE_FORMAT(log_time,'%Y-%m') as m,count(*) as pv
+FROM sys_log
+where event = 'SearchClick'
+and log_time >='2020-01-01' and log_time<='2021-02-01'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m')
+) as t2
+on t1.m = t2.m
+)ORDER BY t1.m desc;
+
+
+select t1.d,t1.uv,t2.pv
+from(
+(SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(DISTINCT action_user) as uv
+FROM sys_log
+where event = 'LoginResult'
+and log_time >='2020-01-01' and log_time<='2021-02-01'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+) as t1
+left join (
+SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as pv
+FROM sys_log
+where event = 'SearchClick'
+and log_time >='2020-01-01' and log_time<='2021-02-01'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+) as t2
+on t1.d = t2.d
+)ORDER BY t1.d desc;
+
+SELECT count(DISTINCT action_user) from sys_log;
+
+
+ @GetMapping(value = "/detail")
+    public Object getUserDetail() {
+        // 获取用户的是否可用的状态 如果是不可用的状态 直接退出系统
+        User user = userMapper.selectOne(User.builder().username(UserUtil.getUserName()).build());
+        if (user != null && ConstantEnum.NO.equals(user.getStatus())) {
+            // 判断登入的用户是否可用 如果不可用 这里需要登出处理 清空当前用户的session
+            return ShiroConfiguration.logoutUrl;
+        }
+        return UserUtil.currentUser();
+    }
+
+
+
+
+
+
+    @Autowired
+    private UserMapper userMapper;
+
+        // 获取用户的是否可用的状态 如果是不可用的状态 直接退出系统
+        User user = userMapper.selectOne(User.builder().username(UserUtil.getUserName()).build());
+        if (user != null && ConstantEnum.NO.equals(user.getStatus())) {
+            // 判断登入的用户是否可用 如果不可用 这里需要登出处理 清空当前用户的session
+            return ShiroConfiguration.logoutUrl;
+        }
+
+
+
+
+
+select t1.m,t1.uv,t2.pv
+from(
+(SELECT DATE_FORMAT(log_time,'%Y-%m') as m,count(DISTINCT action_user) as uv
+FROM sys_log
+where event = 'LoginResult'
+and log_time >='2020-01-01' and log_time<='2021-02-01'
+and action_user not in('yinkai@kungeek.com','wujunnan@kungeek.com',
+'caijinglun@kungeek.com','dongwenjian@kungeek.com','zhangyubo@kungeek.com',
+'wangweizhong@kungeek.com','liuhoulei@kungeek.com','shencheng@kungeek.com',
+'guojunya@kungeek.com','yangjin@kungeek.com','wangmingyu@kungeek.com',
+'liuxiao@kungeek.com','zhudongsheng@kungeek.com','houyaqian@kungeek.com')
+GROUP BY DATE_FORMAT(log_time,'%Y-%m')
+) as t1
+left join (
+SELECT DATE_FORMAT(log_time,'%Y-%m') as m,count(*) as pv
+FROM sys_log
+where event = 'SearchClick'
+and log_time >='2020-01-01' and log_time<='2021-02-01'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m')
+) as t2
+on t1.m = t2.m
+)ORDER BY t1.m desc;
+
+
+
+and action_user not in('yinkai@kungeek.com','wujunnan@kungeek.com',
+'caijinglun@kungeek.com','dongwenjian@kungeek.com','zhangyubo@kungeek.com',
+'wangweizhong@kungeek.com','liuhoulei@kungeek.com','shencheng@kungeek.com',
+'guojunya@kungeek.com','yangjin@kungeek.com','wangmingyu@kungeek.com',
+'liuxiao@kungeek.com','zhudongsheng@kungeek.com','houyaqian@kungeek.com')
+
+
+
+
+
+
+反思：
+ 1. 午休一点半 结束 一点半到两点都是瞌睡的
+ 2. 关于根据时间段获取这个时间段的数据 如 传入的数据到秒 但是通过sql
+ 查询的时候需要在代码里面 把这个时间date类型 转成对应的到天或者到秒的数据
+
+ 我之前造假数据 是有问题的  我造的假数据的问题是
+ 没有考虑任一一个用户肯定是 先登录 后浏览和点击web页面
+ 因为 用户发生了点击的行为 肯定是 用户登录了 或者刷新页面了
+
+ 大体思路是  用户获取的用户的登录为主表进行左外连接 获取对应的点击的次数为右表
+
+ 1)问题是会把用户的刷新页面作为一次登录 进行计数 不过我这里有根据用户的邮箱账号去重distinct 这点问题被解决
+ 2) 之前担心是如何把用户的登录 uv 和用户端点击 如何进行关联
+ 3.改变标签筛选的下载接口的权限码 tagFilter:query 修改之后 这个角色之后的权限码  tagFilter:export
+  出现没有立即生效的情况  CTRL+F5 刷新也不生效 需要退出重登 改变之前存在session 里面的权限码
+ 3.累了17:37 2021/1/25
+
+
+
+
+INSERT INTO db_metadata` (`db_name`, `db_type`, `table_name`, `table_comment`, `primary_field`, `field_name`, `field_comment`) VALUES ('标签es', '2', 'cust_tag', '企业标签表', 'cust_id', 'agency_account_buy_num', '代理记账类产品购买次数');
+
+
+
+
+
+
+
+
+内容描述	搜索框，可模糊检索事件具体属性

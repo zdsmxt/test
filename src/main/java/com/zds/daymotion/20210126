@@ -1,0 +1,75 @@
+
+
+http://10.240.170.223/cas/login?service=http://10.240.170.223:9010//data-web/shiro-cas
+
+        log.info("cas验证开始");
+        // 调用父类中的认证方法，CasRealm已经为我们实现了单点认证。
+        AuthenticationInfo authc = super.doGetAuthenticationInfo(token);
+        String account = (String) authc.getPrincipals().getPrimaryPrincipal();
+        log.info("cas验收完成");
+        // 这个地方说明了 完成单点登录的过程 这里需要保持一下登录的日志
+
+
+SELECT
+	t1.d AS dayOrMonth,
+	t1.uv,
+	t2.pv
+FROM
+	(
+		(
+			SELECT
+				DATE_FORMAT(log_time, '%Y-%m-%d') AS d,
+				count(DISTINCT action_user) AS uv
+			FROM
+				sys_log
+			WHERE
+				EVENT = 'LoginResult'
+			AND log_time >='2021-01-26 00:00:00'
+			AND log_time <='2021-01-26 23:59:59'
+			GROUP BY
+				DATE_FORMAT(log_time, '%Y-%m-%d')
+		) AS t1
+		LEFT JOIN (
+			SELECT
+				DATE_FORMAT(log_time, '%Y-%m-%d') AS d,
+				count(*) AS pv
+			FROM
+				sys_log
+			WHERE
+				EVENT = 'SearchClick'
+			AND log_time >='2021-01-26 00:00:00'
+			AND log_time <='2021-01-26 23:59:59'
+			GROUP BY
+				DATE_FORMAT(log_time, '%Y-%m-%d')
+		) AS t2 ON t1.d = t2.d
+	)
+ORDER BY
+	t1.d DESC;
+
+
+LIMIT ?
+
+
+
+
+
+ @Override
+    public User initSessionUser(String account) {
+
+    // 自己给自己写了个bug 这个地方拿不到用户的session 信息 因为这里还没有往session 里面存
+        // 用户登录埋点
+//        log.info("============后端登录的用户埋点============"+com.data.web.upms.utils.UserUtil.getUserName());
+        logMapper.insertUseGeneratedKeys(LogDO.builder().
+                logTime(new Date()).actionUser(account).
+                actionType(BUTTON).event(EVENT).eventName(EVENT_NAME).build());
+        User user = this.getOrInsertUser(account);
+        // 这个地方打下日志 是为了防止 出现用户 没有任何权限的情况下 每次在cas 页面总是会停止登录页
+        log.info("初始化用户 当前登录的用户user为:{}",user);
+        return initPermissions(user);
+    }
+
+
+    if (BY_MONTH.equals(byDate) && actionTimeRange == null) {
+                Date now = new Date();
+                return sysLogMapper.getMonthTrend(cn.hutool.core.date.DateUtil.beginOfMonth(now), cn.hutool.core.date.DateUtil.beginOfMonth(now));
+            }

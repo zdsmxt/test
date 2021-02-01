@@ -1,0 +1,206 @@
+
+
+    public String buildGetCountLogUv(@Param("start") Date start, @Param("end") Date end) {
+        SQL sql = new SQL().SELECT("select count(DISTINCT action_user) as uv").FROM("sys_log");
+//        sql.WHERE("log_time>=" + start);
+//        sql.WHERE("log_time<=" + end);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sql.WHERE("log_time>="+sdf.format(start));
+        sql.WHERE("log_time<="+sdf.format(end));
+        sql.WHERE("event = 'LoginResult'");
+
+        return sql.toString();
+    }
+
+
+        public String buildGetCountLogUv(@Param("start") Date start, @Param("end") Date end) {
+            SQL sql = new SQL().SELECT("count(DISTINCT action_user) as uv").FROM("sys_log");
+    //        sql.WHERE("log_time>=" + start);
+    //        sql.WHERE("log_time<=" + end);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sql.WHERE("log_time>="+sdf.format(start));
+            sql.WHERE("log_time<="+sdf.format(end));
+            sql.WHERE("event = 'LoginResult'");
+
+            return sql.toString();
+        }
+
+
+        SELECT select count(DISTINCT action_user) as uv FROM sys_log WHERE (log_time>=2020-12-01 AND log_time<=2021-12-01 AND event = 'LoginResult')
+
+            public String buildGetCountLogUv(@Param("start") Date start, @Param("end") Date end) {
+                SQL sql = new SQL().SELECT("select count(DISTINCT action_user) as uv").FROM("sys_log");
+        //        sql.WHERE("log_time>=" + start);
+        //        sql.WHERE("log_time<=" + end);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                sql.WHERE("log_time>="+sdf.format(start));
+                sql.WHERE("log_time<="+sdf.format(end));
+                sql.WHERE("event = 'LoginResult'");
+
+                return sql.toString();
+            }
+
+
+
+
+ @Select("SELECT count(DISTINCT action_user) as uv\n" +
+            "FROM sys_log\n" +
+            "where event = 'LoginResult'\n" +
+            "and log_time >=#{start} and log_time<=#{end}")
+    Integer countAssignTimeUv(Date start, Date end);
+
+    @Select("SELECT count(id) as qv\n" +
+            "FROM sys_log\n" +
+            "where event = 'SearchClick'\n" +
+            "and log_time >=#{start} and log_time<=#{end}")
+    Integer countAssignTimeQv(Date start, Date end);
+
+    @SelectProvider(type = DynamicSqlBuilder.class, method = "buildGetCountLogUv")
+    Integer countUv(/*@Param("start") */Date start, /*@Param("end")*/ Date end);
+
+     @SelectProvider(type = DynamicSqlBuilder.class, method = "buildGetCountLogUvMap")
+    Integer countUv1(Map<String,Object> map);
+
+
+
+
+
+
+
+
+ public String buildGetCountLogUv(@Param("start") Date start, @Param("end") Date end,@Param("userList") List<String> userList) {
+        SQL sql = new SQL().SELECT("count(DISTINCT action_user) as uv").FROM("sys_log");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sql.WHERE("log_time>=#{start}");
+        sql.WHERE("log_time<=#{end}");
+        sql.WHERE("event = 'LoginResult'");
+        if (userList.size() > 0) {
+            StringBuffer concatSql = new StringBuffer("action_user not in");
+            ContactSql(concatSql, userList);
+            sql.WHERE(concatSql.toString());
+        }
+        return sql.toString();
+    }
+
+
+getDayTrend
+
+
+
+
+    public String buildGetCountLogUv(@Param("start") Date start, @Param("end") Date end, @Param("userList") List<String> userList) {
+        SQL sql = new SQL().SELECT("count(DISTINCT action_user) as uv").FROM("sys_log");
+        sql.WHERE("log_time>=#{start}");
+        sql.WHERE("log_time<=#{end}");
+        sql.WHERE("event = 'LoginResult'");
+        if (userList.size() > 0) {
+            StringBuffer concatSql = new StringBuffer("action_user not in");
+            ContactSql(concatSql, userList);
+            sql.WHERE(concatSql.toString());
+        }
+        return sql.toString();
+    }
+    public String buildGetCountLogQv(@Param("start") Date start, @Param("end") Date end, @Param("userList") List<String> userList) {
+        SQL sql = new SQL().SELECT("count(DISTINCT action_user) as uv").FROM("sys_log");
+        sql.WHERE("log_time>=#{start}");
+        sql.WHERE("log_time<=#{end}");
+        sql.WHERE("event = 'SearchClick'");
+        if (userList.size() > 0) {
+            StringBuffer concatSql = new StringBuffer("action_user not in");
+            ContactSql(concatSql, userList);
+            sql.WHERE(concatSql.toString());
+        }
+        return sql.toString();
+    }
+
+    public String getDayTrend(@Param("start") Date start, @Param("end") Date end, @Param("userList") List<String> userList) {
+        SQL dayUv = new SQL().SELECT("DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(DISTINCT action_user) as uv")
+                .FROM("sys_log")
+                .WHERE(" event = 'LoginResult'")
+                .WHERE("log_time>=#{start}").WHERE("log_time<=#{end}");
+        if (userList.size() > 0) {
+            StringBuffer concatSql = new StringBuffer("action_user not in");
+            ContactSql(concatSql, userList);
+            dayUv.WHERE(concatSql.toString());
+        }
+        dayUv.GROUP_BY("DATE_FORMAT(log_time,'%Y-%m-%d')");
+//select DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(DISTINCT action_user) as uv
+// from sys_log where event = 'LoginResult' and log_time>=#{start} and log_time<=#{end} group by DATE_FORMAT(log_time,'%Y-%m-%d')
+
+
+
+        SQL dayQv = new SQL().SELECT("DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(id) as qv")
+                .FROM("sys_log")
+                .WHERE(" event = 'SearchClick'")
+                .WHERE("log_time>=#{start}").WHERE("log_time<=#{end}");
+        if (userList.size() > 0) {
+            StringBuffer concatSql = new StringBuffer("action_user not in");
+            ContactSql(concatSql, userList);
+            dayQv.WHERE(concatSql.toString());
+        }
+        dayQv.GROUP_BY("DATE_FORMAT(log_time,'%Y-%m-%d')");
+
+        dayUv.LEFT_OUTER_JOIN(dayQv.toString())
+
+        SQL sql = new SQL().SELECT("t1.d as dayOrMonth,t1.uv,t2.qv").FROM("("+dayUv+")");
+
+        return sql.toString();
+    }
+
+
+
+    public static void main(String[] args) {
+        new ArrayList<>()
+    }
+
+
+
+    @SelectProvider(type = DynamicSqlBuilder.class, method = "buildGetCountLogUv")
+    Integer countUv(/*@Param("start") */Date start, /*@Param("end")*/ Date end,List<String> userList);
+
+
+            "action_user not in ()"+
+
+
+
+//            this.getTagCategoryDOTree(categoryId, tagCategoryDOS);
+    /**
+     * 读写锁，控制读写互斥
+     */
+    private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+    public TagCategoryDO getTagCategoryDOTree(int cid, List<TagCategoryDO> allCategory) {
+        readWriteLock.readLock().lock();
+        try {
+            return this.recursiveTree(cid, allCategory);
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+
+        // 获取所有标签体系的主键   目前只有三个（用户 企业 业务）所以初始化的值为 3
+//        List<Integer> sysIds = new ArrayList<>(ALL_TAG_SYSTEM_COUNT);
+//        // 这里是为了避免 前端传标签体系id集合
+//        sysIds.add(USER_TAG_SYSTEM_ID);
+//        sysIds.add(ENTERPRISE_TAG_SYSTEM_ID);
+//        sysIds.add(BUSINESS_TAG_SYSTEM_ID);
+
+
+
+
+
+
+
+
+
+反思：
+   1.报错信息提示的关联不大 看结果是 传入的时间数据是完整的 但是拼上是不完整的
+   但是还是有用信息的 sql 语法错误 获取的sql 语句 是两个 SELECT select
+   2.更新权限码的时候 清理一下redis 里面的session缓存
+
+
+
+
+
+
