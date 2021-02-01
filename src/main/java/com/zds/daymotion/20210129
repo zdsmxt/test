@@ -1,0 +1,88 @@
+
+private TagCategoryDO  recursiveTree(int cid, List<TagCategoryDO> allCategory) {
+        tagCategoryIds.add(cid);
+        // 从所有标签分类中获取 指定键的对象
+        TagCategoryDO tagCategoryTree = TagCategoryDO.builder()
+                .id(cid)
+                .children(new ArrayList<>())
+                .build();
+        List<TagCategoryDO> childTreeNodes = new ArrayList<>();
+        for (TagCategoryDO item : allCategory) {
+            if (item.getParentId().equals(cid)) {
+                // 获取传入的这个id 作为parentId 的子分类
+                childTreeNodes.add(item);
+                tagCategoryIds.add(item.getId());
+            }
+        }
+        //遍历所有子分类
+        for (TagCategoryDO child : childTreeNodes) {
+            //递归 给子分类设置子标签分类
+            TagCategoryDO n = recursiveTree(child.getId(), allCategory);
+            tagCategoryTree.getChildren().add(n);
+        }
+        return tagCategoryTree;
+    }
+
+
+    1.系统标签优化 获取标签方法 分离 数据权限和系统标签的查询
+    2.日志查询 去重数据团队和开发团队的人员数据
+    3.用户登录超时  重定向到系统首页？？？？？？？？？？
+
+
+
+@Bean(name = "sessionManager")
+    public DefaultWebSessionManager defaultWebSessionManager(RedisSessionDao redisSessionDao,
+                                                             ShiroRedisCacheManager cacheManager,
+                                                             ShiroSessionProperties shiroSessionProperties) {
+        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+        sessionManager.setCacheManager(cacheManager);
+        //定时检查session
+        sessionManager.setSessionValidationSchedulerEnabled(true);
+        //定时检查session时间
+        sessionManager.setSessionValidationInterval(shiroSessionProperties.getExpire().getTimeout() * ShiroSessionProperties.MINUTE);
+        //session过期时间
+        sessionManager.setGlobalSessionTimeout(shiroSessionProperties.getExpire().getTimeout() * ShiroSessionProperties.MINUTE);
+        //删除过期session
+        sessionManager.setDeleteInvalidSessions(true);
+        sessionManager.setSessionDAO(redisSessionDao);
+        return sessionManager;
+    }
+
+
+2021/01/29-16:43:51 [Thread-35] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [271]- Validating all active sessions...
+2021/01/29-16:43:51 [Thread-34] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [271]- Validating all active sessions...
+2021/01/29-16:43:51 [Thread-35] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [304]- Finished session validation.  No sessions were stopped.
+2021/01/29-16:43:51 [Thread-34] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [304]- Finished session validation.  No sessions were stopped.
+2021/01/29-16:44:51 [Thread-35] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [271]- Validating all active sessions...
+2021/01/29-16:44:51 [Thread-34] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [271]- Validating all active sessions...
+2021/01/29-16:44:51 [Thread-35] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [304]- Finished session validation.  No sessions were stopped.
+2021/01/29-16:44:51 [Thread-34] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [304]- Finished session validation.  No sessions were stopped.
+2021/01/29-16:45:51 [Thread-35] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [271]- Validating all active sessions...
+2021/01/29-16:45:51 [Thread-34] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [271]- Validating all active sessions...
+2021/01/29-16:45:51 [Thread-35] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [304]- Finished session validation.  No sessions were stopped.
+2021/01/29-16:45:51 [Thread-34] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [304]- Finished session validation.  No sessions were stopped.
+2021/01/29-16:46:51 [Thread-34] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [271]- Validating all active sessions...
+2021/01/29-16:46:51 [Thread-35] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [271]- Validating all active sessions...
+2021/01/29-16:46:51 [Thread-35] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [304]- Finished session validation.  No sessions were stopped.
+2021/01/29-16:46:51 [Thread-34] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [304]- Finished session validation.  No sessions were stopped.
+2021/01/29-16:47:51 [Thread-35] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [271]- Validating all active sessions...
+2021/01/29-16:47:51 [Thread-34] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [271]- Validating all active sessions...
+2021/01/29-16:47:51 [Thread-35] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [304]- Finished session validation.  No sessions were stopped.
+2021/01/29-16:47:51 [Thread-34] INFO  org.apache.shiro.session.mgt.AbstractValidatingSessionManager [304]- Finished session validation.  No sessions were stopped.
+
+
+        public Integer getTimeout() {
+            if (null == timeout) {
+//                return DEFAULT_TIMEOUT;
+                return 1;
+            }
+            return timeout;
+        }
+
+
+反思：
+   脑是否懒了
+   体是否懒了
+   1. 15:22 2021/1/29 这个点有点1疲惫和烦躁 办公室一直有人搬东西 很吵 加上 自己的事登录超时uat 重定向到系统首页
+   但是本地 修改session 存活时间 为1分钟的情况下 是可以 正常跳转到 cas 登录页面的 怀疑方向 （是否是用户的session 没有真正清空）
+   2.最终定位用户的session 没有真正在一个小时没有任何操作后被删除

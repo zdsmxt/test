@@ -1,0 +1,168 @@
+
+
+1.
+
+
+
+    public static void main(String[] args) {
+//        System.out.println(cn.hutool.core.date.DateUtil.beginOfMonth(new Date()));
+//        System.out.println(cn.hutool.core.date.DateUtil.endOfMonth(new Date()));
+
+        Calendar ca = Calendar.getInstance();// 得到一个Calendar的实例
+        ca.setTime(new Date()); // 设置时间为当前时间
+        System.out.println(ca.getTime());
+        ca.add(Calendar.MONTH, -1);// 月份减1
+        Date resultDate = ca.getTime(); // 结果
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd ");
+        System.out.println(sdf.format(resultDate));
+    }
+
+
+
+
+
+
+     @Override
+        public Object getActiveTrend(LogActiveTrendVO logActiveTrendVO) {
+            String byDate = logActiveTrendVO.getStatisticalAccuracy();
+            List<String> actionTimeRange = Arrays.asList(logActiveTrendVO.getTimeRange().split(FILTER_VALUE_SPLIT_SYMBOL));
+            if (BY_MONTH.equals(byDate)) {
+                Date now = new Date();
+                Calendar ca = Calendar.getInstance();
+                ca.setTime(now);
+                Date currentDay = ca.getTime();
+                ca.add(Calendar.MONTH, -1);
+                Date aMonthAgo = ca.getTime();
+                return sysLogMapper.getMonthTrend(currentDay, aMonthAgo);
+            } else if (!"".equals(actionTimeRange)) {
+                Date start = DateUtil.str2DateToDay(actionTimeRange.get(0) /*TagFilterServiceImpl.DAY_BEGIN*/, DateUtil.DATE_TO_DAY);
+                Date end = DateUtil.str2DateToDay(actionTimeRange.get(1) /* TagFilterServiceImpl.DAY_END*/, DateUtil.DATE_TO_DAY);
+                if (BY_DAY.equals(byDate)) {
+                    return sysLogMapper.getDayTrend(start, end);
+                } else if (BY_MONTH.equals(byDate)) {
+                    return sysLogMapper.getMonthTrend(start, end);
+                } else {
+                    return Collections.EMPTY_LIST;
+                }
+            }
+            return Collections.EMPTY_LIST;
+        }
+
+
+System.out.println("===getSysLogCondition==="+start);
+
+
+ if (StringUtils.isNotBlank(sysLogVO.getActionTimeRange())) {
+            List<String> actionTimeRange = Arrays.asList(sysLogVO.getActionTimeRange().split(FILTER_VALUE_SPLIT_SYMBOL));
+            Date start = DateUtil.str2DateToDay(actionTimeRange.get(0)/* + TagFilterServiceImpl.DAY_BEGIN*/, DateUtil.DATE_TO_DAY);
+            System.out.println("===getSysLogCondition==="+start);
+            Date end = DateUtil.str2DateToDay(actionTimeRange.get(1)/* + TagFilterServiceImpl.DAY_END*/, DateUtil.DATE_TO_DAY);
+            criteria.andGreaterThanOrEqualTo("logTime", start);
+            criteria.andLessThanOrEqualTo("logTime", end);
+        }
+
+
+
+        /* + TagFilterServiceImpl.DAY_BEGIN*/
+        /* + TagFilterServiceImpl.DAY_END*/
+
+
+
+
+        SELECT count(DISTINCT action_user) as uv
+        FROM sys_log
+        where event = 'LoginResult'
+        and log_time >='2020-09-01 00:00:00' and log_time<='2021-02-01 23:59:59';
+
+
+        SELECT count(id) as uv
+        FROM sys_log
+        where event = 'SearchClick'
+        and log_time >='2020-09-01 00:00:00' and log_time<='2021-02-01 23:59:59'
+
+
+            default Integer countAssignTimeUv(Date start,Date end){
+                Example example = new Example(SysLogDO.class);
+                Example.Criteria criteria = example.createCriteria();
+                criteria.andEqualTo("event", "LoginResult");
+                criteria.andGreaterThanOrEqualTo("logTime", start);
+                criteria.andLessThanOrEqualTo("logTime", end);
+                return this.selectCountByExample(criteria);
+            }
+
+
+
+环境搭建
+业务熟悉 业务逻辑梳理
+
+
+
+=============zhudongsheng@kungeek.com
+=======---=======org.springframework.dao.DataIntegrityViolationException:
+
+    public String buildGetCountLogUv(Date start, Date end) {
+        SQL sql = new SQL().SELECT("SELECT count(DISTINCT action_user) as uv").FROM("sys_log");
+        if (StringUtils.isNotEmpty(start.toString())) {
+            sql.WHERE("log_time>=" + start);
+        }
+        if (StringUtils.isNotEmpty(end.toString())) {
+            sql.WHERE("log_time<=" + end);
+        }
+        return sql.toString();
+    }
+
+
+ @SelectProvider(type = DynamicSqlBuilder.class, method = "buildGetAllUserByParam")
+    @Results({ @Result(column = "display_name", property = "displayName"),
+            @Result(column = "update_user", property = "updateUser"),
+            @Result(column = "create_user", property = "createUser"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime") })
+    List<Map<String, Object>> getAllUserRole(UserVO userVO, List<String> allSubordinateUsername);
+
+public String buildGetAllUserByParam(final UserVO userVO, List<String> allSubordinateUsername) {
+        SQL sql = new SQL().SELECT("t.*,GROUP_CONCAT(t2.rolename) roles,GROUP_CONCAT(t2.id) rids").FROM("sys_user t")
+                .LEFT_OUTER_JOIN("sys_user_role t1 ON(t.id=t1.uid)").LEFT_OUTER_JOIN("sys_role t2 ON(t1.rid=t2.id)");
+        if (StringUtils.isNotBlank(userVO.getUsername())) {
+            sql.WHERE("t.username like concat('" + userVO.getUsername() + "','%')");
+        }
+        if (StringUtils.isNotBlank(userVO.getDisplayName())) {
+            sql.WHERE("t.display_name like concat('" + userVO.getDisplayName() + "','%')");
+        }
+        if (!"admin".equals(userVO.getOperator())) {
+            StringBuffer concatSql = new StringBuffer("t.username in ");
+            ContactSql(concatSql, allSubordinateUsername);
+            sql.WHERE(concatSql.toString());
+        }
+        if (StringUtils.isNotBlank(userVO.getRolename())) {
+            sql.WHERE(" t2.rolename='" + userVO.getRolename() + "' ");
+        }
+        sql.GROUP_BY("t.id");
+        return sql.ORDER_BY("t.create_time desc,t.update_time desc").toString();
+    }
+
+
+
+
+
+反思：
+1.11:41 2021/1/27 这个点 脑袋累了 不灵光了
+2.初始化用户session的时候 由于这里面需要存储用户的登录日志 由于日志表维仲 没有及时修改actionContent 里面的数据可以运行为空
+导致 这一块的异常 被shiro 捕获 导致的单点登录异常
+3.产品 基于日志的描述 由于存的是json 对使用者不友好
+4.查看bitbucket 上 维仲的pr 更新103分支  打包前端代码测试
+5.总结生活中重复的事情 看看能不能 写个脚本实现
+  如开机 打开一系列的软件
+6.昨晚 2021/1/26 23:30 睡的 这个点不犯困17:39 2021/1/27
+
+大胆尝试
+7.我原以为 不好处理的 比如前端 需要的参数 我后端 给合并成一个对象 前端是可以处理的
+8.关于时间处理 前端 可能传时间字符串 也可能是到毫秒级的数值 需要后端转换
+
+
+
+
+
+
+
+
