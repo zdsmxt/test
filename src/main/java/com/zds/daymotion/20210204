@@ -4,6 +4,7 @@
 
 多加反思吧
 
+
 2021/02/04-10:26:32 [Test worker] DEBUG com.data.web.backend.mapper.SysLogMapper.countAssignTimeUvTest [143]- ==>  Preparing: SELECT count(DISTINCT action_user) as uv FROM sys_log where event = 'LoginResult' and action_user not in ('houyaqian@kungeek.com','zhudongsheng@kungeek.com','liuxiao@kungeek.com','wangmingyu@kungeek.com','yangjin@kungeek.com','guojunya@kungeek.com','shencheng@kungeek.com','liuhoulei@kungeek.com','wangweizhong@kungeek.com','zhangyubo@kungeek.com','dongwenjian@kungeek.com','wujunnan@kungeek.com','yinkai@kungeek.com','qiyanan@kungeek.com') and log_time >=? and log_time<=?
 2021/02/04-10:26:32 [Test worker] DEBUG com.data.web.backend.mapper.SysLogMapper.countAssignTimeUvTest [143]- ==> Parameters: 2021-01-02 00:00:00.0(Timestamp), 2021-02-05 23:59:59.0(Timestamp)
 2021/02/04-10:26:32 [Test worker] DEBUG com.data.web.backend.mapper.SysLogMapper.countAssignTimeUvTest [143]- <==      Total: 1
@@ -41,4 +42,7 @@
     Integer countAssignTimeUvTest(Date start, Date end,String dataGroup);
 
 
+==============
+
+对sql 语句的深刻理解 @Select () "" 双引号 说明是一串字符串
 
