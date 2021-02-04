@@ -1,0 +1,170 @@
+
+
+1.两个session  画像平台的后端session  cas单点登录的服务 session
+  过了一晚 之前的用户session 好像并没有失效 会显示超时 然后 自动登录的效果
+
+  自己清空本地的用户的cookie 也会显示 到cas 登录的页面
+
+
+
+
+SELECT
+	t1.d AS dayOrMonth,
+	t1.uv,
+	t2.qv
+FROM
+	(
+		(
+			SELECT
+				DATE_FORMAT(log_time, '%Y-%m-%d') AS d,
+				count(DISTINCT action_user) AS uv
+			FROM
+				sys_log
+			WHERE
+				EVENT = 'LoginResult'
+			AND dept_id != 9
+			AND log_time >='2021-01-04 00:00:00'
+			AND log_time <='2021-02-03 23:59:59'
+			GROUP BY
+				DATE_FORMAT(log_time, '%Y-%m-%d')
+		) AS t1
+		LEFT JOIN (
+			SELECT
+				DATE_FORMAT(log_time, '%Y-%m-%d') AS d,
+				count(*) AS qv
+			FROM
+				sys_log
+			WHERE
+				EVENT = 'SearchClick'
+			AND log_time >='2021-01-04 00:00:00'
+			AND log_time <='2021-02-03 23:59:59'
+			GROUP BY
+				DATE_FORMAT(log_time, '%Y-%m-%d')
+		) AS t2 ON t1.d = t2.d
+	)
+ORDER BY
+	t1.d ASC
+================================================================================================================
+
+SELECT
+	t1.d AS dayOrMonth,
+	t1.uv,
+	t2.qv
+FROM
+	(
+		(
+			SELECT
+				DATE_FORMAT(log_time, '%Y-%m-%d') AS d,
+				count(DISTINCT action_user) AS uv
+			FROM
+				sys_log
+			WHERE
+				EVENT = 'LoginResult'
+			AND dept_id != 9
+			AND log_time >= '2021-01-04 00:00:00'
+			AND log_time <= '2021-02-03 23:59:59'
+			GROUP BY
+				DATE_FORMAT(log_time, '%Y-%m-%d')
+		) AS t1
+		LEFT JOIN (
+			SELECT
+				DATE_FORMAT(log_time, '%Y-%m-%d') AS d,
+				count(*) AS qv
+			FROM
+				sys_log
+			WHERE
+				EVENT = 'SearchClick'
+			AND log_time >= '2021-01-04 00:00:00'
+			AND log_time <= '2021-02-03 23:59:59'
+			GROUP BY
+				DATE_FORMAT(log_time, '%Y-%m-%d')
+		) AS t2 ON t1.d = t2.d
+	)
+ORDER BY
+	t1.d ASC
+
+================================================================================================================
+
+
+[代码优化](v2.1.2):
+1.校验标签名称是否存在的代码 再次优化
+
+
+没有设置部门的用户 查询不到pv qv
+
+为什么用户 没有部门id uv  qv 的值都不存在
+
+2.前端怎么知道 我后端的 session 什么时候失效
+
+
+
+
+    private void handleTagFilter(TagFilterVO tagFilterVO, List<List<TagFilterItemDO>> orderedGroupOrderedItemList) {
+        // 分离出标签细则 标签值数据类型为日期的类型 给时间类型的数据拼00:00:00 或者 23:59:59
+        // 查看标签值 是否是时间类型
+        tagFilterVO.getTagFilterItems().stream().filter(item -> esUtil.judgeIsDate(item)).forEach(item -> {
+            Integer dateFormat = tagMapper.selectByPrimaryKey(item.getTagId()).getDateFormat();
+            // 如果前端传入的日期 这里需要拼上天时分秒或者时分秒
+            if (DateFormatEnum.DATE_TO_DAY.getId().equals(dateFormat)) {
+                // 获取时间的区间值 操作符号为区间
+                if (isBetween(item)) {
+                    List<String> values = Arrays.asList(item.getFilterValue().split(EsUtil.FILTER_VALUE_SPLIT_SYMBOL));
+                    item.setFilterValue(values.get(0) + DAY_BEGIN + EsUtil.FILTER_VALUE_SPLIT_SYMBOL + values.get(1) + DAY_END);
+                }
+                // 操作符号为等于
+                if (OperatorEnum.NE.equals(item.getOperator())) {
+                    item.setOperator(OperatorEnum.BETWEEN);
+                    String value = item.getFilterValue();
+                    item.setFilterValue(value + DAY_BEGIN + EsUtil.FILTER_VALUE_SPLIT_SYMBOL + value + DAY_END);
+                }
+                // 操作符号不等于或者大于等于或者小于
+                if (operatorSet.contains(item.getOperator())) {
+                    item.setFilterValue(item.getFilterValue() + DAY_BEGIN);
+                }
+                // 操作符号大于或者小于等于
+                if (isGtLte(item)) {
+                    item.setFilterValue(item.getFilterValue() + DAY_END);
+                }
+                // 如果前端传入的日期是到月份的 这里需要拼上天时分秒
+            } else if (DateFormatEnum.DATE_TO_MONTH.getId().equals(dateFormat)) {
+                if (isBetween(item)) {
+                    List<String> values = Arrays.asList(item.getFilterValue().split(EsUtil.FILTER_VALUE_SPLIT_SYMBOL));
+                    item.setFilterValue(values.get(0) + DDHHMMSS + EsUtil.FILTER_VALUE_SPLIT_SYMBOL + values.get(1) + DDHHMMSS);
+                }
+                if (OperatorEnum.NE.equals(item.getOperator())) {
+                    item.setOperator(OperatorEnum.BETWEEN);
+                    String value = item.getFilterValue();
+                    item.setFilterValue(value + DDHHMMSS + EsUtil.FILTER_VALUE_SPLIT_SYMBOL + value + DDHHMMSS);
+                }
+                if (operatorSet.contains(item.getOperator())) {
+                    item.setFilterValue(item.getFilterValue() + DDHHMMSS);
+                }
+                if (isGtLte(item)) {
+                    item.setFilterValue(item.getFilterValue() + DDHHMMSS);
+                }
+            } else if (DateFormatEnum.DATE_TO_SECOND.getId().equals(dateFormat) && OperatorEnum.NE.equals(item.getOperator())) {
+                // 处理如果是时间类型 且时间格式是精确到秒的情况 且获取的是等于当天的数据 这里 需要转成区间操作
+                item.setOperator(OperatorEnum.BETWEEN);
+                // 处理传入的标签值
+                String value = item.getFilterValue().substring(0, DATE_TO_DAY);
+                item.setFilterValue(value + DAY_BEGIN + EsUtil.FILTER_VALUE_SPLIT_SYMBOL + value + DAY_END);
+            }
+        });
+        // 排序每一个内层集合里面的item
+        List<TagFilterItemDO> tagFilterItems = tagFilterVO.getTagFilterItems();
+        // 分理处每一个组细则
+        Map<Integer, List<TagFilterItemDO>> groupMap = tagFilterItems.stream().collect(Collectors.groupingBy(TagFilterItemDO::getGroupOrder));
+        // 遍历出每一个组细则 的顺序排好序
+        List<Integer> sortedGroupOrders = groupMap.keySet().stream().sorted().collect(Collectors.toList());
+        // 放置有序组的集合
+        List<List<TagFilterItemDO>> groupItemList = new ArrayList<>(sortedGroupOrders.size());
+        for (Integer groupOrder : sortedGroupOrders) {
+            groupItemList.add(groupMap.get(groupOrder));
+        }
+        // 排序每一个内层集合里面的item
+        for (List<TagFilterItemDO> filterItemDOS : groupItemList) {
+            //遍历groupMap 排序里面的各个list 里面的item
+            orderedGroupOrderedItemList.add(filterItemDOS.stream().sorted(Comparator.comparing(TagFilterItemDO::getGroupInnerOrder)).collect(Collectors.toList()));
+        }
+    }
+

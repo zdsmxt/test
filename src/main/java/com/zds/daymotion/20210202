@@ -1,0 +1,183 @@
+
+
+1. 修改标签模型里面的 企业标签的权限 有对应角色的业务人员看不到 这些标签
+   问题定位：
+   修改之前的 标签部门表的维护 由于 标签管理员 修改标签的权限之后 没有更新
+
+    tagDeptMapper.delete(TagDeptDO.builder().deptId(authority).tagId(tagId).build());
+
+//            example.and()
+//                    .andEqualTo("tagId", tagId)
+//                    .andEqualTo("deptId", previousAuthority)
+//                    .andEqualTo("delFlag", ConstantEnum.NO)
+//                    .andEqualTo("sysId", sysId);
+//            tagDeptMapper.updateByExampleSelective(tagDeptDO, example);
+
+
+反思
+   1.由于这里面 会存在 有的部门下没有任何标签的情况 因为就是 会走全表查询
+     逻辑删除 保留原有的修改痕迹 便于问题的溯源
+   2.为什么会忘了 这个关系的维护逻辑的处理
+
+
+@Override
+    @Transactional(rollbackFor = Exception.class)
+    public Object updateTag(TagVO tagVO) {
+        Integer tagId = tagVO.getId();
+        Integer sysId = tagVO.getSysId();
+        TagDO previousTag = tagMapper.selectByPrimaryKey(tagId);
+        Integer previousAuthority = previousTag.getAuthority();
+        String tagName = tagVO.getName();
+        if (null != tagName) {
+            List<TagDO> tags = tagMapper.select(TagDO.builder().name(tagName).build());
+            if (tags.size() > ConstantEnum.YES) {
+                AssertUtil.assertBlank(tagName, "修改的标签名称已经存在");
+            }
+        }
+        TagDO tagDO = BeanUtil.copy(tagVO, new TagDO());
+        // 补充逻辑 维护 标签和部门的权限关系 (TODO: 考虑到后面会有标签审核 这里用户一旦编辑这个标签的权限 这里面先逻辑删除原有的部门标签关系 新增一个新的部门标签关系)
+        // 如果传入的权限部门和 旧有的这个标签 不一样 说明 这个用户要修改当前标签所属的部门
+        Integer authority = tagDO.getAuthority();
+        Date now = new Date();
+        String userName = UserUtil.getUserName();
+        if (!previousTag.getAuthority().equals(authority)) {
+            // 逻辑删除旧有的部门标签关系
+            // 传入要查询的标签部门记录条件
+            TagDeptDO previousTagDeptDO = TagDeptDO.builder().deptId(previousAuthority).tagId(tagId).delFlag(ConstantEnum.NO).sysId(sysId).build();
+            // 要更新的标签部门里面的值
+            TagDeptDO delTagDeptDO = TagDeptDO.builder().deptId(previousAuthority).tagId(tagId).delFlag(ConstantEnum.YES).sysId(sysId).updateTime(now).updateUser(userName).build();
+            tagDeptMapper.logicDeleteTagDept(previousTagDeptDO, delTagDeptDO);
+            // 添加新的部门标签关系
+            tagDeptMapper.insertUseGeneratedKeys(TagDeptDO.builder().deptId(authority).tagId(tagId)
+                    .createTime(now).createUser(userName).updateTime(now).updateUser(userName)
+                    .delFlag(ConstantEnum.NO).sysId(sysId).build());
+        }
+        tagDO.setUpdateTime(now);
+        tagDO.setUpdateUser(userName);
+        return tagMapper.updateByPrimaryKeySelective(tagDO);
+    }
+
+
+ TagDeptDO previousTagDeptDO = TagDeptDO.builder().deptId(previousAuthority).tagId(tagId).delFlag(ConstantEnum.NO).sysId(sysId).build();
+            // 要更新的标签部门里面的值
+            TagDeptDO delTagDeptDO = TagDeptDO.builder().deptId(previousAuthority).tagId(tagId).delFlag(ConstantEnum.YES).sysId(sysId).updateTime(now).updateUser(userName).build();
+            tagDeptMapper.logicDeleteTagDept(previousTagDeptDO, delTagDeptDO);
+
+
+
+    /**
+     * 逻辑删除标签和部门的关系 这里指定删除指定的体系下与某个部门绑定的标签记录
+     * @param previous
+     * @param delTagDeptDO
+     */
+    default void logicDeleteTagDept(TagDeptDO previous ,TagDeptDO delTagDeptDO) {
+        Example example = new Example(TagDeptDO.class);
+        example.and()
+                .andEqualTo("tagId", previous.getTagId())
+                .andEqualTo("deptId", previous.getDeptId())
+                .andEqualTo("delFlag", ConstantEnum.NO)
+                .andEqualTo("sysId", previous.getSysId());
+        this.updateByExampleSelective(delTagDeptDO, example);
+    }
+
+
+
+        public String buildGetLogByMonth(final UserVO userVO, List<String> allSubordinateUsername) {
+            SQL sql = new SQL().SELECT(" t1.d,t1.uv,t2.pv").FROM("sys_user t")
+                    .LEFT_OUTER_JOIN("sys_user_role t1 ON(t.id=t1.uid)").LEFT_OUTER_JOIN("sys_role t2 ON(t1.rid=t2.id)");
+            if (StringUtils.isNotBlank(userVO.getUsername())) {
+                sql.WHERE("t.username like concat('" + userVO.getUsername() + "','%')");
+            }
+            if (StringUtils.isNotBlank(userVO.getDisplayName())) {
+                sql.WHERE("t.display_name like concat('" + userVO.getDisplayName() + "','%')");
+            }
+            if (!"admin".equals(userVO.getOperator())) {
+                StringBuffer concatSql = new StringBuffer("t.username in ");
+                ContactSql(concatSql, allSubordinateUsername);
+                sql.WHERE(concatSql.toString());
+            }
+            if (StringUtils.isNotBlank(userVO.getRolename())) {
+                sql.WHERE(" t2.rolename='" + userVO.getRolename() + "' ");
+            }
+            sql.GROUP_BY("t.id");
+            return sql.ORDER_BY("t1.asc").toString();
+        }
+
+
+
+
+============>>>t.username in ('houyaqian@kungeek.com','zhudongsheng@kungeek.com','yangjin@kungeek.com','guojunya@kungeek.com','shencheng@kungeek.com','liuhoulei@kungeek.com')
+
+
+
+    public static void main(String[] args) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add("houyaqian@kungeek.com");
+        arrayList.add("zhudongsheng@kungeek.com");
+        arrayList.add("liuxiao@kungeek.com");
+        arrayList.add("wangmingyu@kungeek.com");
+        arrayList.add("yangjin@kungeek.com");
+        arrayList.add("guojunya@kungeek.com");
+        arrayList.add("shencheng@kungeek.com");
+        arrayList.add("liuhoulei@kungeek.com");
+        arrayList.add("wangweizhong@kungeek.com");
+        arrayList.add("zhangyubo@kungeek.com");
+        arrayList.add("dongwenjian@kungeek.com");
+        arrayList.add("wujunnan@kungeek.com");
+        arrayList.add("yinkai@kungeek.com");
+        arrayList.add("qiyanan@kungeek.com");
+        StringBuffer concatSql = new StringBuffer("t.username in ");
+        String s = ContactSql(concatSql, arrayList);
+        System.out.println("============>>>"+s);
+
+
+    }
+
+
+
+
+//===
+
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add("houyaqian@kungeek.com");
+        arrayList.add("zhudongsheng@kungeek.com");
+        arrayList.add("liuxiao@kungeek.com");
+        arrayList.add("wangmingyu@kungeek.com");
+        arrayList.add("yangjin@kungeek.com");
+        arrayList.add("guojunya@kungeek.com");
+        arrayList.add("shencheng@kungeek.com");
+        arrayList.add("liuhoulei@kungeek.com");
+        arrayList.add("wangweizhong@kungeek.com");
+        arrayList.add("zhangyubo@kungeek.com");
+        arrayList.add("dongwenjian@kungeek.com");
+        arrayList.add("wujunnan@kungeek.com");
+        arrayList.add("yinkai@kungeek.com");
+        arrayList.add("qiyanan@kungeek.com");
+        StringBuffer concatSql = new StringBuffer("action_user not in");
+        String s = new DynamicSqlBuilder().ContactSql(concatSql, arrayList);
+
+
+日志表里面添加一个 用户的部门字段 int dept_id
+
+
+
+
+
+select t1.d,t1.uv,t2.pv
+from(
+(SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as uv
+FROM sys_log
+where event = 'LoginResult'
+and dept_id !=
+and log_time >='2020-09-01 00:00:00' and log_time<='2021-02-01 23:59:59'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+) as t1
+left join (
+SELECT DATE_FORMAT(log_time,'%Y-%m-%d') as d,count(*) as pv
+FROM sys_log
+where event = 'SearchClick'
+and log_time >='2020-09-01 00:00:00' and log_time<='2021-02-01 23:59:59'
+GROUP BY DATE_FORMAT(log_time,'%Y-%m-%d')
+) as t2
+on t1.d = t2.d
+)ORDER BY t1.d desc;
