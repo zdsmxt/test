@@ -4,3 +4,41 @@
 
 多加反思吧
 
+2021/02/04-10:26:32 [Test worker] DEBUG com.data.web.backend.mapper.SysLogMapper.countAssignTimeUvTest [143]- ==>  Preparing: SELECT count(DISTINCT action_user) as uv FROM sys_log where event = 'LoginResult' and action_user not in ('houyaqian@kungeek.com','zhudongsheng@kungeek.com','liuxiao@kungeek.com','wangmingyu@kungeek.com','yangjin@kungeek.com','guojunya@kungeek.com','shencheng@kungeek.com','liuhoulei@kungeek.com','wangweizhong@kungeek.com','zhangyubo@kungeek.com','dongwenjian@kungeek.com','wujunnan@kungeek.com','yinkai@kungeek.com','qiyanan@kungeek.com') and log_time >=? and log_time<=?
+2021/02/04-10:26:32 [Test worker] DEBUG com.data.web.backend.mapper.SysLogMapper.countAssignTimeUvTest [143]- ==> Parameters: 2021-01-02 00:00:00.0(Timestamp), 2021-02-05 23:59:59.0(Timestamp)
+2021/02/04-10:26:32 [Test worker] DEBUG com.data.web.backend.mapper.SysLogMapper.countAssignTimeUvTest [143]- <==      Total: 1
+
+@Test
+    public void testNoRepeatDataGroup() throws Exception {
+        Date start = DateUtil.str2DateToDay("2021-01-02" + TagFilterServiceImpl.DAY_BEGIN, DateUtil.DATE_TO_DAY);
+        Date end = DateUtil.str2DateToDay("2021-02-05" + TagFilterServiceImpl.DAY_END, DateUtil.DATE_TO_DAY);
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add("houyaqian@kungeek.com");
+        arrayList.add("zhudongsheng@kungeek.com");
+        arrayList.add("liuxiao@kungeek.com");
+        arrayList.add("wangmingyu@kungeek.com");
+        arrayList.add("yangjin@kungeek.com");
+        arrayList.add("guojunya@kungeek.com");
+        arrayList.add("shencheng@kungeek.com");
+        arrayList.add("liuhoulei@kungeek.com");
+        arrayList.add("wangweizhong@kungeek.com");
+        arrayList.add("zhangyubo@kungeek.com");
+        arrayList.add("dongwenjian@kungeek.com");
+        arrayList.add("wujunnan@kungeek.com");
+        arrayList.add("yinkai@kungeek.com");
+        arrayList.add("qiyanan@kungeek.com");
+        StringBuffer concatSql = new StringBuffer("");
+        String s = new DynamicSqlBuilder().ContactSql(concatSql, arrayList);
+        System.out.println("============"+sysLogMapper.countAssignTimeUvTest(start, end, s));
+    }
+
+
+ @Select("SELECT count(DISTINCT action_user) as uv\n" +
+            "FROM sys_log\n" +
+            "where event = 'LoginResult'\n" +
+            "and action_user not in ${dataGroup}\n" +
+            "and log_time >=#{start} and log_time<=#{end}")
+    Integer countAssignTimeUvTest(Date start, Date end,String dataGroup);
+
+
+
