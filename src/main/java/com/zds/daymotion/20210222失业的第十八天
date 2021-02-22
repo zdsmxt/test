@@ -1,0 +1,137 @@
+linux 配置jdk
+https://blog.csdn.net/weixin_39984161/article/details/91447727
+
+下载jdk到本地电脑
+
+上传jdk 到虚拟机里面的linux
+
+解解压 jdk tar -zxvf jdk-8u281-linux-x64.tar.gz
+
+tar -zxvf jdk-8u281-linux-x64.tar.gz
+
+
+
+
+配置环境变量：
+vim /etc/profile
+export JAVA_HOME=/software/jdk/jdk1.8.0_281
+export CLASSPATH=$:CLASSPATH:$JAVA_HOME/lib/
+export PATH=$PATH:$JAVA_HOME/bin
+[root@localhost jdk1.8.0_281]# source /etc/profile
+[root@localhost jdk1.8.0_281]# java -version
+java version "1.8.0_281"
+Java(TM) SE Runtime Environment (build 1.8.0_281-b09)
+Java HotSpot(TM) 64-Bit Server VM (build 25.281-b09, mixed mode)
+
+
+
+
+https://www.jianshu.com/p/9f2c162ac77c
+
+安装nginx
+# 安装依赖
+yum -y install gcc zlib zlib-devel pcre-devel openssl openssl-devel
+# 解压缩
+tar -zxvf linux-nginx-1.12.2.tar.gz
+cd nginx-1.12.2/
+# 执行配置
+./configure
+# 编译安装(默认安装在/usr/local/nginx)
+make
+make install
+
+我这个系统没有防火墙这个模块
+防火墙配置
+nginx默认监听80端口，如果未关闭防火墙需要配置iptables规则开放80端口(以centos6为例)。
+编辑配置文件：vim /etc/sysconfig/iptables
+在文件中间添加iptables规则
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+重启防火墙：service iptables restart
+或者关闭iptables规则：iptables -F && iptables -t nat -F
+
+Nginx验证
+nginx主配置文件：/usr/local/nginx/conf/nginx.conf
+nginx日志文件：/usr/local/nginx/logs/access.log
+启动Nginx：/usr/local/nginx/sbin/nginx （重要 一定要启动 否则访问不动）
+
+然后直接访问ip地址，比如：http://192.168.109.111/，如果能看到如下Nginx主页说明安装ok。
+界面展示的有
+
+Welcome to nginx!
+If you see this page, the nginx web server is successfully installed and working. Further configuration is required.
+
+For online documentation and support please refer to nginx.org.
+Commercial support is available at nginx.com.
+
+Thank you for using nginx.
+
+
+查看nginx进程
+[root@localhost ~]# ps -ef | grep nginx
+root      13040      1  0 09:13 ?        00:00:00 nginx: master process /usr/local/nginx/sbin/nginx
+nobody    13041  13040  0 09:13 ?        00:00:00 nginx: worker process
+root      13081  13056  0 09:18 pts/3    00:00:00 grep --color=auto nginx
+
+
+linux 安装mysql
+
+cat /var/log/mysqld.log|grep 'A temporary password'
+2021-02-22T01:32:42.137560Z 1 [Note] A temporary password is generated for root@localhost: pfb6-Dc,zyeW
+
+
+https://www.cnblogs.com/zhangliuhero/p/13927823.html
+
+
+linux  查找相关的文件
+https://www.cnblogs.com/balaamwe/archive/2011/10/27/2225921.html
+
+[root@localhost logs]# ps -ef |grep mysql
+mysql     13800      1  0 09:32 ?        00:00:00 /usr/sbin/mysqld --daemonize --pid-file=/var/run/mysqld/mysqld.pid
+root      13872  13056  0 09:50 pts/3    00:00:00 grep --color=auto mysql
+[root@localhost logs]# ps -ef |grep java
+root      13874  13056  0 09:50 pts/3    00:00:00 grep --color=auto java
+[root@localhost logs]# ps -ef |grep jdk
+root      13876  13056  0 09:50 pts/3    00:00:00 grep --color=auto jdk
+[root@localhost logs]# ps -ef |grep nginx
+root      13040      1  0 09:13 ?        00:00:00 nginx: master process /usr/local/nginx/sbin/nginx
+nobody    13041  13040  0 09:13 ?        00:00:00 nginx: worker process
+root      13878  13056  0 09:50 pts/3    00:00:00 grep --color=auto nginx
+
+
+閱讀和學習音樂 ,集中的音樂,學習專注力讀書音樂 ,舒壓放鬆鋼琴音樂,放鬆音樂
+
+
+
+
+[root@localhost treedemo]# ps -ef |grep mysql
+mysql     13800      1  0 09:32 ?        00:00:06 /usr/sbin/mysqld --daemonize --pid-file=/var/run/mysqld/mysqld.pid
+root      13997  13056  0 13:35 pts/3    00:00:00 grep --color=auto mysql
+[root@localhost treedemo]# netstat -natp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      13040/nginx: master
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      7116/sshd
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      13737/master
+tcp        0     48 192.168.109.111:22      192.168.109.112:4801    ESTABLISHED 13048/sshd: root@pt
+tcp        0      0 192.168.109.111:22      192.168.109.112:4811    ESTABLISHED 13052/sshd: root@no
+tcp6       0      0 :::3306                 :::*                    LISTEN      13800/mysqld
+tcp6       0      0 :::22                   :::*                    LISTEN      7116/sshd
+tcp6       0      0 ::1:25                  :::*                    LISTEN      13737/master
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7592    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7584    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7590    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:5030    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7591    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7585    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7469    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7589    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7588    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:5029    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7586    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7593    ESTABLISHED 13800/mysqld
+tcp6       0      0 192.168.109.111:3306    192.168.109.112:7587    ESTABLISHED 13800/mysqld
+
+
+java -jar xxx.jar
+
+java -jar treedemo-0.0.1-SNAPSHOT.jar

@@ -1,0 +1,15 @@
+
+
+玩玩linux
+
+[root@localhost ~]#  netstat -natp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      7093/sshd
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      7220/master
+tcp        0      0 192.168.109.111:22      192.168.109.112:5772    ESTABLISHED 8926/sshd: root@pts
+tcp        0    240 192.168.109.111:22      192.168.109.112:12527   ESTABLISHED 21849/sshd: root@pt
+tcp6       0      0 :::22                   :::*                    LISTEN      7093/sshd
+tcp6       0      0 ::1:25                  :::*                    LISTEN      7220/master
+
+

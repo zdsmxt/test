@@ -1,0 +1,155 @@
+被yum 源安装 困顿的小伙子 陷入了看视频舒适区的小朱
+
+进入 linux 文件 /etc/sysconfig/network-scripts 使用vi命令修改ifcfg-enxxxx文件
+
+
+
+TYPE=Ethernet
+DEFROUTE=yes
+PEERDNS=yes
+PEERROUTES=yes
+iIPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_PEERROUTE=yes
+IPV6PEERDNS=yes
+IPV6_FAILURE_FATAL=no
+NAME=ifcfg-ens33
+#UUID=960e1b59-4c61-4548-9b0d-d61774562d20
+DEVICE=ifcfg-ens33
+ONBOOT=yes
+HWADDR=00:0c:29:8b:8f:ec
+IPADDR0=192.168.109.111
+GATEWAY0=192.168.109.2
+BOOTPROTO=static
+
+DNS1=8.8.8.8
+DNS2=114.114.114.114
+
+
+
+
+
+[root@localhost ~]# cat /etc/sysconfig/network-scripts/ifcfg-ens33
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=static
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=ens33
+#UUID=58752c2d-0e77-489b-b233-7de16f8c0a7e
+DEVICE=ens33
+ONBOOT=yes
+IPADDR=192.168.109.123
+NETMASK=255.255.255.0
+GATEWAY=192.168.109.2
+DNS1=119.29.29.29
+
+
+https://blog.csdn.net/wang1046811344/article/details/81210159
+这个不是 过年期间防火墙加高的原因 是因为 这个版本的操作系统 repos 源有问题
+安装网路工具 不是 yum install ifconfig 这个命令
+ sudo yum install net-tools
+
+ =======
+
+
+ 这个问题的解决
+
+
+
+[root@localhost ~]# yum install vim
+已加载插件：fastestmirror
+Loading mirror speeds from cached hostfile
+There are no enabled repos.
+ Run "yum repolist all" to see the repos you have.
+ To enable Red Hat Subscription Management repositories:
+     subscription-manager repos --enable <repo>
+ To enable custom repositories:
+     yum-config-manager --enable <repo>
+
+
+
+1. cd /etc/yum.repos.d
+
+2. mv CentOS-Base.repo CentOS-Base.repo.backup
+
+3. wget http://mirrors.163.com/.help/CentOS7-Base-163.repo
+
+4. mv CentOS6-Base-163.repo CentOS-Base.repo
+
+5.yum clean all
+
+
+[root@localhost yum.repos.d]# cat /etc/sysconfig/network-scripts/ifcfg-ens33
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=static
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=ens33
+#UUID=58752c2d-0e77-489b-b233-7de16f8c0a7e
+DEVICE=ens33
+ONBOOT=yes
+IPADDR=192.168.109.123
+NETMASK=255.255.255.0
+GATEWAY=192.168.109.2
+DNS1=119.29.29.29
+
+
+
+我就是因为这个 yum 源下载不到软件 从过年初一一直郁闷到今天正月初十
+
+总算解决了
+果然 这种应用级别的还是早点去解决 越是基础越要 我们自己好好去专研
+
+安一个linux 的可视化的试着装一些别的东西
+
+总结 按部就班的 安装一下 这个虚拟机软件
+下载对于的linux 操作系统镜像
+
+查看linux 的镜像版本
+
+第一步 最关键的一步 设置用户名和密码 root 123456
+
+设置网络的连通性
+
+vi /etc/sysconfig/network-scripts/ifcfg-en33
+
+dhcp 动态分配网络地址 改为静态的 static
+
+设置这个虚拟机的linux 的ip 子网掩码 和网关
+dns 域名解析服务器设置 4个8
+
+这个网关的选择 这里 我选的是192.168.109.1 不行
+但是我改为192.168.109.2 就可以了
+
+注意这里 网段有效地址 是192.168.109.100 到192.168.109.254
+
+
+jdk 下载官网
+https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html
+
+
+
+
+
+
+
+
+
+
+
