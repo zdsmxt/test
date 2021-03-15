@@ -135,3 +135,317 @@ tcp6       0      0 192.168.109.111:3306    192.168.109.112:7587    ESTABLISHED 
 java -jar xxx.jar
 
 java -jar treedemo-0.0.1-SNAPSHOT.jar
+
+
+你会别人不会的那叫技术      你会别人也会的那叫常识
+
+[root@localhost ~]# ps -ef | grep WxBeeMaths-1.0.0-SNAPSHOT.jar
+root      14162  14076 13 15:25 pts/0    00:00:58 java -jar WxBeeMaths-1.0.0-SNAPSHOT.jar
+root      14241  14208  0 15:33 pts/1    00:00:00 grep --color=auto WxBeeMaths-1.0.0-SNAPSHOT.jar
+
+
+http://192.168.109.111:8050/
+
+http://192.168.109.111
+
+http://localhost:8050/
+
+
+
+
+
+
+
+
+[root@localhost ~]# ps -ef | grep WxBeeMaths-1.0.0-SNAPSHOT.jar
+root      14252  14076 10 15:39 pts/0    00:00:59 java -jar WxBeeMaths-1.0.0-SNAPSHOT.jar
+root      14300  14208  0 15:49 pts/1    00:00:00 grep --color=auto WxBeeMaths-1.0.0-SNAPSHOT.jar
+[root@localhost ~]#
+[root@localhost ~]# kill -9 14252
+
+
+
+[root@localhost beemath]#
+[root@localhost beemath]# java -jar WxBeeMaths-1.0.0-SNAPSHOT.jar
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.0.4.RELEASE)
+
+2021-02-22 15:40:03.615 INFO  [main] com.tft.bee.WxBeeMathsServerApplication: Starting WxBeeMathsServerApplication v1.0.0-SNAPSHOT on l               ocalhost.localdomain with PID 14252 (/project/beemath/WxBeeMaths-1.0.0-SNAPSHOT.jar started by root in /project/beemath)
+2021-02-22 15:40:03.621 INFO  [main] com.tft.bee.WxBeeMathsServerApplication: The following profiles are active: test
+2021-02-22 15:40:08.830 WARN  [main] org.mybatis.spring.mapper.ClassPathMapperScanner: No MyBatis mapper was found in '[com.*.mapper]'                package. Please check your configuration.
+2021-02-22 15:40:09.466 DEBUG [main] com.baomidou.mybatisplus.spring.boot.starter.MybatisPlusAutoConfiguration: Searching for mappers a               nnotated with @Mapper
+2021-02-22 15:40:09.484 DEBUG [main] com.baomidou.mybatisplus.spring.boot.starter.MybatisPlusAutoConfiguration: Using auto-configuratio               n base package 'com.tft.bee'
+2021-02-22 15:40:17.951 DEBUG [main] io.netty.util.internal.logging.InternalLoggerFactory: Using SLF4J as the default logging framework
+2021-02-22 15:40:18.129 DEBUG [main] io.netty.util.ResourceLeakDetector: -Dio.netty.leakDetection.level: simple
+2021-02-22 15:40:18.132 DEBUG [main] io.netty.util.ResourceLeakDetector: -Dio.netty.leakDetection.targetRecords: 4
+2021-02-22 15:40:18.246 DEBUG [main] io.netty.util.internal.PlatformDependent0: -Dio.netty.noUnsafe: false
+2021-02-22 15:40:18.247 DEBUG [main] io.netty.util.internal.PlatformDependent0: Java version: 8
+2021-02-22 15:40:18.250 DEBUG [main] io.netty.util.internal.PlatformDependent0: sun.misc.Unsafe.theUnsafe: available
+2021-02-22 15:40:18.264 DEBUG [main] io.netty.util.internal.PlatformDependent0: sun.misc.Unsafe.copyMemory: available
+2021-02-22 15:40:18.266 DEBUG [main] io.netty.util.internal.PlatformDependent0: java.nio.Buffer.address: available
+2021-02-22 15:40:18.268 DEBUG [main] io.netty.util.internal.PlatformDependent0: direct buffer constructor: available
+2021-02-22 15:40:18.271 DEBUG [main] io.netty.util.internal.PlatformDependent0: java.nio.Bits.unaligned: available, true
+2021-02-22 15:40:18.271 DEBUG [main] io.netty.util.internal.PlatformDependent0: jdk.internal.misc.Unsafe.allocateUninitializedArray(int               ): unavailable prior to Java9
+2021-02-22 15:40:18.271 DEBUG [main] io.netty.util.internal.PlatformDependent0: java.nio.DirectByteBuffer.<init>(long, int): available
+2021-02-22 15:40:18.272 DEBUG [main] io.netty.util.internal.PlatformDependent: sun.misc.Unsafe: available
+2021-02-22 15:40:18.273 DEBUG [main] io.netty.util.internal.PlatformDependent: -Dio.netty.tmpdir: /tmp (java.io.tmpdir)
+2021-02-22 15:40:18.273 DEBUG [main] io.netty.util.internal.PlatformDependent: -Dio.netty.bitMode: 64 (sun.arch.data.model)
+2021-02-22 15:40:18.291 DEBUG [main] io.netty.util.internal.PlatformDependent: -Dio.netty.noPreferDirect: false
+2021-02-22 15:40:18.292 DEBUG [main] io.netty.util.internal.PlatformDependent: -Dio.netty.maxDirectMemory: 247332864 bytes
+2021-02-22 15:40:18.293 DEBUG [main] io.netty.util.internal.PlatformDependent: -Dio.netty.uninitializedArrayAllocationThreshold: -1
+2021-02-22 15:40:18.295 DEBUG [main] io.netty.util.internal.CleanerJava6: java.nio.ByteBuffer.cleaner(): available
+2021-02-22 15:40:18.296 DEBUG [main] io.netty.util.ResourceLeakDetectorFactory: Loaded default ResourceLeakDetector: io.netty.util.Reso               urceLeakDetector@312aa7c
+2021-02-22 15:40:18.396 DEBUG [main] io.netty.util.internal.PlatformDependent: org.jctools-core.MpscChunkedArrayQueue: available
+2021-02-22 15:40:18.441 DEBUG [main] reactor.util.Loggers$LoggerFactory: Using Slf4j logging framework
+2021-02-22 15:40:18.981 DEBUG [main] reactor.core.publisher.UnsafeSupport: Starting UnsafeSupport init in Java 1.8
+2021-02-22 15:40:18.982 DEBUG [main] reactor.core.publisher.UnsafeSupport: Unsafe is available
+2021-02-22 15:40:19.460 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.numHeapArenas: 2
+2021-02-22 15:40:19.460 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.numDirectArenas: 2
+2021-02-22 15:40:19.461 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.pageSize: 8192
+2021-02-22 15:40:19.461 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.maxOrder: 11
+2021-02-22 15:40:19.461 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.chunkSize: 16777216
+2021-02-22 15:40:19.461 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.tinyCacheSize: 512
+2021-02-22 15:40:19.461 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.smallCacheSize: 256
+2021-02-22 15:40:19.462 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.normalCacheSize: 64
+2021-02-22 15:40:19.462 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.maxCachedBufferCapacity: 32768
+2021-02-22 15:40:19.462 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.cacheTrimInterval: 8192
+2021-02-22 15:40:19.476 DEBUG [main] io.netty.buffer.PooledByteBufAllocator: -Dio.netty.allocator.useCacheForAllThreads: true
+2021-02-22 15:40:19.499 DEBUG [main] io.netty.util.internal.InternalThreadLocalMap: -Dio.netty.threadLocalMap.stringBuilder.initialSize               : 1024
+2021-02-22 15:40:19.499 DEBUG [main] io.netty.util.internal.InternalThreadLocalMap: -Dio.netty.threadLocalMap.stringBuilder.maxSize: 40               96
+2021-02-22 15:40:20.409 DEBUG [main] com.baomidou.mybatisplus.toolkit.GlobalConfigUtils: DeBug: MyBatis Plus Global configuration Initi               alizing !
+2021-02-22 15:40:20.443 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.baomidou.mybatisplus.mapper               .SqlRunner.SelectList
+2021-02-22 15:40:20.443 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.baomidou.mybatisplus.mapper               .SqlRunner.SelectObjs
+2021-02-22 15:40:20.444 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.baomidou.mybatisplus.mapper               .SqlRunner.Insert
+2021-02-22 15:40:20.445 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.baomidou.mybatisplus.mapper               .SqlRunner.Update
+2021-02-22 15:40:20.445 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.baomidou.mybatisplus.mapper               .SqlRunner.Delete
+2021-02-22 15:40:20.445 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.baomidou.mybatisplus.mapper               .SqlRunner.Count
+2021-02-22 15:40:20.446 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: Mybatis-plus init success.
+2021-02-22 15:40:20.620 INFO  [main] com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure: Init DruidDataSource
+2021-02-22 15:40:21.987 INFO  [main] com.alibaba.druid.pool.DruidDataSource: {dataSource-1} inited
+2021-02-22 15:40:22.342 DEBUG [main] org.mybatis.spring.SqlSessionFactoryBean: Scanned package: 'com.tft.bee.entity' for aliases
+2021-02-22 15:40:23.400 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathWXBil               lMapper.insertWxBill
+2021-02-22 15:40:23.426 DEBUG [main] org.mybatis.spring.SqlSessionFactoryBean: Parsed mapper file: 'URL [jar:file:/project/beemath/WxBe               eMaths-1.0.0-SNAPSHOT.jar!/BOOT-INF/classes!/com/tft/bee/mapper/BeeMathWXBillMapper.xml]'
+2021-02-22 15:40:23.571 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathInvit               ationInfoMapper.selectByOpenId
+2021-02-22 15:40:23.593 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathInvit               ationInfoMapper.selectAmountInfo
+2021-02-22 15:40:23.597 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathInvit               ationInfoMapper.updateOrderNo
+2021-02-22 15:40:23.598 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathInvit               ationInfoMapper.updateDelete
+2021-02-22 15:40:23.598 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathInvit               ationInfoMapper.updatePerson
+2021-02-22 15:40:23.600 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathInvit               ationInfoMapper.addInvitationInfo
+2021-02-22 15:40:23.600 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathInvit               ationInfoMapper.selectByOrderNo
+2021-02-22 15:40:23.600 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathInvit               ationInfoMapper.updateInvitationInfo
+2021-02-22 15:40:23.601 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathInvit               ationInfoMapper.selectByInvit
+2021-02-22 15:40:23.649 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCapit               alMapper.selectByOpenId
+2021-02-22 15:40:23.649 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCapit               alMapper.selectLogByStatus
+2021-02-22 15:40:23.650 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCapit               alMapper.selectLogByOpenId
+2021-02-22 15:40:23.651 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCapit               alMapper.addCapitalLog
+2021-02-22 15:40:23.652 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCapit               alMapper.addCapitalInfo
+2021-02-22 15:40:23.653 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCapit               alMapper.updateCapitalInfo
+2021-02-22 15:40:23.699 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSyste               mResourcesMapper.selectById
+2021-02-22 15:40:23.700 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSyste               mResourcesMapper.selectFirstAll
+2021-02-22 15:40:23.701 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSyste               mResourcesMapper.selectActiveAdministrationInfoById
+2021-02-22 15:40:23.703 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSyste               mResourcesMapper.selectNewInfo
+2021-02-22 15:40:23.728 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCoupo               nMapper.selectById
+2021-02-22 15:40:23.730 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCoupo               nMapper.addCouponTemplate
+2021-02-22 15:40:23.731 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCoupo               nMapper.selectCouponByOpenId
+2021-02-22 15:40:23.746 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCoupo               nMapper.selectCouponByCourseId
+2021-02-22 15:40:23.747 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCoupo               nMapper.selectRelationByTemplateId
+2021-02-22 15:40:23.748 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCoupo               nMapper.updateIsUsed
+2021-02-22 15:40:23.748 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCoupo               nMapper.updateEnable
+2021-02-22 15:40:23.749 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCoupo               nMapper.updateDeleteRelation
+2021-02-22 15:40:23.750 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCoupo               nMapper.addTemplateCourseId
+2021-02-22 15:40:23.751 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCoupo               nMapper.selectCouponById
+2021-02-22 15:40:23.790 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCdkMa               pper.selectById
+2021-02-22 15:40:23.792 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCdkMa               pper.addCdkBatch
+2021-02-22 15:40:23.793 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCdkMa               pper.selectCdkById
+2021-02-22 15:40:23.793 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCdkMa               pper.selectBatchById
+2021-02-22 15:40:23.794 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCdkMa               pper.selectTemplateByCdk
+2021-02-22 15:40:23.794 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCdkMa               pper.checkCdk
+2021-02-22 15:40:23.796 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCdkMa               pper.updateCdkInfo
+2021-02-22 15:40:23.797 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCdkMa               pper.addCouponInfo
+2021-02-22 15:40:23.798 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCdkMa               pper.addCdkTemplate
+2021-02-22 15:40:23.822 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCdkMa               pper.addCdkList
+2021-02-22 15:40:24.158 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               CourseMapper.selectInfoById
+2021-02-22 15:40:24.158 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               CourseMapper.selectByCourseId
+2021-02-22 15:40:24.204 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               AdministrationMapper.selectByCourseIdAndtype
+2021-02-22 15:40:24.205 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               AdministrationMapper.selectById
+2021-02-22 15:40:24.206 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               AdministrationMapper.selectByCampId
+2021-02-22 15:40:24.208 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               AdministrationMapper.addAdministrationInfo
+2021-02-22 15:40:24.250 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.selectOrderInfo
+2021-02-22 15:40:24.250 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.selectForPay
+2021-02-22 15:40:24.253 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.selectByCampId
+2021-02-22 15:40:24.254 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.selectInfoByGroupNo2
+2021-02-22 15:40:24.254 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.updateOrderNo
+2021-02-22 15:40:24.257 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.addGroupInfo
+2021-02-22 15:40:24.276 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.addOrderInfo
+2021-02-22 15:40:24.277 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.updateOrderInfo
+2021-02-22 15:40:24.279 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.updateGroupInfo
+2021-02-22 15:40:24.280 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.selectByOrderId
+2021-02-22 15:40:24.280 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.selectByGroupId
+2021-02-22 15:40:24.280 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.selectByPay
+2021-02-22 15:40:24.281 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.updateOrderActualAmount
+2021-02-22 15:40:24.281 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.selectByadministrationId
+2021-02-22 15:40:24.281 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               OrderInfoMapper.selectByOrderStates
+2021-02-22 15:40:24.340 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               LearningRecordsMapper.selectByOpenId
+2021-02-22 15:40:24.341 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               LearningRecordsMapper.selectById
+2021-02-22 15:40:24.343 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               LearningRecordsMapper.saveLearningRecords
+2021-02-22 15:40:24.345 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               LearningRecordsMapper.selectScheduleInfo
+2021-02-22 15:40:24.346 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               LearningRecordsMapper.updateMax
+2021-02-22 15:40:24.348 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               LearningRecordsMapper.saveSchedule
+2021-02-22 15:40:24.348 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               LearningRecordsMapper.selectStatisticsByOpenId
+2021-02-22 15:40:24.366 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               LearningRecordsMapper.saveStatistics
+2021-02-22 15:40:24.396 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.selectByOpenId
+2021-02-22 15:40:24.396 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.selectByCode
+2021-02-22 15:40:24.397 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.selectByOpen
+2021-02-22 15:40:24.398 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.addLoginInfo
+2021-02-22 15:40:24.399 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.updateLoginInfo
+2021-02-22 15:40:24.417 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.saveUserInfo
+2021-02-22 15:40:24.419 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.updateUserInfo
+2021-02-22 15:40:24.421 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.addActionInfo
+2021-02-22 15:40:24.422 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.selectByPhone
+2021-02-22 15:40:24.424 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.updateUserPhone
+2021-02-22 15:40:24.424 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.UserInfoMapp               er.queryShareInfo
+2021-02-22 15:40:27.140 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathQuery               ForPCMapper.selectUserList
+2021-02-22 15:40:27.142 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathQuery               ForPCMapper.selectLearnList
+2021-02-22 15:40:27.174 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathQuery               ForPCMapper.selectCorrectRate
+2021-02-22 15:40:27.178 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathQuery               ForPCMapper.selectOrderList
+2021-02-22 15:40:27.181 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathQuery               ForPCMapper.selectHoneyList
+2021-02-22 15:40:27.202 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathQuery               ForPCMapper.selectGroupList
+2021-02-22 15:40:27.208 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathQuery               ForPCMapper.selectInvitationList
+2021-02-22 15:40:27.227 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathQuery               ForPCMapper.selectStatisticsList
+2021-02-22 15:40:27.267 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCours               eMapper.selectInfoById
+2021-02-22 15:40:27.268 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCours               eMapper.selectById
+2021-02-22 15:40:27.269 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCours               eMapper.selectCoursePosterInfo
+2021-02-22 15:40:27.269 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathCours               eMapper.selectAll
+2021-02-22 15:40:27.346 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathLearn               ingRecordsMapper.selectByOpenId
+2021-02-22 15:40:27.348 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathLearn               ingRecordsMapper.saveLearningRecords
+2021-02-22 15:40:27.380 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSched               uleMapper.selectByOpenId
+2021-02-22 15:40:27.382 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSched               uleMapper.selectScheduleInfo
+2021-02-22 15:40:27.383 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSched               uleMapper.updateMax
+2021-02-22 15:40:27.383 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSched               uleMapper.saveSchedule
+2021-02-22 15:40:27.412 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathHoney               InfoMapper.saveHoneyInfo
+2021-02-22 15:40:27.439 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathHoney               InfoMapper.selectByOpenId
+2021-02-22 15:40:27.469 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathHoney               Mapper.updateHoney
+2021-02-22 15:40:27.471 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathHoney               Mapper.saveHoney
+2021-02-22 15:40:27.471 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathHoney               Mapper.selectByOpenId
+2021-02-22 15:40:27.509 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSecti               onMapper.selectByCourseId
+2021-02-22 15:40:27.510 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSecti               onMapper.selectById
+2021-02-22 15:40:27.510 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSecti               onMapper.selectTypes
+2021-02-22 15:40:27.511 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathSecti               onMapper.getExperienceLessonInfoById
+2021-02-22 15:40:27.536 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathStati               sticsMapper.selectByOpenId
+2021-02-22 15:40:27.539 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathStati               sticsMapper.saveStatistics
+2021-02-22 15:40:27.573 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathFeedb               ackMapper.addBackInfo
+2021-02-22 15:40:27.664 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectOrderInfo
+2021-02-22 15:40:27.665 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectForPay
+2021-02-22 15:40:27.665 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectByPayStatus
+2021-02-22 15:40:27.666 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectInfoByGroupNo2
+2021-02-22 15:40:27.666 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.updateOrderNo
+2021-02-22 15:40:27.668 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.addGroupInfo
+2021-02-22 15:40:27.669 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.addOrderInfo
+2021-02-22 15:40:27.669 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectInfoByGroupNo
+2021-02-22 15:40:27.670 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.updateOrderInfo
+2021-02-22 15:40:27.671 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.updateGroupInfo
+2021-02-22 15:40:27.672 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.updateGroupErr
+2021-02-22 15:40:27.672 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.updateOrderInfoErr
+2021-02-22 15:40:27.673 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.updateOrderStatusT
+2021-02-22 15:40:27.673 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.updateOrderStatusF
+2021-02-22 15:40:27.673 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectByGroup
+2021-02-22 15:40:27.687 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectPayOrder
+2021-02-22 15:40:27.688 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectByOrderId
+2021-02-22 15:40:27.689 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectByStatus
+2021-02-22 15:40:27.689 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectForOrderList
+2021-02-22 15:40:27.689 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectOrderByGroupId
+2021-02-22 15:40:27.689 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectOvertimeGroupInfo
+2021-02-22 15:40:27.690 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectInfoByGroupId
+2021-02-22 15:40:27.690 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.discardOrder
+2021-02-22 15:40:27.690 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.discardInvit
+2021-02-22 15:40:27.691 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.discardGroup
+2021-02-22 15:40:27.691 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectGroupOrder
+2021-02-22 15:40:27.691 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.countInvtationOrder
+2021-02-22 15:40:27.691 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectUnlock
+2021-02-22 15:40:27.692 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.queryForMyCourse
+2021-02-22 15:40:27.692 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectByGroupId
+2021-02-22 15:40:27.692 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectByPay
+2021-02-22 15:40:27.692 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectOrderByAdministrationId
+2021-02-22 15:40:27.693 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectForRobot
+2021-02-22 15:40:27.693 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectByOldOrderId
+2021-02-22 15:40:27.693 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectGroupByAdministrationId
+2021-02-22 15:40:27.694 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.updateOrderActualAmount
+2021-02-22 15:40:27.694 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectOrderInfoByGroupId
+2021-02-22 15:40:27.694 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.getOrderInfoByOrderNo
+2021-02-22 15:40:27.695 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.updateOrderOfWXBill
+2021-02-22 15:40:27.696 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathOrder               InfoMapper.selectByOrderStatus
+2021-02-22 15:40:27.754 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathGroup               AdministrationMapper.selectByCourseIdAndtype
+2021-02-22 15:40:27.755 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathGroup               AdministrationMapper.selectByCourseId
+2021-02-22 15:40:27.755 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathGroup               AdministrationMapper.selectById
+2021-02-22 15:40:27.756 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathGroup               AdministrationMapper.selectByGroupNum
+2021-02-22 15:40:27.764 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathTrans               actionInfoMapper.selectByPayStatus
+2021-02-22 15:40:27.784 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathTrans               actionInfoMapper.selectInvitationInfo
+2021-02-22 15:40:27.785 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathTrans               actionInfoMapper.selectOrderByGroupId
+2021-02-22 15:40:27.786 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathTrans               actionInfoMapper.selectByGroupId
+2021-02-22 15:40:27.938 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathUserI               nfoMapper.selectByOpenId
+2021-02-22 15:40:27.939 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathUserI               nfoMapper.selectAllScheduleByOpenId
+2021-02-22 15:40:27.940 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathUserI               nfoMapper.updateBabyInfo
+2021-02-22 15:40:27.941 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathUserI               nfoMapper.selectPageInfoByOpenId
+2021-02-22 15:40:27.961 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathUserI               nfoMapper.selectProgressByOpenId
+2021-02-22 15:40:27.962 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathUserI               nfoMapper.queryUserDate1
+2021-02-22 15:40:27.971 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathPoste               rMapper.selectInfo
+2021-02-22 15:40:27.986 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathPoste               rMapper.selectPosterInfo
+2021-02-22 15:40:27.987 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathPoste               rMapper.selectPosterInfoByType
+2021-02-22 15:40:27.987 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathPoste               rMapper.addPosterInfo
+2021-02-22 15:40:27.987 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathPoste               rMapper.updatePosterInfo
+2021-02-22 15:40:27.988 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathPoste               rMapper.selectPosterInfoByCourse
+2021-02-22 15:40:28.042 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate1
+2021-02-22 15:40:28.043 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate2
+2021-02-22 15:40:28.043 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate3
+2021-02-22 15:40:28.044 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate4
+2021-02-22 15:40:28.044 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate5
+2021-02-22 15:40:28.044 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate6
+2021-02-22 15:40:28.045 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate7
+2021-02-22 15:40:28.045 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate13
+2021-02-22 15:40:28.045 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate8
+2021-02-22 15:40:28.061 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate9
+2021-02-22 15:40:28.062 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate10
+2021-02-22 15:40:28.062 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate12
+2021-02-22 15:40:28.062 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.selectByDate11
+2021-02-22 15:40:28.065 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.addData1
+2021-02-22 15:40:28.169 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.addData2
+2021-02-22 15:40:28.187 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.addData3
+2021-02-22 15:40:28.191 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.addData4
+2021-02-22 15:40:28.217 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathDataS               tatisticsMapper.addData5
+2021-02-22 15:40:28.376 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.camp.mapper.BeeCamp               CapitalMapper.addCapitalLog
+2021-02-22 15:40:28.478 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathActiv               eAdministrationMapper.selectInfoById
+2021-02-22 15:40:28.478 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathActiv               eAdministrationMapper.selectById
+2021-02-22 15:40:28.479 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathActiv               eAdministrationMapper.addCouponInfo
+2021-02-22 15:40:28.479 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathActiv               eAdministrationMapper.selectByIdAndType1
+2021-02-22 15:40:28.480 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathActiv               eAdministrationMapper.selectCourses
+2021-02-22 15:40:28.480 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathActiv               eAdministrationMapper.selectByIdAndType2
+2021-02-22 15:40:28.481 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathActiv               eAdministrationMapper.addActiveLog
+2021-02-22 15:40:28.482 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathActiv               eAdministrationMapper.selectLogById
+2021-02-22 15:40:28.482 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathActiv               eAdministrationMapper.updateSourceId
+2021-02-22 15:40:28.483 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathActiv               eAdministrationMapper.updateLogInfo
+2021-02-22 15:40:30.899 DEBUG [main] com.baomidou.mybatisplus.spring.boot.starter.MybatisPlusAutoConfiguration: No org.mybatis.spring.m               apper.MapperFactoryBean found.
+2021-02-22 15:40:30.904 DEBUG [main] com.baomidou.mybatisplus.MybatisConfiguration: addMappedStatement: com.tft.bee.mapper.BeeMathQuest               ionMapper.selectBySectionId
+2021-02-22 15:40:36.460 INFO  [main] com.tft.bee.WxBeeMathsServerApplication: Started WxBeeMathsServerApplication in 38.289 seconds (JV               M running for 40.201)
+2021-02-22 15:41:22.036 WARN  [http-nio-8050-exec-1] org.springframework.web.servlet.PageNotFound: No mapping found for HTTP request wi               th URI [/] in DispatcherServlet with name 'dispatcherServlet'
+2021-02-22 15:41:22.253 INFO  [http-nio-8050-exec-1] com.tft.bee.config.BeeInterceptor: 请求进入拦截器 request start url:http://192.168               .109.111:8050/error
+2021-02-22 15:41:22.260 INFO  [http-nio-8050-exec-1] com.tft.bee.config.BeeInterceptor: --------------------身份标识:null
+2021-02-22 15:42:12.054 WARN  [http-nio-8050-exec-2] org.springframework.web.servlet.PageNotFound: No mapping found for HTTP request with URI [/] in DispatcherServlet with name 'dispatcherServlet'
+2021-02-22 15:42:12.076 INFO  [http-nio-8050-exec-2] com.tft.bee.config.BeeInterceptor: 请求进入拦截器 request start url:http://192.168.109.111:8050/error
+2021-02-22 15:42:12.076 INFO  [http-nio-8050-exec-2] com.tft.bee.config.BeeInterceptor: --------------------身份标识:null
+2021-02-22 15:43:30.436 WARN  [http-nio-8050-exec-5] org.springframework.web.servlet.PageNotFound: No mapping found for HTTP request with URI [/] in DispatcherServlet with name 'dispatcherServlet'
+2021-02-22 15:43:30.459 INFO  [http-nio-8050-exec-5] com.tft.bee.config.BeeInterceptor: 请求进入拦截器 request start url:http://192.168.109.111:8050/error
+2021-02-22 15:43:30.460 INFO  [http-nio-8050-exec-5] com.tft.bee.config.BeeInterceptor: --------------------身份标识:null
+已杀死=====================================================
+
+
+
+
+
+
+
