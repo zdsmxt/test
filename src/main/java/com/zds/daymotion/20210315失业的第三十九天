@@ -1,0 +1,9 @@
+何以解忧 唯有攒技挣钱
+
+硬盘 到内存 内核 应用程序
+
+redis 的持久化
+mysql 的undo log
+mysql 的redo log
+
+页缓存
